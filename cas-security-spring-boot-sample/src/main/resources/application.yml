@@ -1,0 +1,10 @@
+security:
+  basic:
+    enabled: true
+  ignored: /ignored
+  cas:
+    server:
+      base-url: http://localhost:8080/cas/
+      protocol-version: 3
+    service:
+      resolution-mode: dynamic
