@@ -55,7 +55,7 @@ security:
 
 _dynamic_ resolution mode is a novel mode from that starter that will allow you to do not hard-code service url in your configuration. Thereby your configuration will be more portable and easy to use.
 
-**ATTENTION** _dynamic_ resolution mode use information from `HttpServletRequest` to build service url, that can be a security breach if you do not control headers like `Host` or `X-Forwarded-*` that why _dynamic_ resolution mode **is not the default mode** and you must activate it as describe on above properties.
+**ATTENTION** _dynamic_ resolution mode use information from `HttpServletRequest` to build service url, that can be a security breach if you do not control headers like `Host` or `X-Forwarded-*` that why _dynamic_ resolution mode **is not the default mode** and you must activate it as describe on below properties.
 
 ```yml
 security:
