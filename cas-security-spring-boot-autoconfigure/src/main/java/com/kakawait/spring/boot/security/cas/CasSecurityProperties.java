@@ -43,6 +43,8 @@ public class CasSecurityProperties {
     @Data
     public static class User {
         private String[] rolesAttributes = new String[0];
+
+        private String[] defaultRoles = new String[] { "USER" };
     }
 
     @Data
