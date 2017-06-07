@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
@@ -191,6 +192,7 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
+    @Order(SecurityProperties.BASIC_AUTH_ORDER - 1)
     static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         private final CasAuthenticationFilterConfigurer filterConfigurer = new CasAuthenticationFilterConfigurer();
