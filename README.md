@@ -91,7 +91,7 @@ The supported properties are:
 | `security.cas.server.protocol-version`      | `3`                            | Determine which CAS protocol version to be used, only protocol version 1, 2 or 3 is supported.                                                                                                                                                                     |
 | `security.cas.server.base-url`              |                                | The start of the CAS server url, i.e. https://localhost:8443/cas                                                                                                                                                                                                   |
 | `security.cas.server.paths.login`           | `/login`                       | Defines the location of the CAS server login path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                           |
-| `security.cas.server.paths.logout`           | `/logout`                      | Defines the location of the CAS server logout path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                          |
+| `security.cas.server.paths.logout`          | `/logout`                      | Defines the location of the CAS server logout path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                          |
 | `security.cas.service.resolution-mode`      | `static`                       | Resolution modes can be `static` or `dynamic`, by default is `static` and you must fill `security.cas.service.base-url` whereas in `dynamic` mode service url will be generated from receiving `HttpServletRequest`                                                |
 | `security.cas.service.base-url`             |                                | The name of the server this application is hosted on. Service URL will be dynamically constructed using this, i.e. https://localhost:8443 (you must include the protocol, but port is optional if it's a standard port).  Skipped if resolution mode is `dynamic`. |
 | `security.cas.service.paths.login`          | `/login`                       | Defines the application login path that will be append to the existing `security.cas.service.base-url` url                                                                                                                                                         |
@@ -111,6 +111,12 @@ public class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter
     public void configure(CasAuthenticationFilterConfigurer filter) {
         // Here you can configure CasAuthenticationFilter
     }
+    
+    @Override
+    public void configure(CasSingleSignOutFilterConfigurer filter) {
+        // Here you can configure SingleSignOutFilter
+    }
+
 
     @Override
     public void configure(CasAuthenticationProviderSecurityBuilder provider) {

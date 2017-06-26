@@ -5,6 +5,7 @@ import com.kakawait.security.cas.ProxyCallbackAndServiceAuthenticationDetailsSou
 import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
 import lombok.Getter;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
+import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
@@ -32,7 +33,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -197,6 +200,9 @@ public class CasSecurityAutoConfiguration {
 
         private final CasAuthenticationFilterConfigurer filterConfigurer = new CasAuthenticationFilterConfigurer();
 
+        private final CasSingleSignOutFilterConfigurer singleSignOutFilterConfigurer =
+                new CasSingleSignOutFilterConfigurer();
+
         private final CasAuthenticationProviderSecurityBuilder providerBuilder =
                 new CasAuthenticationProviderSecurityBuilder();
 
@@ -231,6 +237,7 @@ public class CasSecurityAutoConfiguration {
         private void init() {
             configurers.forEach(c -> {
                 c.configure(filterConfigurer);
+                c.configure(singleSignOutFilterConfigurer);
                 c.configure(providerBuilder);
             });
         }
@@ -242,12 +249,16 @@ public class CasSecurityAutoConfiguration {
             filter.setAuthenticationManager(authenticationManager());
             filter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(paths.getLogin()));
 
+            SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
+            singleSignOutFilterConfigurer.configure(singleSignOutFilter);
+
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
                 http.authorizeRequests().antMatchers(paths).authenticated()
                     .and()
                     .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .and()
+                    .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
                     .addFilter(filter);
                 if (securityProperties.getBasic().isEnabled()) {
                     BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);

@@ -10,6 +10,10 @@ public abstract class CasSecurityConfigurerAdapter implements CasSecurityConfigu
     }
 
     @Override
+    public void configure(CasSingleSignOutFilterConfigurer filter) {
+    }
+
+    @Override
     public void configure(CasAuthenticationProviderSecurityBuilder provider) {
     }
 
