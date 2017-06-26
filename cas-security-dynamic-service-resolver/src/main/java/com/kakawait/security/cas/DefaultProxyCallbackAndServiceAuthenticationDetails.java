@@ -21,6 +21,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetails
 
     @Override
     public String getProxyCallbackUrl() {
+        if (proxyCallbackPath == null) {
+            return null;
+        }
         String path = context.getContextPath() + proxyCallbackPath;
         return UrlUtils.buildFullRequestUrl(context.getScheme(), context.getServerName(),
                 context.getServerPort(), path, null);

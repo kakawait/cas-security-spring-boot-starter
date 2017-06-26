@@ -31,9 +31,9 @@ public class CasTicketValidatorConfiguration {
         Cas20ServiceTicketValidator ticketValidator = new Cas30ProxyTicketValidator(
                 casSecurityProperties.getServer().getBaseUrl().toASCIIString());
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
-        if (casSecurityProperties.getService().isProxyCallbackEnabled()) {
-            ticketValidator.setProxyCallbackUrl(
-                    buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getProxyCallback()));
+        String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
+        if (proxyCallback != null) {
+            ticketValidator.setProxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
         }
         return ticketValidator;
     }
@@ -44,9 +44,9 @@ public class CasTicketValidatorConfiguration {
         Cas20ServiceTicketValidator ticketValidator = new Cas20ProxyTicketValidator(
                 casSecurityProperties.getServer().getBaseUrl().toASCIIString());
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
-        if (casSecurityProperties.getService().isProxyCallbackEnabled()) {
-            ticketValidator.setProxyCallbackUrl(
-                    buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getProxyCallback()));
+        String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
+        if (proxyCallback != null) {
+            ticketValidator.setProxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
         }
         return ticketValidator;
     }
