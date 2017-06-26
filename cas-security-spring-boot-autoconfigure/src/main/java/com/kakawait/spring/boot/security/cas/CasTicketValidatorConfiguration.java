@@ -7,12 +7,11 @@ import org.jasig.cas.client.validation.Cas30ProxyTicketValidator;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.cas.ServiceProperties;
 
 import java.net.URI;
+
+import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.buildUrl;
 
 /**
  * @author Thibaud Leprêtre
@@ -31,7 +30,11 @@ public class CasTicketValidatorConfiguration {
     TicketValidator cas30ProxyTicketValidator() {
         Cas20ServiceTicketValidator ticketValidator = new Cas30ProxyTicketValidator(
                 casSecurityProperties.getServer().getBaseUrl().toASCIIString());
-        ticketValidator.setProxyCallbackUrl(casSecurityProperties.getService().getPaths().getProxyCallback());
+        URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+        if (casSecurityProperties.getService().isProxyCallbackEnabled()) {
+            ticketValidator.setProxyCallbackUrl(
+                    buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getProxyCallback()));
+        }
         return ticketValidator;
     }
 
@@ -40,7 +43,11 @@ public class CasTicketValidatorConfiguration {
     TicketValidator cas20ProxyTicketValidator() {
         Cas20ServiceTicketValidator ticketValidator = new Cas20ProxyTicketValidator(
                 casSecurityProperties.getServer().getBaseUrl().toASCIIString());
-        ticketValidator.setProxyCallbackUrl(casSecurityProperties.getService().getPaths().getProxyCallback());
+        URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+        if (casSecurityProperties.getService().isProxyCallbackEnabled()) {
+            ticketValidator.setProxyCallbackUrl(
+                    buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getProxyCallback()));
+        }
         return ticketValidator;
     }
 

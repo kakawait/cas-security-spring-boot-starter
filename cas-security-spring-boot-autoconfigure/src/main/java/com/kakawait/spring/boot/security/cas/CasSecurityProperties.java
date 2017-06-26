@@ -93,6 +93,13 @@ public class CasSecurityProperties {
         private ServiceResolutionMode resolutionMode = ServiceResolutionMode.STATIC;
 
         /**
+         * Determine if proxy callback url should be set inside
+         * {@link org.jasig.cas.client.validation.Cas20ServiceTicketValidator#setProxyCallbackUrl(String)} and thus
+         * activating pgt callback.
+         */
+        private boolean ProxyCallbackEnabled = true;
+
+        /**
          * CAS Service base url (your application base url)
          */
         private URI baseUrl;
@@ -128,4 +135,5 @@ public class CasSecurityProperties {
         STATIC,
         DYNAMIC
     }
+
 }
