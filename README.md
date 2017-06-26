@@ -120,7 +120,6 @@ public class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter
         // Here you can configure SingleSignOutFilter
     }
 
-
     @Override
     public void configure(CasAuthenticationProviderSecurityBuilder provider) {
         // Here  you can configure CasAuthenticationProvider
