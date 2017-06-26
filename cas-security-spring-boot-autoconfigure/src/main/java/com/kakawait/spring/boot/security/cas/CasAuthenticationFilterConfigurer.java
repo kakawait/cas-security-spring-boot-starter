@@ -22,13 +22,12 @@ public class CasAuthenticationFilterConfigurer {
     private AuthenticationFailureHandler proxyAuthenticationFailureHandler;
 
     @NonNull
-    private String proxyReceptorUrl;
-
-    @NonNull
     private ProxyGrantingTicketStorage proxyGrantingTicketStorage;
 
     @NonNull
     private ServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource;
+
+    private String proxyReceptorUrl;
 
     void configure(CasAuthenticationFilter filter) {
         if (authenticationFailureHandler != null) {

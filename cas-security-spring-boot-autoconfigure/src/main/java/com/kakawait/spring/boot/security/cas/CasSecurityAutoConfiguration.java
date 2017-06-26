@@ -4,6 +4,7 @@ import com.kakawait.security.cas.LaxServiceProperties;
 import com.kakawait.security.cas.ProxyCallbackAndServiceAuthenticationDetailsSource;
 import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
@@ -304,7 +305,7 @@ public class CasSecurityAutoConfiguration {
         static class ServerInstanceProperty {}
     }
 
-    static String buildUrl(URI baseUrl, String path) {
+    static String buildUrl(URI baseUrl, @NonNull String path) {
         if (baseUrl != null) {
             return UriComponentsBuilder
                     .fromUri(baseUrl)
