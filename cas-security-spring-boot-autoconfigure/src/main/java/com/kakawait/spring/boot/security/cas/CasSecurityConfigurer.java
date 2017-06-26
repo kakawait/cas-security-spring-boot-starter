@@ -8,4 +8,6 @@ public interface CasSecurityConfigurer {
     void configure(CasAuthenticationFilterConfigurer filter);
 
     void configure(CasAuthenticationProviderSecurityBuilder provider);
+
+    void configure(CasSingleSignOutFilterConfigurer filter);
 }
