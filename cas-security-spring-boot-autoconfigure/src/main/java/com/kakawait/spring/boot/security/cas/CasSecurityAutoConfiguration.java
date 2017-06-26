@@ -74,13 +74,7 @@ public class CasSecurityAutoConfiguration {
         ServiceProperties serviceProperties = new ServiceProperties();
 
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
-        if (baseUrl != null) {
-            String clientLoginUrl = UriComponentsBuilder
-                    .fromUri(baseUrl)
-                    .path(casSecurityProperties.getService().getPaths().getLogin())
-                    .toUriString();
-            serviceProperties.setService(clientLoginUrl);
-        }
+        serviceProperties.setService(buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getLogin()));
         return serviceProperties;
     }
 
@@ -308,6 +302,16 @@ public class CasSecurityAutoConfiguration {
 
         @ConditionalOnProperty(value = "security.cas.server.base-url")
         static class ServerInstanceProperty {}
+    }
+
+    static String buildUrl(URI baseUrl, String path) {
+        if (baseUrl != null) {
+            return UriComponentsBuilder
+                    .fromUri(baseUrl)
+                    .path(path)
+                    .toUriString();
+        }
+        return path;
     }
 
 }
