@@ -1,15 +1,26 @@
 package com.kakawait;
 
+import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
+import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 
@@ -30,6 +41,52 @@ public class CasSecuritySpringBootSampleApplication {
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return filterRegBean;
     }
+
+    @Configuration
+    static class CasLogoutConfiguration extends CasSecurityConfigurerAdapter {
+        @Override
+        public void init(HttpSecurity http) throws Exception {
+            // Allow GET method to /logout even if CSRF is enabled
+            http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+        }
+    }
+
+    @Profile("custom-logout")
+    @Configuration
+    static class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
+        private final CasSecurityProperties casSecurityProperties;
+
+        public CasCustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
+            this.casSecurityProperties = casSecurityProperties;
+        }
+
+        @Override
+        public void init(HttpSecurity http) throws Exception {
+            http.logout().logoutSuccessUrl("/logout.html").logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            String logoutUrl = UriComponentsBuilder
+                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
+                    .path(casSecurityProperties.getServer().getPaths().getLogout())
+                    .toUriString();
+            LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+            filter.setFilterProcessesUrl("/cas/logout");
+            http.addFilterBefore(filter, LogoutFilter.class);
+        }
+    }
+
+    @Profile("custom-logout")
+    @Configuration
+    static class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+        @Override
+        public void addViewControllers(ViewControllerRegistry registry) {
+            registry.addViewController("/logout.html").setViewName("logout");
+            registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        }
+    }
+
 
     @RestController
     @RequestMapping(value = "/")

@@ -72,7 +72,7 @@ public class CasSecurityProperties {
         private Paths paths = new Paths();
 
         @Data
-        static class Paths {
+        public static class Paths {
             /**
              * CAS Server login path that will be append to {@link Server#baseUrl}
              *

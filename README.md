@@ -109,7 +109,7 @@ If you need to set additional configuration options simply register within Sprin
 
 ```java
 @Configuration
-public class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
+class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
     @Override
     public void configure(CasAuthenticationFilterConfigurer filter) {
         // Here you can configure CasAuthenticationFilter
@@ -124,10 +124,89 @@ public class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter
     public void configure(CasAuthenticationProviderSecurityBuilder provider) {
         // Here  you can configure CasAuthenticationProvider
     }
+    
+    @Override
+    public void init(HttpSecurity http) throws Exception {
+        // Here you can configure Spring Security HttpSecurity object during init process
+    }
+    
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        // Here you can configure Spring Security HttpSecurity object during init configure
+    }
 }
 ```
 
 Otherwise every beans defined in that starter are annotated with `@ConditionOnMissingBean` thus you can override default bean definitions.
+
+## Logout & SLO
+
+By default starter will configure both _logout_ and _single logout (SLO)_.
+
+**ATTENTION** default _logout_ (on `/logout`) behavior will:
+ 
+1. Logout from application and also logout from CAS server that will logout any other applications.
+2. Keep default Spring security behavior concerning _CSRF_ and _logging out_ to summarize if _CSRF_ is enabled logout will only mapped on `POST`, see https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#csrf-logout for more details 
+
+If you want to change those behaviors, for example by adding a logout page that will propose user to logout from other application, you may configure like following:
+
+```java
+@Configuration
+class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
+    private final CasSecurityProperties casSecurityProperties;
+
+    public CasCustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
+        this.casSecurityProperties = casSecurityProperties;
+    }
+
+    @Override
+    public void init(HttpSecurity http) throws Exception {
+        http.logout()
+            .logoutSuccessUrl("/logout.html")
+            // Allow GET method on `/logout` even if CSRF is enabled
+            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+    }
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        String logoutUrl = UriComponentsBuilder
+                .fromUri(casSecurityProperties.getServer().getBaseUrl())
+                .path(casSecurityProperties.getServer().getPaths().getLogout())
+                .toUriString();
+        LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+        filter.setFilterProcessesUrl("/cas/logout");
+        http.addFilterBefore(filter, LogoutFilter.class);
+    }
+}
+
+@Configuration
+class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/logout.html").setViewName("logout");
+        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    }
+}
+```
+
+With possible `logout.html` like following
+ 
+ ```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Logout page</title>
+</head>
+<body>
+    <h2>Do you want to log out of CAS?</h2>
+    <p>You have logged out of this application, but may still have an active single-sign on session with CAS.</p>
+    <p><a href="/cas/logout" th:href="@{/cas/logout}">Logout of CAS</a></p>
+</body>
+</html>
+```
+
+You can checkout & run sample module [`cas-security-spring-boot-sample`](https://github.com/kakawait/cas-security-spring-boot-starter/tree/master/cas-security-spring-boot-sample) with _profile_ `custom-logout`.
 
 ## License
 
