@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -255,6 +256,14 @@ public class CasSecurityAutoConfiguration {
 
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
+
+            if (securityProperties.isRequireSsl()) {
+                http.requiresChannel().anyRequest().requiresSecure();
+            }
+            if (!securityProperties.isEnableCsrf()) {
+                http.csrf().disable();
+            }
+            SpringBootWebSecurityConfiguration.configureHeaders(http.headers(), securityProperties.getHeaders());
 
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
