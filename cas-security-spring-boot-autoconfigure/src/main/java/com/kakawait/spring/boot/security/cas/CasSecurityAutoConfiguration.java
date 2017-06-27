@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
@@ -34,7 +35,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -155,6 +155,7 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     static class DefaultCasSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {
 
         private final CasSecurityProperties casSecurityProperties;
@@ -187,6 +188,14 @@ public class CasSecurityAutoConfiguration {
             filter.proxyReceptorUrl(casSecurityProperties.getService().getPaths().getProxyCallback())
                   .serviceAuthenticationDetailsSource(authenticationDetailsSource)
                   .proxyGrantingTicketStorage(new ProxyGrantingTicketStorageImpl());
+        }
+
+        @Override
+        public void init(HttpSecurity http) throws Exception {
+            CasSecurityProperties.Server serverProperties = casSecurityProperties.getServer();
+            http.logout()
+                .permitAll()
+                .logoutSuccessUrl(buildUrl(serverProperties.getBaseUrl(), serverProperties.getPaths().getLogout()));
         }
     }
 
@@ -266,6 +275,9 @@ public class CasSecurityAutoConfiguration {
                 } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
                     http.authorizeRequests().anyRequest().authenticated();
                 }
+            }
+            for (CasSecurityConfigurer configurer : configurers) {
+                http.apply(configurer);
             }
         }
 
