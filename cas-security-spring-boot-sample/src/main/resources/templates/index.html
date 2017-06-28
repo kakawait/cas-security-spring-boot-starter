@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Index page</title>
+</head>
+<body>
+<h2 th:text="${username} ? 'Hello, ' + ${username} + '!' : 'Hello world!'">Hello world!</h2>
+</body>
+</html>

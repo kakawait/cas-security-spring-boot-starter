@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -87,19 +90,31 @@ public class CasSecuritySpringBootSampleApplication {
         }
     }
 
+    @Controller
+    @RequestMapping(value = "/")
+    static class IndexController {
+
+        @RequestMapping
+        public String hello(Principal principal, Model model) {
+            if (StringUtils.hasText(principal.getName())) {
+                model.addAttribute("username", principal.getName());
+            }
+            return "index";
+        }
+
+        @RequestMapping(path = "/ignored")
+        public String ignored() {
+            return "index";
+        }
+    }
 
     @RestController
-    @RequestMapping(value = "/")
+    @RequestMapping(value = "/api")
     static class HelloWorldController {
 
         @GetMapping
         public @ResponseBody String hello(Principal principal) {
             return principal == null ? "Hello anonymous" : "Hello " + principal.getName();
-        }
-
-        @GetMapping(path = "/ignored")
-        public @ResponseBody String ignored() {
-            return "Hello world!";
         }
     }
 
