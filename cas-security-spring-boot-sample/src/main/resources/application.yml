@@ -1,7 +1,7 @@
 security:
   basic:
     enabled: true
-  ignored: /ignored
+  ignored: /ignored, /**/favicon.ico
   cas:
     server:
       base-url: http://localhost:8080/cas/

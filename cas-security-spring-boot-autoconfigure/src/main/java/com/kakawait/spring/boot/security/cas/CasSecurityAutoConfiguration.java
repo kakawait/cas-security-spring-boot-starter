@@ -36,9 +36,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -250,9 +253,10 @@ public class CasSecurityAutoConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             CasAuthenticationFilter filter = new CasAuthenticationFilter();
-            filterConfigurer.configure(filter);
             filter.setAuthenticationManager(authenticationManager());
-            filter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(paths.getLogin()));
+            filter.setRequiresAuthenticationRequestMatcher(getRequestMatcher(serviceProperties));
+            filter.setAuthenticationSuccessHandler(getAuthenticationSuccessHandler(serviceProperties));
+            filterConfigurer.configure(filter);
 
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
@@ -295,6 +299,18 @@ public class CasSecurityAutoConfiguration {
             CasAuthenticationProvider provider = providerBuilder.build();
             provider.setServiceProperties(serviceProperties);
             auth.authenticationProvider(provider);
+        }
+
+        private AuthenticationSuccessHandler getAuthenticationSuccessHandler(ServiceProperties serviceProperties) {
+            CasAuthenticationSuccessHandler authenticationSuccessHandler =
+                    new CasAuthenticationSuccessHandler(serviceProperties.getArtifactParameter());
+            authenticationSuccessHandler.setUseReferer(true);
+            return authenticationSuccessHandler;
+        }
+
+        private RequestMatcher getRequestMatcher(ServiceProperties serviceProperties) {
+            return new OrRequestMatcher(new AntPathRequestMatcher(paths.getLogin()),
+                    request -> request.getParameter(serviceProperties.getArtifactParameter()) != null);
         }
 
         private String[] getSecurePaths() {
