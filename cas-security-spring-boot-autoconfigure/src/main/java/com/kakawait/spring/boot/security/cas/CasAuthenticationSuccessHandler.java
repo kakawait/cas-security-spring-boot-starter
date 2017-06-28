@@ -1,7 +1,7 @@
 package com.kakawait.spring.boot.security.cas;
 
 import lombok.NonNull;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Thibaud Leprêtre
  */
-class CasAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final String ticketParameterName;
 

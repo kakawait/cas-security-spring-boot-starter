@@ -302,10 +302,7 @@ public class CasSecurityAutoConfiguration {
         }
 
         private AuthenticationSuccessHandler getAuthenticationSuccessHandler(ServiceProperties serviceProperties) {
-            CasAuthenticationSuccessHandler authenticationSuccessHandler =
-                    new CasAuthenticationSuccessHandler(serviceProperties.getArtifactParameter());
-            authenticationSuccessHandler.setUseReferer(true);
-            return authenticationSuccessHandler;
+            return new CasAuthenticationSuccessHandler(serviceProperties.getArtifactParameter());
         }
 
         private RequestMatcher getRequestMatcher(ServiceProperties serviceProperties) {
