@@ -128,11 +128,6 @@ class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
     }
     
     @Override
-    public void init(HttpSecurity http) throws Exception {
-        // Here you can configure Spring Security HttpSecurity object during init process
-    }
-    
-    @Override
     public void configure(HttpSecurity http) throws Exception {
         // Here you can configure Spring Security HttpSecurity object during init configure
     }
