@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.constraints.Max;
@@ -39,6 +41,8 @@ public class CasSecurityProperties {
      * Security authorize mode to apply.
      */
     private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.ROLE;
+
+    private ProxyValidation proxyValidation = new ProxyValidation();
 
     @Data
     public static class User {
@@ -122,6 +126,14 @@ public class CasSecurityProperties {
             private String proxyCallback;
         }
 
+    }
+
+    @Data
+    public static class ProxyValidation {
+
+        private boolean enabled = true;
+
+        private List<List<String>> chains = new ArrayList<>();
     }
 
     public enum ServiceResolutionMode {
