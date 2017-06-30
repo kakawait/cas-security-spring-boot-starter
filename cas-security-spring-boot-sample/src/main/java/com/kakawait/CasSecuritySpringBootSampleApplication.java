@@ -1,15 +1,18 @@
 package com.kakawait;
 
+import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -45,31 +48,41 @@ public class CasSecuritySpringBootSampleApplication {
         return filterRegBean;
     }
 
+    @Profile("!custom-logout")
     @Configuration
-    static class CasLogoutConfiguration extends CasSecurityConfigurerAdapter {
+    static class LogoutConfiguration extends CasSecurityConfigurerAdapter {
         @Override
-        public void init(HttpSecurity http) throws Exception {
+        public void configure(HttpSecurity http) throws Exception {
             // Allow GET method to /logout even if CSRF is enabled
             http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
         }
     }
 
+    @Configuration
+    static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.antMatcher("/api/**").authorizeRequests().anyRequest().authenticated();
+            // Applying CAS security on current HttpSecurity (FilterChain)
+            // I'm not using .apply() from HttpSecurity due to following issue
+            // https://github.com/spring-projects/spring-security/issues/4422
+            CasHttpSecurityConfigurer.cas().configure(http);
+            http.exceptionHandling().authenticationEntryPoint(new Http401AuthenticationEntryPoint("CAS"));
+        }
+    }
+
     @Profile("custom-logout")
     @Configuration
-    static class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
+    static class CustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
         private final CasSecurityProperties casSecurityProperties;
 
-        public CasCustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
+        public CustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
             this.casSecurityProperties = casSecurityProperties;
         }
 
         @Override
-        public void init(HttpSecurity http) throws Exception {
-            http.logout().logoutSuccessUrl("/logout.html").logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-        }
-
-        @Override
         public void configure(HttpSecurity http) throws Exception {
+            http.logout().permitAll().logoutSuccessUrl("/logout.html").logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
             String logoutUrl = UriComponentsBuilder
                     .fromUri(casSecurityProperties.getServer().getBaseUrl())
                     .path(casSecurityProperties.getServer().getPaths().getLogout())
