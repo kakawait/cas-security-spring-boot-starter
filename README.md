@@ -91,6 +91,8 @@ The supported properties are:
 | `security.cas.paths`                        | `/**`                          | Comma-separated list of paths to secure (work as same way as `security.basic.path`)                                                                                                                                                                                |
 | `security.cas.user.default-roles`           | `USER`                         | Comma-separated list of default user roles. If roles have been found from `security.cas.user.roles-attributes` default roles will be append to the list of users roles                                                                                             |
 | `security.cas.user.roles-attributes`        |                                | Comma-separated list of CAS attributes to be used to determine user roles                                                                                                                                                                                          |
+| `security.cas.proxy-validation.enabled`     | `true`                         | Defines if proxy should be checked again chains `security.cas.proxy-validation.chains`                                                                                                                                                                             |
+| `security.cas.proxy-validation.chains`      |                                | Defines proxy chains. Each acceptable proxy chain should include a comma-separated list of URLs (for exact match) or regular expressions of URLs (starting by the ^ character)                                                                                     |
 | `security.cas.server.protocol-version`      | `3`                            | Determine which CAS protocol version to be used, only protocol version 1, 2 or 3 is supported.                                                                                                                                                                     |
 | `security.cas.server.base-url`              |                                | The start of the CAS server url, i.e. https://localhost:8443/cas                                                                                                                                                                                                   |
 | `security.cas.server.paths.login`           | `/login`                       | Defines the location of the CAS server login path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                           |
@@ -99,7 +101,7 @@ The supported properties are:
 | `security.cas.service.base-url`             |                                | The name of the server this application is hosted on. Service URL will be dynamically constructed using this, i.e. https://localhost:8443 (you must include the protocol, but port is optional if it's a standard port).  Skipped if resolution mode is `dynamic`. |
 | `security.cas.service.paths.login`          | `/login`                       | Defines the application login path that will be append to the existing `security.cas.service.base-url` url                                                                                                                                                         |
 | `security.cas.service.paths.logout`         | `/logout`                      | Defines the application logout path that will be append to the existing `security.cas.service.base-url` url                                                                                                                                                        |
-| `security.cas.service.paths.proxy-callback` |                                | The callback path that will be, if present, append to the `security.cas.service.base-url` and add to as parameter inside request validation. **It must be set if you want to receive _Proxy Granting Ticket_ `PGT`**.                                                |
+| `security.cas.service.paths.proxy-callback` |                                | The callback path that will be, if present, append to the `security.cas.service.base-url` and add to as parameter inside request validation. **It must be set if you want to receive _Proxy Granting Ticket_ `PGT`**.                                              |
 
 Otherwise you can checkout [CasSecurityProperties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-autoconfigure/src/main/java/com/kakawait/spring/boot/security/cas/CasSecurityProperties.java) class.
 
@@ -207,6 +209,45 @@ With possible `logout.html` like following
 ```
 
 You can checkout & run sample module [`cas-security-spring-boot-sample`](https://github.com/kakawait/cas-security-spring-boot-starter/tree/master/cas-security-spring-boot-sample) with _profile_ `custom-logout`.
+
+## Proxy chains validation
+
+By default client configuration is `security.cas.proxy-validation.enabled = true` with empty proxy chains (`security.cas.proxy-validation.chains`). That mean you will not be able to validate proxy ticket since proxy chains is empty.
+
+You should disable proxy validation using:
+
+```yml
+security:
+  cas:
+    proxy-validation:
+      enabled: false
+```
+
+**But is not recommended for production environment**, or define your own proxy chains:
+
+```yml
+security
+  cas:
+    proxy-validation:
+      chains:
+        - http://localhost:8180, http://localhost:8181
+        - - http://localhost:8280
+          - http://localhost:8281
+        - ^http://my\\.domain\\..*
+```
+
+As you can see there is multiple syntaxes for `yml` format to define _collection of collection_:
+
+1. Using _comma-separated_ list
+2. Using double `- -` syntax
+
+If you are using `properties` format you could translate like following:
+
+```properties
+security.cas.proxy-validation.chains[0] = http://localhost:8180, http://localhost:8181
+security.cas.proxy-validation.chains[1] = http://localhost:8280, http://localhost:8281
+security.cas.proxy-validation.chains[2] = ^http://my\\.domain\\..*
+```
 
 ## License
 
