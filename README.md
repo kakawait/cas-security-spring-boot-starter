@@ -157,15 +157,11 @@ class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
     }
 
     @Override
-    public void init(HttpSecurity http) throws Exception {
-        http.logout()
-            .logoutSuccessUrl("/logout.html")
-            // Allow GET method on `/logout` even if CSRF is enabled
-            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-    }
-
-    @Override
     public void configure(HttpSecurity http) throws Exception {
+        http.logout()
+            .permitAll()
+            .logoutSuccessUrl("/logout.html")
+            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
         String logoutUrl = UriComponentsBuilder
                 .fromUri(casSecurityProperties.getServer().getBaseUrl())
                 .path(casSecurityProperties.getServer().getPaths().getLogout())
