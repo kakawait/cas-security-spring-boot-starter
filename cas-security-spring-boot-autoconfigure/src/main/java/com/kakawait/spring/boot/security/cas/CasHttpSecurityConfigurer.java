@@ -223,7 +223,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             Field field = ReflectionUtils.findField(CasAuthenticationProvider.class, "ticketValidator");
             ReflectionUtils.makeAccessible(field);
             if (ReflectionUtils.getField(field, provider) == null) {
-                provider.setTicketValidator(this.ticketValidator);
+                provider.setTicketValidator(ticketValidator);
             }
             provider.afterPropertiesSet();
             auth.authenticationProvider(provider);

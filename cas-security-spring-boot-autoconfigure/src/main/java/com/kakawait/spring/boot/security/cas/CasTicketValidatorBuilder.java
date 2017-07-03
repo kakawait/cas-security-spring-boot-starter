@@ -112,7 +112,6 @@ public class CasTicketValidatorBuilder {
             }
             ticketValidator.setRenew(renew);
         }
-
     }
 
     private static class Cas10TicketValidatorBuilder extends AbstractTicketValidatorBuilder<Cas10TicketValidator> {
