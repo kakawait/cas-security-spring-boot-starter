@@ -6,7 +6,7 @@ import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
-import org.jasig.cas.client.validation.TicketValidator;
+import org.jasig.cas.client.validation.ProxyList;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,11 +26,9 @@ import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.userdetails.AbstractCasAssertionUserDetailsService;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource;
-import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -38,8 +36,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
 
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
@@ -156,16 +153,13 @@ public class CasSecurityAutoConfiguration {
 
         private final AbstractCasAssertionUserDetailsService userDetailsService;
 
-        private final TicketValidator ticketValidator;
-
         private final ServiceAuthenticationDetailsSource authenticationDetailsSource;
 
         public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
-                AbstractCasAssertionUserDetailsService userDetailsService, TicketValidator ticketValidator,
+                AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource) {
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
-            this.ticketValidator = ticketValidator;
             this.authenticationDetailsSource = authenticationDetailsSource;
         }
 
@@ -173,8 +167,7 @@ public class CasSecurityAutoConfiguration {
         public void configure(CasAuthenticationProviderSecurityBuilder provider) {
             provider.serviceResolutionMode(casSecurityProperties.getService().getResolutionMode())
                     .authenticationUserDetailsService(userDetailsService)
-                    .key(casSecurityProperties.getKey())
-                    .ticketValidator(ticketValidator);
+                    .key(casSecurityProperties.getKey());
         }
 
         @Override
@@ -189,6 +182,27 @@ public class CasSecurityAutoConfiguration {
             String logoutSuccessUrl = buildUrl(casSecurityProperties.getServer().getBaseUrl(),
                     casSecurityProperties.getServer().getPaths().getLogout());
             http.logout().permitAll().logoutSuccessUrl(logoutSuccessUrl);
+        }
+
+        @Override
+        public void configure(CasTicketValidatorBuilder ticketValidator) {
+            URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+            ticketValidator.protocolVersion(casSecurityProperties.getServer().getProtocolVersion());
+            String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
+            if (proxyCallback != null) {
+                ticketValidator.proxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
+            }
+            if (!casSecurityProperties.getProxyValidation().isEnabled()) {
+                ticketValidator.proxyChainsValidation(false);
+            } else {
+                List<String[]> proxyChains = casSecurityProperties
+                        .getProxyValidation()
+                        .getChains()
+                        .stream()
+                        .map(l -> l.toArray(new String[l.size()]))
+                        .collect(Collectors.toList());
+                ticketValidator.proxyChains(new ProxyList(proxyChains));
+            }
         }
     }
 

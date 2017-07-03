@@ -1,7 +1,6 @@
 package com.kakawait.spring.boot.security.cas;
 
 import com.kakawait.security.cas.DynamicProxyCallbackUrlCasAuthenticationProvider;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jasig.cas.client.validation.TicketValidator;
@@ -20,25 +19,18 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 @Setter
 public class CasAuthenticationProviderSecurityBuilder implements SecurityBuilder<CasAuthenticationProvider> {
 
-    @NonNull
     private CasSecurityProperties.ServiceResolutionMode serviceResolutionMode;
 
-    @NonNull
     private AuthenticationUserDetailsService<CasAssertionAuthenticationToken> authenticationUserDetailsService;
 
-    @NonNull
     private GrantedAuthoritiesMapper grantedAuthoritiesMapper;
 
-    @NonNull
     private MessageSource messageSource;
 
-    @NonNull
     private StatelessTicketCache statelessTicketCache;
 
-    @NonNull
     private TicketValidator ticketValidator;
 
-    @NonNull
     private String key;
 
     @Override
@@ -64,7 +56,6 @@ public class CasAuthenticationProviderSecurityBuilder implements SecurityBuilder
         if (grantedAuthoritiesMapper != null) {
             provider.setAuthoritiesMapper(grantedAuthoritiesMapper);
         }
-        provider.afterPropertiesSet();
         return provider;
     }
 }
