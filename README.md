@@ -131,10 +131,15 @@ class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         // Here you can configure Spring Security HttpSecurity object during init configure
     }
+    
+    @Override
+    public void configure(CasTicketValidatorBuilder ticketValidator) {
+        // Here you can configure CasTicketValidator
+    }
 }
 ```
 
-Otherwise every beans defined in that starter are annotated with `@ConditionOnMissingBean` thus you can override default bean definitions.
+Otherwise many beans defined in that starter are annotated with `@ConditionOnMissingBean` thus you can override default bean definitions.
 
 ## Logout & SLO
 

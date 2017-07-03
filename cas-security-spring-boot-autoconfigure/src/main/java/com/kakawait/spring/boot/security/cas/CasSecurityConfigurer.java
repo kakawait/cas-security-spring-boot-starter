@@ -23,4 +23,6 @@ public interface CasSecurityConfigurer {
      */
     @Deprecated
     void init(HttpSecurity http) throws Exception;
+
+    void configure(CasTicketValidatorBuilder ticketValidator);
 }

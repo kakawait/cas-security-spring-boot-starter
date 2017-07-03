@@ -2,6 +2,7 @@ package com.kakawait.spring.boot.security.cas;
 
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
+import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration;
@@ -23,7 +24,9 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -145,6 +148,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
 
         private final ServiceProperties serviceProperties;
 
+        private final TicketValidator ticketValidator;
+
         private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
         private AuthenticationManager authenticationManager;
@@ -154,12 +159,13 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         public CasHttpSecurityConfigurerAdapter(List<CasSecurityConfigurer> configurers,
                 SecurityProperties securityProperties, CasSecurityProperties casSecurityProperties,
                 CasAuthenticationEntryPoint authenticationEntryPoint, ServiceProperties serviceProperties,
-                ObjectPostProcessor<Object> objectPostProcessor) {
+                TicketValidator ticketValidator, ObjectPostProcessor<Object> objectPostProcessor) {
             this.configurers = configurers;
             this.securityProperties = securityProperties;
             this.casSecurityProperties = casSecurityProperties;
             this.authenticationEntryPoint = authenticationEntryPoint;
             this.serviceProperties = serviceProperties;
+            this.ticketValidator = ticketValidator;
             authenticationManagerBuilder = new AuthenticationManagerBuilder(objectPostProcessor);
         }
 
@@ -214,6 +220,12 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         void configure(AuthenticationManagerBuilder auth) throws Exception {
             CasAuthenticationProvider provider = providerBuilder.build();
             provider.setServiceProperties(serviceProperties);
+            Field field = ReflectionUtils.findField(CasAuthenticationProvider.class, "ticketValidator");
+            ReflectionUtils.makeAccessible(field);
+            if (ReflectionUtils.getField(field, provider) == null) {
+                provider.setTicketValidator(this.ticketValidator);
+            }
+            provider.afterPropertiesSet();
             auth.authenticationProvider(provider);
         }
 
