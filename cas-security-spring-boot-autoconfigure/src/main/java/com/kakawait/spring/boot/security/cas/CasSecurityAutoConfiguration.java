@@ -6,18 +6,15 @@ import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
-import org.jasig.cas.client.session.SingleSignOutFilter;
-import org.jasig.cas.client.validation.TicketValidator;
+import org.jasig.cas.client.validation.ProxyList;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -25,23 +22,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
-import org.springframework.security.cas.authentication.CasAuthenticationProvider;
 import org.springframework.security.cas.userdetails.AbstractCasAssertionUserDetailsService;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
-import org.springframework.security.cas.web.CasAuthenticationFilter;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,8 +36,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
 
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
@@ -69,6 +55,7 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration
 @Import({CasLoginSecurityConfiguration.class, CasAssertionUserDetailsServiceConfiguration.class,
         CasTicketValidatorConfiguration.class, DefaultCasSecurityConfigurerAdapter.class,
         DynamicCasSecurityConfiguration.class, StaticCasSecurityConfiguration.class})
+@EnableWebSecurity
 public class CasSecurityAutoConfiguration {
 
     @Bean
@@ -166,16 +153,13 @@ public class CasSecurityAutoConfiguration {
 
         private final AbstractCasAssertionUserDetailsService userDetailsService;
 
-        private final TicketValidator ticketValidator;
-
         private final ServiceAuthenticationDetailsSource authenticationDetailsSource;
 
         public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
-                AbstractCasAssertionUserDetailsService userDetailsService, TicketValidator ticketValidator,
+                AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource) {
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
-            this.ticketValidator = ticketValidator;
             this.authenticationDetailsSource = authenticationDetailsSource;
         }
 
@@ -183,8 +167,7 @@ public class CasSecurityAutoConfiguration {
         public void configure(CasAuthenticationProviderSecurityBuilder provider) {
             provider.serviceResolutionMode(casSecurityProperties.getService().getResolutionMode())
                     .authenticationUserDetailsService(userDetailsService)
-                    .key(casSecurityProperties.getKey())
-                    .ticketValidator(ticketValidator);
+                    .key(casSecurityProperties.getKey());
         }
 
         @Override
@@ -195,119 +178,58 @@ public class CasSecurityAutoConfiguration {
         }
 
         @Override
-        public void init(HttpSecurity http) throws Exception {
-            CasSecurityProperties.Server serverProperties = casSecurityProperties.getServer();
-            http.logout()
-                .permitAll()
-                .logoutSuccessUrl(buildUrl(serverProperties.getBaseUrl(), serverProperties.getPaths().getLogout()));
+        public void configure(HttpSecurity http) throws Exception {
+            String logoutSuccessUrl = buildUrl(casSecurityProperties.getServer().getBaseUrl(),
+                    casSecurityProperties.getServer().getPaths().getLogout());
+            http.logout().permitAll().logoutSuccessUrl(logoutSuccessUrl);
+        }
+
+        @Override
+        public void configure(CasTicketValidatorBuilder ticketValidator) {
+            URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+            ticketValidator.protocolVersion(casSecurityProperties.getServer().getProtocolVersion());
+            String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
+            if (proxyCallback != null) {
+                ticketValidator.proxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
+            }
+            if (!casSecurityProperties.getProxyValidation().isEnabled()) {
+                ticketValidator.proxyChainsValidation(false);
+            } else {
+                List<String[]> proxyChains = casSecurityProperties
+                        .getProxyValidation()
+                        .getChains()
+                        .stream()
+                        .map(l -> l.toArray(new String[l.size()]))
+                        .collect(Collectors.toList());
+                ticketValidator.proxyChains(new ProxyList(proxyChains));
+            }
         }
     }
 
     @Order(SecurityProperties.BASIC_AUTH_ORDER - 1)
     static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-        private final CasAuthenticationFilterConfigurer filterConfigurer = new CasAuthenticationFilterConfigurer();
-
-        private final CasSingleSignOutFilterConfigurer singleSignOutFilterConfigurer =
-                new CasSingleSignOutFilterConfigurer();
-
-        private final CasAuthenticationProviderSecurityBuilder providerBuilder =
-                new CasAuthenticationProviderSecurityBuilder();
-
         private final List<CasSecurityConfigurer> configurers;
-
-        private final SecurityProperties securityProperties;
 
         private final CasSecurityProperties casSecurityProperties;
 
-        private final CasAuthenticationEntryPoint authenticationEntryPoint;
-
-        private final ServiceProperties serviceProperties;
-
-        private final AuthenticationManager authenticationManager;
-
-        private final CasSecurityProperties.Service.Paths paths;
-
         public CasLoginSecurityConfiguration(List<CasSecurityConfigurer> configurers,
-                SecurityProperties securityProperties, CasSecurityProperties casSecurityProperties,
-                CasAuthenticationEntryPoint authenticationEntryPoint, ServiceProperties serviceProperties,
-                AuthenticationManager authenticationManager) {
+                CasSecurityProperties casSecurityProperties) {
             this.configurers = configurers;
-            this.securityProperties = securityProperties;
             this.casSecurityProperties = casSecurityProperties;
-            this.authenticationEntryPoint = authenticationEntryPoint;
-            this.serviceProperties = serviceProperties;
-            this.authenticationManager = authenticationManager;
-            paths = casSecurityProperties.getService().getPaths();
-        }
-
-        @PostConstruct
-        private void init() {
-            configurers.forEach(c -> {
-                c.configure(filterConfigurer);
-                c.configure(singleSignOutFilterConfigurer);
-                c.configure(providerBuilder);
-            });
         }
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            CasAuthenticationFilter filter = new CasAuthenticationFilter();
-            filter.setAuthenticationManager(authenticationManager());
-            filter.setRequiresAuthenticationRequestMatcher(getRequestMatcher(serviceProperties));
-            filter.setAuthenticationSuccessHandler(getAuthenticationSuccessHandler(serviceProperties));
-            filterConfigurer.configure(filter);
-
-            SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
-            singleSignOutFilterConfigurer.configure(singleSignOutFilter);
-
-            if (securityProperties.isRequireSsl()) {
-                http.requiresChannel().anyRequest().requiresSecure();
-            }
-            if (!securityProperties.isEnableCsrf()) {
-                http.csrf().disable();
-            }
-            SpringBootWebSecurityConfiguration.configureHeaders(http.headers(), securityProperties.getHeaders());
-
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
-                http.authorizeRequests().antMatchers(paths).authenticated()
-                    .and()
-                    .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .and()
-                    .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
-                    .addFilter(filter);
-                if (securityProperties.getBasic().isEnabled()) {
-                    BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);
-                    http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
-                }
-                SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
-                if (mode == SecurityAuthorizeMode.ROLE) {
-                    List<String> roles = securityProperties.getUser().getRole();
-                    http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[roles.size()]));
-                } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
-                    http.authorizeRequests().anyRequest().authenticated();
+                http.requestMatchers().antMatchers(paths);
+                CasHttpSecurityConfigurer.cas().init(http);
+                for (CasSecurityConfigurer configurer : configurers) {
+                    configurer.init(http);
+                    configurer.configure(http);
                 }
             }
-            for (CasSecurityConfigurer configurer : configurers) {
-                http.apply(configurer);
-            }
-        }
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            CasAuthenticationProvider provider = providerBuilder.build();
-            provider.setServiceProperties(serviceProperties);
-            auth.authenticationProvider(provider);
-        }
-
-        private AuthenticationSuccessHandler getAuthenticationSuccessHandler(ServiceProperties serviceProperties) {
-            return new CasAuthenticationSuccessHandler(serviceProperties.getArtifactParameter());
-        }
-
-        private RequestMatcher getRequestMatcher(ServiceProperties serviceProperties) {
-            return new OrRequestMatcher(new AntPathRequestMatcher(paths.getLogin()),
-                    request -> request.getParameter(serviceProperties.getArtifactParameter()) != null);
         }
 
         private String[] getSecurePaths() {
