@@ -7,7 +7,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-dynamic-service-resolver</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
 
     <name>Cas security dynamic service resolver</name>
@@ -52,6 +52,13 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
+
+    <distributionManagement>
+        <relocation>
+            <artifactId>spring-security-cas-extension</artifactId>
+            <version>0.1.0</version>
+        </relocation>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies> <!-- The parent should provide all that -->

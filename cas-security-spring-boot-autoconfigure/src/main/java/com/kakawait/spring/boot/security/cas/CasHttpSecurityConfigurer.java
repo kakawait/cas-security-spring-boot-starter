@@ -1,5 +1,6 @@
 package com.kakawait.spring.boot.security.cas;
 
+import com.kakawait.spring.security.cas.web.authentication.CasAuthenticationSuccessHandler;
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;

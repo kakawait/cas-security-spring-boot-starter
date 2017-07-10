@@ -1,12 +1,10 @@
-package com.kakawait.security.cas;
+package com.kakawait.spring.security.cas.web.authentication;
 
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
 
 /**
  * @author Thibaud Leprêtre
- * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
-@Deprecated
 public interface ProxyCallbackAndServiceAuthenticationDetails extends ServiceAuthenticationDetails {
     String getProxyCallbackUrl();
 }
