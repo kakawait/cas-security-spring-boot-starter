@@ -119,7 +119,7 @@ public class CasTicketValidatorBuilder {
         private static final String OMISSION_MESSAGE_TEMPLATE =
                 "Configuration \"{}\" isn't possible using protocol version 1, will be omitted!";
 
-        public Cas10TicketValidatorBuilder(String casServerUrlPrefix) {
+        Cas10TicketValidatorBuilder(String casServerUrlPrefix) {
             super(casServerUrlPrefix);
         }
 

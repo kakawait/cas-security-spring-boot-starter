@@ -1,6 +1,6 @@
 # Spring Security CAS starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C0.3.0%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C0.3.1%7Cjar)
 [![license](https://img.shields.io/github/license/kakawait/cas-security-spring-boot-starter.svg)](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/LICENSE.md)
 
 > A Spring boot starter that will help you configure [Spring Security Cas](http://docs.spring.io/spring-security/site/docs/current/reference/html/cas.html) within the application security context.
@@ -20,7 +20,7 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
 </dependency>
 ```
 
@@ -140,6 +140,36 @@ class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
 ```
 
 Otherwise many beans defined in that starter are annotated with `@ConditionOnMissingBean` thus you can override default bean definitions.
+
+## Proxy granting storage
+
+Starter does not provide any additional _proxy granting storage_ (yet), by default an _in memory_ storage is used [`ProxyGrantingTicketStorageImpl`](https://github.com/apereo/java-cas-client/blob/master/cas-client-core/src/main/java/org/jasig/cas/client/proxy/ProxyGrantingTicketStorageImpl.java).
+
+To override it you can expose a `ProxyGrantingTicketStorage` beans like following:
+
+```java
+@Bean
+ProxyGrantingTicketStorage proxyGrantingTicketStorage() {
+    return new MyCustomProxyGrantingTicketStorage();
+}
+```
+
+**Or** use `configurer` but a bit longer since you must report `ProxyGrantingTicketStorage` in both `CasAuthenticationFilter` and `TicketValidator`
+
+```java
+@Configuration
+class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
+    @Override
+    public void configure(CasAuthenticationFilterConfigurer filter) {
+        filter.proxyGrantingTicketStorage(new MyCustomProxyGrantingStorage());
+    }
+    
+    @Override
+    public void configure(CasTicketValidatorBuilder ticketValidator) {
+        ticketValidator.proxyGrantingTicketStorage(new MyCustomProxyGrantingStorage());
+    }
+}
+```
 
 ## Logout & SLO
 

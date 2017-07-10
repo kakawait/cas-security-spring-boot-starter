@@ -5,6 +5,7 @@ import com.kakawait.security.cas.ProxyCallbackAndServiceAuthenticationDetailsSou
 import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.ProxyList;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -75,6 +76,12 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "dynamic")
     ServiceProperties laxServiceProperties() {
         return new LaxServiceProperties();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ProxyGrantingTicketStorage.class)
+    ProxyGrantingTicketStorage proxyGrantingTicketStorage() {
+        return new ProxyGrantingTicketStorageImpl();
     }
 
     @Getter
@@ -155,12 +162,16 @@ public class CasSecurityAutoConfiguration {
 
         private final ServiceAuthenticationDetailsSource authenticationDetailsSource;
 
+        private final ProxyGrantingTicketStorage proxyGrantingTicketStorage;
+
         public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
                 AbstractCasAssertionUserDetailsService userDetailsService,
-                ServiceAuthenticationDetailsSource authenticationDetailsSource) {
+                ServiceAuthenticationDetailsSource authenticationDetailsSource,
+                ProxyGrantingTicketStorage proxyGrantingTicketStorage) {
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
             this.authenticationDetailsSource = authenticationDetailsSource;
+            this.proxyGrantingTicketStorage = proxyGrantingTicketStorage;
         }
 
         @Override
@@ -174,7 +185,7 @@ public class CasSecurityAutoConfiguration {
         public void configure(CasAuthenticationFilterConfigurer filter) {
             filter.proxyReceptorUrl(casSecurityProperties.getService().getPaths().getProxyCallback())
                   .serviceAuthenticationDetailsSource(authenticationDetailsSource)
-                  .proxyGrantingTicketStorage(new ProxyGrantingTicketStorageImpl());
+                  .proxyGrantingTicketStorage(proxyGrantingTicketStorage);
         }
 
         @Override
@@ -203,6 +214,7 @@ public class CasSecurityAutoConfiguration {
                         .collect(Collectors.toList());
                 ticketValidator.proxyChains(new ProxyList(proxyChains));
             }
+            ticketValidator.proxyGrantingTicketStorage(proxyGrantingTicketStorage);
         }
     }
 
