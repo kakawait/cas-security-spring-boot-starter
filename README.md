@@ -141,6 +141,36 @@ class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
 
 Otherwise many beans defined in that starter are annotated with `@ConditionOnMissingBean` thus you can override default bean definitions.
 
+## Proxy granting storage
+
+Starter does not provide any additional _proxy granting storage_ (yet), by default an _in memory_ storage is used [`ProxyGrantingTicketStorageImpl`](https://github.com/apereo/java-cas-client/blob/master/cas-client-core/src/main/java/org/jasig/cas/client/proxy/ProxyGrantingTicketStorageImpl.java).
+
+To override it you can expose a `ProxyGrantingTicketStorage` beans like following:
+
+```java
+@Bean
+ProxyGrantingTicketStorage proxyGrantingTicketStorage() {
+    return new MyCustomProxyGrantingTicketStorage();
+}
+```
+
+**Or** use `configurer` but a bit longer since you must report `ProxyGrantingTicketStorage` in both `CasAuthenticationFilter` and `TicketValidator`
+
+```java
+@Configuration
+class CustomCasSecurityConfiguration extends CasSecurityConfigurerAdapter {
+    @Override
+    public void configure(CasAuthenticationFilterConfigurer filter) {
+        filter.proxyGrantingTicketStorage(new MyCustomProxyGrantingStorage());
+    }
+    
+    @Override
+    public void configure(CasTicketValidatorBuilder ticketValidator) {
+        ticketValidator.proxyGrantingTicketStorage(new MyCustomProxyGrantingStorage());
+    }
+}
+```
+
 ## Logout & SLO
 
 By default starter will configure both _logout_ and _single logout (SLO)_.
