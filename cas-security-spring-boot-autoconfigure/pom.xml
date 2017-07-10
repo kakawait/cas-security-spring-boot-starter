@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot autoconfigure</name>
@@ -44,6 +44,7 @@
 
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
 
+        <cas-security-dynamic-service-resolver.version>0.3.0</cas-security-dynamic-service-resolver.version>
         <lombok.version>1.16.16</lombok.version>
         <hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
 
@@ -81,7 +82,7 @@
         <dependency>
             <groupId>com.kakawait</groupId>
             <artifactId>cas-security-dynamic-service-resolver</artifactId>
-            <version>${project.version}</version>
+            <version>${cas-security-dynamic-service-resolver.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>

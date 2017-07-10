@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-sample</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
