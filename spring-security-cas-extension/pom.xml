@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                        http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kakawait</groupId>
-    <artifactId>cas-security-spring-boot-starter</artifactId>
-    <version>0.4.0</version>
+    <artifactId>spring-security-cas-extension</artifactId>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>Cas security spring boot starter</name>
-    <description>Spring boot starter for Apereo CAS client fully integrated with Spring security</description>
+    <name>Spring security cas extension</name>
+    <description>Spring security cas extension and additional implementation used by the starter</description>
     <url>https://github.com/kakawait/cas-security-spring-boot-starter</url>
 
     <licenses>
@@ -43,8 +43,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
-
-        <cas-security-dynamic-service-resolver.version>0.3.0</cas-security-dynamic-service-resolver.version>
+        <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
@@ -66,30 +65,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.kakawait</groupId>
-            <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-cas</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>oss.sonatype.org</id>
-            <name>Sonatype OSS Staging</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-            <layout>default</layout>
-        </repository>
-        <snapshotRepository>
-            <id>oss.sonatype.org</id>
-            <name>Sonatype OSS Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <layout>default</layout>
-        </snapshotRepository>
-    </distributionManagement>
 
     <profiles>
         <profile>
@@ -156,5 +144,5 @@
             </build>
         </profile>
     </profiles>
-</project>
 
+</project>

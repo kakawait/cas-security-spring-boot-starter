@@ -1,4 +1,4 @@
-package com.kakawait.security.cas;
+package com.kakawait.spring.security.cas.web.authentication;
 
 import org.springframework.security.web.util.UrlUtils;
 
@@ -6,17 +6,15 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Thibaud Leprêtre
- * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
-@Deprecated
-public class DefaultProxyCallbackAndServiceAuthenticationDetails
+class DefaultProxyCallbackAndServiceAuthenticationDetails
         implements ProxyCallbackAndServiceAuthenticationDetails {
 
     private final HttpServletRequest context;
 
     private final String proxyCallbackPath;
 
-    public DefaultProxyCallbackAndServiceAuthenticationDetails(HttpServletRequest context, String proxyCallbackPath) {
+    DefaultProxyCallbackAndServiceAuthenticationDetails(HttpServletRequest context, String proxyCallbackPath) {
         this.context = context;
         this.proxyCallbackPath = proxyCallbackPath;
     }

@@ -1,4 +1,4 @@
-package com.kakawait.security.cas;
+package com.kakawait.spring.security.cas.web.authentication;
 
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
@@ -8,9 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Thibaud Leprêtre
- * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
-@Deprecated
 public class ProxyCallbackAndServiceAuthenticationDetailsSource extends ServiceAuthenticationDetailsSource {
     private final String proxyCallbackPath;
 

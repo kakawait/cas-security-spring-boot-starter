@@ -1,7 +1,7 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.security.cas.web.authentication;
 
-import lombok.NonNull;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,11 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Thibaud Leprêtre
  */
-class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final String ticketParameterName;
 
-    CasAuthenticationSuccessHandler(@NonNull String ticketParameterName) {
+    public CasAuthenticationSuccessHandler(String ticketParameterName) {
+        Assert.notNull(ticketParameterName, "tickerParameterName must not be null!");
         this.ticketParameterName = ticketParameterName;
     }
 

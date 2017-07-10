@@ -1,8 +1,8 @@
 package com.kakawait.spring.boot.security.cas;
 
-import com.kakawait.security.cas.LaxServiceProperties;
-import com.kakawait.security.cas.ProxyCallbackAndServiceAuthenticationDetailsSource;
-import com.kakawait.security.cas.RequestAwareCasAuthenticationEntryPoint;
+import com.kakawait.spring.security.cas.LaxServiceProperties;
+import com.kakawait.spring.security.cas.web.RequestAwareCasAuthenticationEntryPoint;
+import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetailsSource;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
