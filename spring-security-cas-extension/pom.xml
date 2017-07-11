@@ -77,6 +77,12 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api.version}</version>
         </dependency>
+        <!-- Deprecated since 0.4.0, will be removed on 1.0.0 -->
+        <dependency>
+            <groupId>com.kakawait</groupId>
+            <artifactId>cas-security-dynamic-service-resolver</artifactId>
+            <version>0.4.0</version>
+        </dependency>
     </dependencies>
 
     <profiles>
