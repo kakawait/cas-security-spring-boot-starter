@@ -1,4 +1,4 @@
-package com.kakawait.security.cas;
+package com.kakawait.spring.security.cas.web;
 
 import org.jasig.cas.client.util.CommonUtils;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
@@ -14,9 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Thibaud Leprêtre
- * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
-@Deprecated
 public class RequestAwareCasAuthenticationEntryPoint extends CasAuthenticationEntryPoint {
 
     private final String loginPath;

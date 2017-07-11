@@ -1,6 +1,6 @@
 package com.kakawait.spring.boot.security.cas;
 
-import com.kakawait.security.cas.DynamicProxyCallbackUrlCasAuthenticationProvider;
+import com.kakawait.spring.security.cas.authentication.DynamicProxyCallbackUrlCasAuthenticationProvider;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jasig.cas.client.validation.TicketValidator;
