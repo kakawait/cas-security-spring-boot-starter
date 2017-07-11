@@ -42,6 +42,7 @@
         <module>spring-security-cas-extension</module>
         <module>cas-security-spring-boot-starter</module>
         <module>cas-security-spring-boot-autoconfigure</module>
+        <module>cas-security-dynamic-service-resolver</module>
     </modules>
 
 </project>
