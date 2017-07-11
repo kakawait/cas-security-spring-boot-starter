@@ -7,7 +7,7 @@
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-starter-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
 
     <name>Cas security spring boot starter parent</name>
     <description>Spring boot starter for Apereo CAS client fully integrated with Spring security</description>
