@@ -84,7 +84,7 @@ public class CasSecurityAutoConfiguration {
     }
 
     @Getter
-    static abstract class AbstractCasSecurityConfiguration {
+    abstract static class AbstractCasSecurityConfiguration {
         private final CasSecurityProperties casSecurityProperties;
 
         private final ServiceProperties serviceProperties;

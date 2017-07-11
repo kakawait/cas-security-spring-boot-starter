@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 class DefaultProxyCallbackAndServiceAuthenticationDetails
         implements ProxyCallbackAndServiceAuthenticationDetails {
 
-    private final HttpServletRequest context;
+    private final transient HttpServletRequest context;
 
     private final String proxyCallbackPath;
 

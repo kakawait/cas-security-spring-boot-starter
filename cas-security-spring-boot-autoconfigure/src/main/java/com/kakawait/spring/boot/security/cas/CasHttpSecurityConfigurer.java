@@ -82,8 +82,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
     public void init(HttpSecurity http) throws Exception {
         if (!isInitialized) {
             ApplicationContext context = http.getSharedObject(ApplicationContext.class);
-            CasHttpSecurityConfigurerAdapter securityConfigurerAdapter = getCasHttpSecurityConfigurerAdapter(context);
-            securityConfigurerAdapter.init(http);
+            getCasHttpSecurityConfigurerAdapter(context).init(http);
             isInitialized = true;
         }
     }
@@ -112,8 +111,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
     public void configure(HttpSecurity http) throws Exception {
         init(http);
         ApplicationContext context = http.getSharedObject(ApplicationContext.class);
-        CasHttpSecurityConfigurerAdapter securityConfigurerAdapter = getCasHttpSecurityConfigurerAdapter(context);
-        securityConfigurerAdapter.configure(http);
+        getCasHttpSecurityConfigurerAdapter(context).configure(http);
     }
 
     private CasHttpSecurityConfigurerAdapter getCasHttpSecurityConfigurerAdapter(ApplicationContext context) {
