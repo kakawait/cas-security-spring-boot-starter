@@ -56,7 +56,6 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration
 @Import({CasLoginSecurityConfiguration.class, CasAssertionUserDetailsServiceConfiguration.class,
         CasTicketValidatorConfiguration.class, DefaultCasSecurityConfigurerAdapter.class,
         DynamicCasSecurityConfiguration.class, StaticCasSecurityConfiguration.class})
-@EnableWebSecurity
 public class CasSecurityAutoConfiguration {
 
     @Bean
