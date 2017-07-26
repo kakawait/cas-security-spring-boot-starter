@@ -1,5 +1,6 @@
-package com.kakawait.security.cas;
+package com.kakawait.spring.security.cas.authentication;
 
+import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetails;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -7,9 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 
 /**
  * @author Thibaud Leprêtre
- * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
-@Deprecated
 public class DynamicProxyCallbackUrlCasAuthenticationProvider extends CasAuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

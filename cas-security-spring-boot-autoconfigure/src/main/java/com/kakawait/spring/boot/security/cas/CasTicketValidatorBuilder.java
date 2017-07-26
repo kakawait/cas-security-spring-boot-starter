@@ -96,7 +96,7 @@ public class CasTicketValidatorBuilder {
                .allowEmptyProxyChain(allowEmptyProxyChain);
     }
 
-    private static abstract class AbstractTicketValidatorBuilder<T extends AbstractCasProtocolUrlBasedTicketValidator>
+    private abstract static class AbstractTicketValidatorBuilder<T extends AbstractCasProtocolUrlBasedTicketValidator>
             extends CasTicketValidatorBuilder {
 
         AbstractTicketValidatorBuilder(String casServerUrlPrefix) {
@@ -144,7 +144,7 @@ public class CasTicketValidatorBuilder {
             if (allowEmptyProxyChain != null) {
                 logger.warn(OMISSION_MESSAGE_TEMPLATE, "allowEmptyProxyChain");
             }
-            configure(ticketValidator);
+            super.configure(ticketValidator);
             return ticketValidator;
         }
     }
@@ -199,7 +199,7 @@ public class CasTicketValidatorBuilder {
         @Override
         public TicketValidator build() {
             Cas20ProxyTicketValidator ticketValidator = new Cas20ProxyTicketValidator(casServerUrlPrefix);
-            configure(ticketValidator);
+            super.configure(ticketValidator);
 
             if (proxyChainsValidation != null) {
                 ticketValidator.setAcceptAnyProxy(!proxyChainsValidation);
@@ -233,7 +233,7 @@ public class CasTicketValidatorBuilder {
             if (allowEmptyProxyChain != null) {
                 logger.warn(OMISSION_MESSAGE_TEMPLATE, "allowEmptyProxyChain");
             }
-            configure(ticketValidator);
+            super.configure(ticketValidator);
             return ticketValidator;
         }
     }
@@ -247,7 +247,7 @@ public class CasTicketValidatorBuilder {
         @Override
         public Cas30ProxyTicketValidator build() {
             Cas30ProxyTicketValidator ticketValidator = new Cas30ProxyTicketValidator(casServerUrlPrefix);
-            configure(ticketValidator);
+            super.configure(ticketValidator);
 
             if (proxyChainsValidation != null) {
                 ticketValidator.setAcceptAnyProxy(!proxyChainsValidation);

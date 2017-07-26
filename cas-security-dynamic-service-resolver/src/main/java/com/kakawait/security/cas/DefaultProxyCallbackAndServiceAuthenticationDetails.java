@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Thibaud Leprêtre
+ * @deprecated Please use new artifact id {@code spring-security-cas-extension}
  */
+@Deprecated
 public class DefaultProxyCallbackAndServiceAuthenticationDetails
         implements ProxyCallbackAndServiceAuthenticationDetails {
 
