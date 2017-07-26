@@ -10,16 +10,19 @@ import javax.servlet.http.HttpServletRequest;
  * @author Thibaud Leprêtre
  */
 public class ProxyCallbackAndServiceAuthenticationDetailsSource extends ServiceAuthenticationDetailsSource {
+    private final ServiceProperties serviceProperties;
+
     private final String proxyCallbackPath;
 
     public ProxyCallbackAndServiceAuthenticationDetailsSource(ServiceProperties serviceProperties,
             String proxyCallbackPath) {
         super(serviceProperties);
+        this.serviceProperties = serviceProperties;
         this.proxyCallbackPath = proxyCallbackPath;
     }
 
     @Override
     public ServiceAuthenticationDetails buildDetails(HttpServletRequest context) {
-        return new DefaultProxyCallbackAndServiceAuthenticationDetails(context, proxyCallbackPath);
+        return new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, context, proxyCallbackPath);
     }
 }
