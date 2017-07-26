@@ -2,6 +2,7 @@ package com.kakawait.spring.security.cas.web.authentication;
 
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.web.util.UrlUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,6 @@ class DefaultProxyCallbackAndServiceAuthenticationDetails
                 .toString()
                 .replaceFirst("^\\?", "");
         return UrlUtils.buildFullRequestUrl(context.getScheme(), context.getServerName(),
-                context.getServerPort(), context.getRequestURI(), query);
+                context.getServerPort(), context.getRequestURI(), StringUtils.hasText(query) ? query : null);
     }
 }
