@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot autoconfigure</name>
