@@ -40,7 +40,7 @@ public class CasAuthenticationFilterConfigurer {
         if (proxyAuthenticationFailureHandler != null) {
             filter.setProxyAuthenticationFailureHandler(proxyAuthenticationFailureHandler);
         }
-        if (authenticationFailureHandler != null) {
+        if (authenticationSuccessHandler != null) {
             filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         }
         if (proxyReceptorUrl != null) {
