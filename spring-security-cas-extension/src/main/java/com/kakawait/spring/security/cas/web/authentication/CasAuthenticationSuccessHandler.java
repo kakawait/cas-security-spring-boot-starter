@@ -12,21 +12,22 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-    private final String ticketParameterName;
+    private final String artifactParameter;
 
-    public CasAuthenticationSuccessHandler(String ticketParameterName) {
-        Assert.notNull(ticketParameterName, "tickerParameterName must not be null!");
-        this.ticketParameterName = ticketParameterName;
+    public CasAuthenticationSuccessHandler(String artifactParameter) {
+        Assert.notNull(artifactParameter, "artifactParameter must not be null!");
+        this.artifactParameter = artifactParameter;
     }
 
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
         String url = super.determineTargetUrl(request, response);
-        String ticket = request.getParameter(ticketParameterName);
+        String ticket = request.getParameter(artifactParameter);
         if (ticket != null) {
             url = UriComponentsBuilder
                     .fromUriString(request.getRequestURL().toString())
-                    .replaceQueryParam(ticketParameterName, new Object[0])
+                    .query(request.getQueryString())
+                    .replaceQueryParam(artifactParameter, new Object[0])
                     .build()
                     .toUriString();
         }
