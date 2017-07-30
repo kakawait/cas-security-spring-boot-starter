@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.4</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot autoconfigure</name>
@@ -44,8 +44,7 @@
 
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
 
-        <cas-security-dynamic-service-resolver.version>0.3.0</cas-security-dynamic-service-resolver.version>
-        <lombok.version>1.16.16</lombok.version>
+        <lombok.version>1.16.18</lombok.version>
         <hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -72,29 +71,23 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-cas</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.kakawait</groupId>
-            <artifactId>cas-security-dynamic-service-resolver</artifactId>
-            <version>${cas-security-dynamic-service-resolver.version}</version>
+            <artifactId>spring-security-cas-extension</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
+            <optional>true</optional>
         </dependency>
-
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <optional>true</optional>
             <scope>provided</scope>
         </dependency>
 

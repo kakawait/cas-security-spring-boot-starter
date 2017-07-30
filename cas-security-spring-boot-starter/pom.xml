@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-starter</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.4</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot starter</name>
@@ -44,8 +44,6 @@
 
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
 
-        <cas-security-dynamic-service-resolver.version>0.3.0</cas-security-dynamic-service-resolver.version>
-
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -76,8 +74,14 @@
         </dependency>
         <dependency>
             <groupId>com.kakawait</groupId>
+            <artifactId>spring-security-cas-extension</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Deprecated since 0.4.0, will be removed on 1.0.0 -->
+        <dependency>
+            <groupId>com.kakawait</groupId>
             <artifactId>cas-security-dynamic-service-resolver</artifactId>
-            <version>${cas-security-dynamic-service-resolver.version}</version>
+            <version>0.4.0</version>
         </dependency>
     </dependencies>
 

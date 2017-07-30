@@ -1,7 +1,7 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.security.cas.web.authentication;
 
-import lombok.NonNull;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,22 +10,24 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Thibaud Leprêtre
  */
-class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class CasAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-    private final String ticketParameterName;
+    private final String artifactParameter;
 
-    CasAuthenticationSuccessHandler(@NonNull String ticketParameterName) {
-        this.ticketParameterName = ticketParameterName;
+    public CasAuthenticationSuccessHandler(String artifactParameter) {
+        Assert.notNull(artifactParameter, "artifactParameter must not be null!");
+        this.artifactParameter = artifactParameter;
     }
 
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
         String url = super.determineTargetUrl(request, response);
-        String ticket = request.getParameter(ticketParameterName);
+        String ticket = request.getParameter(artifactParameter);
         if (ticket != null) {
             url = UriComponentsBuilder
                     .fromUriString(request.getRequestURL().toString())
-                    .replaceQueryParam(ticketParameterName, new Object[0])
+                    .query(request.getQueryString())
+                    .replaceQueryParam(artifactParameter, new Object[0])
                     .build()
                     .toUriString();
         }
