@@ -150,8 +150,15 @@ public class CasSecurityAutoConfiguration {
         @ConditionalOnMissingBean(ServiceAuthenticationDetailsSource.class)
         ServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource(
                 CasSecurityProperties casSecurityProperties) {
+            URI callbackBaseUrl = casSecurityProperties.getService().getCallbackBaseUrl();
             String proxyCallbackPath = casSecurityProperties.getService().getPaths().getProxyCallback();
-            return new ProxyCallbackAndServiceAuthenticationDetailsSource(getServiceProperties(), proxyCallbackPath);
+            URI proxyCallbackUri = null;
+            if (proxyCallbackPath != null) {
+                proxyCallbackUri = callbackBaseUrl != null
+                        ? UriComponentsBuilder.fromUri(callbackBaseUrl).path(proxyCallbackPath).build().toUri()
+                        : URI.create(proxyCallbackPath);
+            }
+            return new ProxyCallbackAndServiceAuthenticationDetailsSource(getServiceProperties(), proxyCallbackUri);
         }
     }
 
@@ -200,10 +207,12 @@ public class CasSecurityAutoConfiguration {
         @Override
         public void configure(CasTicketValidatorBuilder ticketValidator) {
             URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+            URI callbackBaseUrl = casSecurityProperties.getService().getCallbackBaseUrl();
             ticketValidator.protocolVersion(casSecurityProperties.getServer().getProtocolVersion());
             String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
-            if (proxyCallback != null) {
-                ticketValidator.proxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
+            if ((baseUrl != null || callbackBaseUrl != null) && proxyCallback != null) {
+                String proxyCallbackUrl = buildUrl(callbackBaseUrl != null ? callbackBaseUrl : baseUrl, proxyCallback);
+                ticketValidator.proxyCallbackUrl(proxyCallbackUrl);
             }
             if (!casSecurityProperties.getProxyValidation().isEnabled()) {
                 ticketValidator.proxyChainsValidation(false);

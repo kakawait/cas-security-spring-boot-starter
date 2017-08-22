@@ -68,6 +68,8 @@ public class CasSecurityProperties {
          */
         private URI baseUrl;
 
+        private URI validationBaseUrl;
+
         private Paths paths = new Paths();
 
         @Data
@@ -96,10 +98,30 @@ public class CasSecurityProperties {
          */
         private URI baseUrl;
 
+        /**
+         * CAS Service callback base url, example https://my-cas.server.com/
+         *
+         * If defined will be used to compute complete <i>proxy callback url</i> instead of using {@link #baseUrl}.
+         * It will also be use even if {@link #baseUrl} is not defined and you're using {@link #resolutionMode}
+         * is equals to {@link ServiceResolutionMode#DYNAMIC}.
+         *
+         * <i>Proxy callback</i> request is a fully new request executed from CAS server (using its own http client)
+         * to your service. Thus it can be useful to be different than {@link #baseUrl} when CAS server can't share the
+         * same network as your browser.
+         *
+         * For example when using containers (<i>Docker</i> or other) or VM, you can't use {@code localhost} hostname
+         * as <i>proxy callback url</i> since CAS server inside container or VM doesn't have the same {@code localhost}
+         * as your host machine.
+         *
+         * @see Paths#baseUrl
+         * @see Paths#proxyCallback
+         */
+        private URI callbackBaseUrl;
+
         private Paths paths = new Paths();
 
         @Data
-        static class Paths {
+        public static class Paths {
 
             /**
              * CAS Service login path that will be append to {@link Service#baseUrl}
@@ -114,8 +136,10 @@ public class CasSecurityProperties {
             private String logout = "/logout";
 
             /**
-             * CAS Service proxy callback path that will be append to {@link Service#baseUrl} if not null
+             * CAS Service proxy callback path that will be append to {@link Service#callbackBaseUrl} if defined else
+             * fallback to {@link Service#baseUrl}
              *
+             * @see Service#callbackBaseUrl
              * @see org.jasig.cas.client.validation.Cas20ServiceTicketValidator#proxyCallbackUrl
              */
             private String proxyCallback;

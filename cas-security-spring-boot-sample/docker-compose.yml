@@ -1,0 +1,19 @@
+version: '3'
+services:
+  cas:
+    # Tag version does not really represent CAS server version. Please check pom.xml to get real version.
+    image: apereo/cas:v5.1.3
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/tmp:/root/.m2/repository/
+      - ./docker/cas.properties:/cas-overlay/etc/cas/config/cas.properties:ro
+      - ./docker/All-10000005.json:/cas-overlay/etc/cas/services/All-10000005.json:ro
+      - ./docker/pom.xml:/cas-overlay/pom.xml
+  app:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+

@@ -3,6 +3,8 @@ package com.kakawait;
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
+import org.jasig.cas.client.authentication.AttributePrincipal;
+import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
@@ -11,13 +13,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +32,9 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.lang.reflect.Field;
 import java.security.Principal;
+import java.util.Optional;
 
 /**
  * @author Thibaud Leprêtre
@@ -110,9 +117,11 @@ public class CasSecuritySpringBootSampleApplication {
     static class IndexController {
 
         @RequestMapping
-        public String hello(Principal principal, Model model) {
-            if (principal != null && StringUtils.hasText(principal.getName())) {
-                model.addAttribute("username", principal.getName());
+        public String hello(Authentication authentication, Model model) {
+            if (authentication != null && StringUtils.hasText(authentication.getName())) {
+                model.addAttribute("username", authentication.getName());
+                model.addAttribute("principal", authentication.getPrincipal());
+                model.addAttribute("pgt", getProxyGrantingTicket(authentication).orElse(null));
             }
             return "index";
         }
@@ -120,6 +129,22 @@ public class CasSecuritySpringBootSampleApplication {
         @RequestMapping(path = "/ignored")
         public String ignored() {
             return "index";
+        }
+
+        /**
+         * Hacky code please do not use that in production
+         */
+        private Optional<String> getProxyGrantingTicket(Authentication authentication) {
+            if (!(authentication instanceof CasAuthenticationToken)) {
+                return Optional.empty();
+            }
+            AttributePrincipal principal = ((CasAuthenticationToken) authentication).getAssertion().getPrincipal();
+            if (!(principal instanceof AttributePrincipalImpl)) {
+                return Optional.empty();
+            }
+            Field field = ReflectionUtils.findField(AttributePrincipalImpl.class, "proxyGrantingTicket");
+            ReflectionUtils.makeAccessible(field);
+            return Optional.of(ReflectionUtils.getField(field, principal).toString());
         }
     }
 
