@@ -45,7 +45,6 @@
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
 
         <lombok.version>1.16.18</lombok.version>
-        <hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
@@ -76,12 +75,6 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -101,9 +94,6 @@
     <profiles>
         <profile>
             <id>release</id>
-            <properties>
-                <gpg.executable>gpg2</gpg.executable>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
