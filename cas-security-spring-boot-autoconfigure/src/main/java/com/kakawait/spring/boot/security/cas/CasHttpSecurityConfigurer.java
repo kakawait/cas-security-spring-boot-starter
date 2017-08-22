@@ -1,6 +1,5 @@
 package com.kakawait.spring.boot.security.cas;
 
-import com.kakawait.spring.security.cas.web.authentication.CasAuthenticationSuccessHandler;
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
@@ -19,11 +18,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.ReflectionUtils;
 
@@ -181,8 +178,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         public void init(HttpSecurity http) throws Exception {
             CasAuthenticationFilter filter = new CasAuthenticationFilter();
             filter.setAuthenticationManager(authenticationManager());
-            filter.setRequiresAuthenticationRequestMatcher(getRequestMatcher(serviceProperties));
-            filter.setAuthenticationSuccessHandler(getAuthenticationSuccessHandler(serviceProperties));
+            filter.setRequiresAuthenticationRequestMatcher(getRequestMatcher());
+            filter.setServiceProperties(serviceProperties);
             filterConfigurer.configure(filter);
 
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
@@ -242,14 +239,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             this.authenticationManager = authenticationManager;
         }
 
-        private AuthenticationSuccessHandler getAuthenticationSuccessHandler(ServiceProperties serviceProperties) {
-            return new CasAuthenticationSuccessHandler(serviceProperties.getArtifactParameter());
-        }
-
-        private RequestMatcher getRequestMatcher(ServiceProperties serviceProperties) {
-            return new OrRequestMatcher(
-                    new AntPathRequestMatcher(casSecurityProperties.getService().getPaths().getLogin()),
-                    request -> request.getParameter(serviceProperties.getArtifactParameter()) != null);
+        private RequestMatcher getRequestMatcher() {
+            return new AntPathRequestMatcher(casSecurityProperties.getService().getPaths().getLogin());
         }
     }
 }
