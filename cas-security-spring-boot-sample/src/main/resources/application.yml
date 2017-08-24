@@ -3,13 +3,19 @@ security:
     enabled: true
   ignored: /ignored, /**/favicon.ico
   cas:
-    proxy-validation:
-      chains:
-        - http://localhost:8180, http://localhost:8181
-        - - http://localhost:8280
-          - http://localhost:8281
     server:
-      base-url: http://localhost:8080/cas/
+      base-url: https://127.0.0.1:10100/cas/
+      ticket-validator: https://cas:10100/cas/
       protocol-version: 3
     service:
-      resolution-mode: dynamic
+      base-url: https://127.0.0.1:8443/
+      proxy-callback-url: https://cas-client:8443/
+      paths:
+        proxy-callback: /j_spring_cas_security_proxyreceptor
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/etc/keystore/cas-client.jks
+    key-store-password: changeit
