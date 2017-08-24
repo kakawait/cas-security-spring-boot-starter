@@ -111,7 +111,7 @@ public class CasSecuritySpringBootSampleApplication {
 
         @RequestMapping
         public String hello(Principal principal, Model model) {
-            if (StringUtils.hasText(principal.getName())) {
+            if (principal != null && StringUtils.hasText(principal.getName())) {
                 model.addAttribute("username", principal.getName());
             }
             return "index";
