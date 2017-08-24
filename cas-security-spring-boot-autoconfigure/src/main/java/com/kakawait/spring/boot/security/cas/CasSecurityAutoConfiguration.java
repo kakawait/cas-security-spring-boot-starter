@@ -257,6 +257,11 @@ public class CasSecurityAutoConfiguration {
                     paths.add(path);
                 }
             }
+            // Add login, logout and proxy-callback paths in order to be handle by CasAuthenticationFilter.
+            // Without authentication will be broken.
+            paths.add(casSecurityProperties.getService().getPaths().getLogin());
+            paths.add(casSecurityProperties.getService().getPaths().getLogout());
+            paths.add(casSecurityProperties.getService().getPaths().getProxyCallback());
             return paths.toArray(new String[paths.size()]);
         }
     }

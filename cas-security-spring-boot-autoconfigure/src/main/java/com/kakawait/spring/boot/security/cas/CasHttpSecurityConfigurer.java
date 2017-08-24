@@ -178,7 +178,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         public void init(HttpSecurity http) throws Exception {
             CasAuthenticationFilter filter = new CasAuthenticationFilter();
             filter.setAuthenticationManager(authenticationManager());
-            filter.setRequiresAuthenticationRequestMatcher(getRequestMatcher());
+            filter.setRequiresAuthenticationRequestMatcher(getAuthenticationRequestMatcher());
             filter.setServiceProperties(serviceProperties);
             filterConfigurer.configure(filter);
 
@@ -239,7 +239,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             this.authenticationManager = authenticationManager;
         }
 
-        private RequestMatcher getRequestMatcher() {
+        private RequestMatcher getAuthenticationRequestMatcher() {
             return new AntPathRequestMatcher(casSecurityProperties.getService().getPaths().getLogin());
         }
     }
