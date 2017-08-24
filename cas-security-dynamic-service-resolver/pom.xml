@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                        http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kakawait</groupId>
-    <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-    <version>0.5.0</version>
+    <artifactId>cas-security-dynamic-service-resolver</artifactId>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
 
-    <name>Cas security spring boot autoconfigure</name>
-    <description>Spring boot autoconfigure for Apereo CAS client fully integrated with Spring security</description>
+    <name>Cas security dynamic service resolver</name>
+    <description>Spring security and Apereo override implementation to support dynamic service resolution</description>
     <url>https://github.com/kakawait/cas-security-spring-boot-starter</url>
 
     <licenses>
@@ -44,13 +45,20 @@
 
         <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
 
-        <lombok.version>1.16.18</lombok.version>
+        <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
+
+    <distributionManagement>
+        <relocation>
+            <artifactId>spring-security-cas-extension</artifactId>
+            <version>0.4.4</version>
+        </relocation>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies> <!-- The parent should provide all that -->
@@ -67,27 +75,16 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.kakawait</groupId>
-            <artifactId>spring-security-cas-extension</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-cas</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <optional>true</optional>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
         </dependency>
     </dependencies>
 

@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-starter</artifactId>
-    <version>0.4.4</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot starter</name>
@@ -42,7 +42,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>1.5.6.RELEASE</spring-boot-dependencies.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
@@ -97,9 +97,6 @@
     <profiles>
         <profile>
             <id>release</id>
-            <properties>
-                <gpg.executable>gpg2</gpg.executable>
-            </properties>
             <build>
                 <plugins>
                     <plugin>

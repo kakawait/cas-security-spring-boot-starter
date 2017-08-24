@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
 /**
  * @author Thibaud Leprêtre
  */
@@ -64,8 +61,6 @@ public class CasSecurityProperties {
          * @see org.jasig.cas.client.validation.Cas20ProxyTicketValidator
          * @see org.jasig.cas.client.validation.Cas10TicketValidationFilter
          */
-        @Min(1)
-        @Max(3)
         private int protocolVersion = 3;
 
         /**

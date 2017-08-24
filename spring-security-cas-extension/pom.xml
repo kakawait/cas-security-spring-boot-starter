@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>spring-security-cas-extension</artifactId>
-    <version>0.4.4</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <name>Spring security cas extension</name>
@@ -42,7 +42,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <spring-boot-dependencies.version>1.5.4.RELEASE</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>1.5.6.RELEASE</spring-boot-dependencies.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -82,9 +82,6 @@
     <profiles>
         <profile>
             <id>release</id>
-            <properties>
-                <gpg.executable>gpg2</gpg.executable>
-            </properties>
             <build>
                 <plugins>
                     <plugin>

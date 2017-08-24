@@ -67,6 +67,7 @@ public class CasSecurityAutoConfiguration {
 
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
         serviceProperties.setService(buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getLogin()));
+        serviceProperties.setAuthenticateAllArtifacts(true);
         return serviceProperties;
     }
 
@@ -74,7 +75,9 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "dynamic")
     ServiceProperties laxServiceProperties() {
-        return new LaxServiceProperties();
+        LaxServiceProperties serviceProperties = new LaxServiceProperties();
+        serviceProperties.setAuthenticateAllArtifacts(true);
+        return serviceProperties;
     }
 
     @Bean
