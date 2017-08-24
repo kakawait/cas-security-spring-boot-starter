@@ -68,6 +68,8 @@ public class CasSecurityProperties {
          */
         private URI baseUrl;
 
+        private URI ticketValidator;
+
         private Paths paths = new Paths();
 
         @Data
@@ -95,6 +97,8 @@ public class CasSecurityProperties {
          * CAS Service base url (your application base url)
          */
         private URI baseUrl;
+
+        private URI proxyCallbackUrl;
 
         private Paths paths = new Paths();
 

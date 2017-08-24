@@ -20,8 +20,8 @@ public class CasTicketValidatorConfiguration {
 
     @Bean
     TicketValidator ticketValidator(List<CasSecurityConfigurer> casSecurityConfigurers) {
-        String baseUrl = casSecurityProperties.getServer().getBaseUrl().toASCIIString();
-        CasTicketValidatorBuilder builder = new CasTicketValidatorBuilder(baseUrl);
+        String ticketValidator = casSecurityProperties.getServer().getTicketValidator().toASCIIString();
+        CasTicketValidatorBuilder builder = new CasTicketValidatorBuilder(ticketValidator);
         casSecurityConfigurers.forEach(c -> c.configure(builder));
         return builder.build();
     }
