@@ -196,11 +196,11 @@ public class CasSecurityAutoConfiguration {
 
         @Override
         public void configure(CasTicketValidatorBuilder ticketValidator) {
-            URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+            URI proxyCallbackUrl = casSecurityProperties.getService().getProxyCallbackUrl();
             ticketValidator.protocolVersion(casSecurityProperties.getServer().getProtocolVersion());
             String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
             if (proxyCallback != null) {
-                ticketValidator.proxyCallbackUrl(buildUrl(baseUrl, proxyCallback));
+                ticketValidator.proxyCallbackUrl(buildUrl(proxyCallbackUrl, proxyCallback));
             }
             if (!casSecurityProperties.getProxyValidation().isEnabled()) {
                 ticketValidator.proxyChainsValidation(false);
