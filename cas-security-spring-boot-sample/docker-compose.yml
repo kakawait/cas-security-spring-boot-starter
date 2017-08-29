@@ -11,9 +11,13 @@ services:
       - ./docker/All-10000005.json:/cas-overlay/etc/cas/services/All-10000005.json:ro
       - ./docker/pom.xml:/cas-overlay/pom.xml
   app:
-    build: .
+    build:
+      context: ../
+      dockerfile: cas-security-spring-boot-sample/Dockerfile
     ports:
       - "8081:8081"
+      - "5005"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
 

@@ -150,10 +150,10 @@ public class CasSecurityAutoConfiguration {
         @ConditionalOnMissingBean(ServiceAuthenticationDetailsSource.class)
         ServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource(
                 CasSecurityProperties casSecurityProperties) {
-            URI callbackBaseUrl = casSecurityProperties.getService().getCallbackBaseUrl();
             String proxyCallbackPath = casSecurityProperties.getService().getPaths().getProxyCallback();
             URI proxyCallbackUri = null;
             if (proxyCallbackPath != null) {
+                URI callbackBaseUrl = casSecurityProperties.getService().getCallbackBaseUrl();
                 proxyCallbackUri = callbackBaseUrl != null
                         ? UriComponentsBuilder.fromUri(callbackBaseUrl).path(proxyCallbackPath).build().toUri()
                         : URI.create(proxyCallbackPath);
@@ -206,12 +206,13 @@ public class CasSecurityAutoConfiguration {
 
         @Override
         public void configure(CasTicketValidatorBuilder ticketValidator) {
-            URI baseUrl = casSecurityProperties.getService().getBaseUrl();
-            URI callbackBaseUrl = casSecurityProperties.getService().getCallbackBaseUrl();
+            URI baseUrl = (casSecurityProperties.getService().getCallbackBaseUrl() != null)
+                    ? casSecurityProperties.getService().getCallbackBaseUrl()
+                    : casSecurityProperties.getService().getBaseUrl();
             ticketValidator.protocolVersion(casSecurityProperties.getServer().getProtocolVersion());
             String proxyCallback = casSecurityProperties.getService().getPaths().getProxyCallback();
-            if ((baseUrl != null || callbackBaseUrl != null) && proxyCallback != null) {
-                String proxyCallbackUrl = buildUrl(callbackBaseUrl != null ? callbackBaseUrl : baseUrl, proxyCallback);
+            if (baseUrl != null && proxyCallback != null) {
+                String proxyCallbackUrl = buildUrl(baseUrl, proxyCallback);
                 ticketValidator.proxyCallbackUrl(proxyCallbackUrl);
             }
             if (!casSecurityProperties.getProxyValidation().isEnabled()) {
