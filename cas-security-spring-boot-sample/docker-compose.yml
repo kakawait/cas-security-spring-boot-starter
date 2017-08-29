@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 services:
   cas:
     # Tag version does not really represent CAS server version. Please check pom.xml to get real version.
@@ -10,6 +10,11 @@ services:
       - ./docker/cas.properties:/cas-overlay/etc/cas/config/cas.properties:ro
       - ./docker/All-10000005.json:/cas-overlay/etc/cas/services/All-10000005.json:ro
       - ./docker/pom.xml:/cas-overlay/pom.xml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/cas"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
   app:
     build:
       context: ../
@@ -21,4 +26,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+    depends_on:
+      cas:
+        condition: service_healthy
 
