@@ -68,6 +68,24 @@ public class CasSecurityProperties {
          */
         private URI baseUrl;
 
+        /**
+         * CAS Server validation base url, example https://my-cas.server.internal/
+         *
+         * If defined it will be used to compute complete <i>validation base url</i> (for ticket validation)
+         * instead of using {@link Server#baseUrl}.
+         *
+         * <i>Validation url</i> request is executed by the <i>java CAS client</i> when intercepting a
+         * <i>service ticket</i> or <i>proxy ticket</i>. Thus it can be useful to be different than
+         * {@link Server#baseUrl} when CAS server can't share the same network as your browser (for example).
+         *
+         * For example when using containers (<i>Docker</i> or others) or VM, you can't use {@code localhost} hostname
+         * in your <i>validation url</i> since your CAS service inside a container or VM doesn't have the same
+         * {@code localhost} as you host machine.
+         *
+         * @see Server#baseUrl
+         * @see Paths#validationBaseUrl
+         * @see Service#callbackBaseUrl
+         */
         private URI validationBaseUrl;
 
         private Paths paths = new Paths();
@@ -99,22 +117,24 @@ public class CasSecurityProperties {
         private URI baseUrl;
 
         /**
-         * CAS Service callback base url, example https://my-cas.server.com/
+         * CAS Service callback base url, example https://my.service.com/
          *
-         * If defined will be used to compute complete <i>proxy callback url</i> instead of using {@link #baseUrl}.
-         * It will also be use even if {@link #baseUrl} is not defined and you're using {@link #resolutionMode}
+         * If defined it will be used to compute complete <i>proxy callback url</i> instead of using
+         * {@link Service#baseUrl}.
+         * It will also be use even if {@link #baseUrl} is not defined and you're using {@link Service#resolutionMode}
          * is equals to {@link ServiceResolutionMode#DYNAMIC}.
          *
          * <i>Proxy callback</i> request is a fully new request executed from CAS server (using its own http client)
-         * to your service. Thus it can be useful to be different than {@link #baseUrl} when CAS server can't share the
-         * same network as your browser.
+         * to your service. Thus it can be useful to be different than {@link Service#baseUrl} when CAS server
+         * can't share the same network as your browser (for example).
          *
-         * For example when using containers (<i>Docker</i> or other) or VM, you can't use {@code localhost} hostname
-         * as <i>proxy callback url</i> since CAS server inside container or VM doesn't have the same {@code localhost}
-         * as your host machine.
+         * For example when using containers (<i>Docker</i> or others) or VM, you can't use {@code localhost} hostname
+         * in your <i>proxy callback url</i> since CAS server inside a container or VM doesn't have the same
+         * {@code localhost} as your host machine.
          *
-         * @see Paths#baseUrl
+         * @see Service#baseUrl
          * @see Paths#proxyCallback
+         * @see Server#validationBaseUrl
          */
         private URI callbackBaseUrl;
 
