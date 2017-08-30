@@ -1,6 +1,6 @@
 # Cas security spring boot sample
 
-[![asciicast](https://asciinema.org/a/sFfnoCvlxHMgxGEg6VvPuscAv.png)](https://asciinema.org/a/sFfnoCvlxHMgxGEg6VvPuscAv)
+[![asciicast](https://asciinema.org/a/eNoup6KEIfd2TbmSwnpQxdjCT.png)](https://asciinema.org/a/eNoup6KEIfd2TbmSwnpQxdjCT)
 
 ## Run using docker
 
