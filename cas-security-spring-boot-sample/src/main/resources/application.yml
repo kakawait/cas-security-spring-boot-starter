@@ -25,7 +25,7 @@ spring:
 security:
   cas:
     server:
-      validation-base-url: http://cas:8080/cas/
+      validation-base-url: http://cas:8082/cas/
     service:
       callback-base-url: http://app:8081/cas/
       paths:
