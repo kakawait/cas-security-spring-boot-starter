@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-sample</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 
     <name>Cas security spring boot sample</name>
 
@@ -48,5 +48,14 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

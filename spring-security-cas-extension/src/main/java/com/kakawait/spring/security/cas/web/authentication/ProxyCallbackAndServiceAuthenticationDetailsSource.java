@@ -4,6 +4,8 @@ import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource;
 
+import java.net.URI;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -12,17 +14,17 @@ import javax.servlet.http.HttpServletRequest;
 public class ProxyCallbackAndServiceAuthenticationDetailsSource extends ServiceAuthenticationDetailsSource {
     private final ServiceProperties serviceProperties;
 
-    private final String proxyCallbackPath;
+    private final URI proxyCallbackUri;
 
     public ProxyCallbackAndServiceAuthenticationDetailsSource(ServiceProperties serviceProperties,
-            String proxyCallbackPath) {
+            URI proxyCallbackUri) {
         super(serviceProperties);
         this.serviceProperties = serviceProperties;
-        this.proxyCallbackPath = proxyCallbackPath;
+        this.proxyCallbackUri = proxyCallbackUri;
     }
 
     @Override
     public ServiceAuthenticationDetails buildDetails(HttpServletRequest context) {
-        return new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, context, proxyCallbackPath);
+        return new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, context, proxyCallbackUri);
     }
 }

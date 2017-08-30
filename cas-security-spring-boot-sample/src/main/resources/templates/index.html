@@ -6,5 +6,9 @@
 </head>
 <body>
 <h2 th:text="${username} ? 'Hello, ' + ${username} + '!' : 'Hello world!'">Hello world!</h2>
+<ul>
+    <li th:text="${principal} ? ${principal} : 'No principal!'">Principal object</li>
+    <li th:text="${pgt} ? ${pgt} : 'No proxy granting ticket!'">Proxy granting ticket object</li>
+</ul>
 </body>
 </html>
