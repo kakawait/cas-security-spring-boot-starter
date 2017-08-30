@@ -4,6 +4,7 @@ import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -20,8 +21,10 @@ public class CasTicketValidatorConfiguration {
 
     @Bean
     TicketValidator ticketValidator(List<CasSecurityConfigurer> casSecurityConfigurers) {
-        String baseUrl = casSecurityProperties.getServer().getBaseUrl().toASCIIString();
-        CasTicketValidatorBuilder builder = new CasTicketValidatorBuilder(baseUrl);
+        URI baseUrl = casSecurityProperties.getServer().getValidationBaseUrl() != null
+                ? casSecurityProperties.getServer().getValidationBaseUrl()
+                : casSecurityProperties.getServer().getBaseUrl();
+        CasTicketValidatorBuilder builder = new CasTicketValidatorBuilder(baseUrl.toASCIIString());
         casSecurityConfigurers.forEach(c -> c.configure(builder));
         return builder.build();
     }

@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 security:
   basic:
     enabled: true
@@ -13,3 +16,23 @@ security:
       protocol-version: 3
     service:
       resolution-mode: dynamic
+
+---
+
+spring:
+  profiles: docker
+
+security:
+  cas:
+    server:
+      validation-base-url: http://cas:8082/cas/
+    service:
+      callback-base-url: http://app:8081/cas/
+      paths:
+        proxy-callback: /cas/proxy-callback
+
+logging:
+  level:
+    org.jasig.cas.client.validation: debug
+
+
