@@ -1,11 +1,15 @@
 # Cas security spring boot sample
 
+[![asciicast](https://asciinema.org/a/sFfnoCvlxHMgxGEg6VvPuscAv.png)](https://asciinema.org/a/sFfnoCvlxHMgxGEg6VvPuscAv)
+
 ## Run using docker
 
 ```bash
 docker-compose build --no-cache 
 docker-compose up -d
 ```
+
+**ATTENTION** first time usage, CAS Server will take many time to deploy (around ~5mins), you can check progress using `docker-compose logs -f`.
 
 ## Usage
 
