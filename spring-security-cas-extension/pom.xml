@@ -26,6 +26,10 @@
             <name>Thibaud Leprêtre</name>
             <email>thibaud.lepretre@gmail.com</email>
         </developer>
+        <developer>
+            <name>Jonathan Coueraud</name>
+            <email>j.coueraud@gmail.com</email>
+        </developer>
     </developers>
 
     <scm>
@@ -76,6 +80,11 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
