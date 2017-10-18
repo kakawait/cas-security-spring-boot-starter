@@ -1,15 +1,7 @@
 package com.kakawait.spring.boot.security.cas;
 
 
-import com.kakawait.spring.security.cas.client.AuthenticatedPrincipal;
-import com.kakawait.spring.security.cas.client.Cas;
-import com.kakawait.spring.security.cas.client.CasClientProperties;
-import com.kakawait.spring.security.cas.client.CasInterceptor;
-import com.kakawait.spring.security.cas.client.CasRequestService;
-import com.kakawait.spring.security.cas.client.CasRequestServiceImpl;
-import com.kakawait.spring.security.cas.client.CasRequestSpecification;
-import com.kakawait.spring.security.cas.client.JasigProxyTicketService;
-import com.kakawait.spring.security.cas.client.ProxyTicketService;
+import com.kakawait.spring.security.cas.client.*;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -57,8 +49,8 @@ public class CasClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ProxyTicketService proxyTicketService() {
-        return new JasigProxyTicketService();
+    public ProxyTicketRepository proxyTicketService() {
+        return new JasigProxyTicketRepository();
     }
 
     @Bean
@@ -68,30 +60,28 @@ public class CasClientAutoConfiguration {
         return new CasClientProperties();
     }
 
-
     @Bean
     @ConditionalOnMissingBean
-    public CasRequestService casRequestService(ProxyTicketService proxyTicketService,
-            CasClientProperties casClientProperties) {
-        return new CasRequestServiceImpl(proxyTicketService, casClientProperties);
+    public CasRequestFactory casRequestFactory(CasClientProperties casClientProperties) {
+        return new CasRequestFactory(casClientProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CasRequestSpecification casRequestSpecification() {
-        return new CasRequestSpecification();
+    public CasStatelessService casStatelessService(ProxyTicketRepository proxyTicketRepository,
+            CasRequestFactory casRequestFactory) {
+        return new CasStatelessServiceImpl(proxyTicketRepository, casRequestFactory);
     }
 
     @Bean
-    public CasInterceptor casInterceptor(AuthenticatedPrincipal authenticatedPrincipal,
-            CasRequestService casRequestService,
-            CasRequestSpecification casRequestSpecification) {
-        return new CasInterceptor(authenticatedPrincipal, casRequestService, casRequestSpecification);
+    public CasStatelessInterceptor casInterceptor(AuthenticatedPrincipal authenticatedPrincipal,
+            CasStatelessService casStatelessService) {
+        return new CasStatelessInterceptor(authenticatedPrincipal, casStatelessService);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RestTemplateCustomizer restTemplateCustomizer(final CasInterceptor casInterceptor) {
+    public RestTemplateCustomizer restTemplateCustomizer(final CasStatelessInterceptor casInterceptor) {
         return restTemplate -> {
             List<ClientHttpRequestInterceptor> list = new ArrayList<>(
                     restTemplate.getInterceptors());

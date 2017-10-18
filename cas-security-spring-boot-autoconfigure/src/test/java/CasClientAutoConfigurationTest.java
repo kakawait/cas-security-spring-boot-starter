@@ -1,6 +1,6 @@
 import com.kakawait.spring.boot.security.cas.CasClientAutoConfiguration;
 import com.kakawait.spring.security.cas.client.Cas;
-import com.kakawait.spring.security.cas.client.CasInterceptor;
+import com.kakawait.spring.security.cas.client.CasStatelessInterceptor;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class CasClientAutoConfigurationTest {
         List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
         Assertions.assertThat(interceptors).hasSize(1);
         ClientHttpRequestInterceptor interceptor = interceptors.get(0);
-        Assertions.assertThat(interceptor).isInstanceOf(CasInterceptor.class);
+        Assertions.assertThat(interceptor).isInstanceOf(CasStatelessInterceptor.class);
     }
 
     private ConfigurableApplicationContext init(Class<?> config) {

@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * @author Jonathan Coueraud
  */
-public class JasigProxyTicketService implements ProxyTicketService {
+public class JasigProxyTicketRepository implements ProxyTicketRepository {
 
     @Override
     public Ticket getProxyTicket(Principal principal, URI targetUri) throws IOException {

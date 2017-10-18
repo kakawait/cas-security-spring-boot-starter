@@ -8,6 +8,6 @@ import java.security.Principal;
 /**
  * @author Jonathan Coueraud
  */
-public interface CasRequestService {
+public interface CasStatelessService {
     HttpRequest createRequest(Principal principal, HttpRequest request) throws IOException;
 }

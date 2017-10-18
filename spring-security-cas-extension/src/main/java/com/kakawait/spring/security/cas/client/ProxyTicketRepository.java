@@ -7,6 +7,6 @@ import java.security.Principal;
 /**
  * @author Jonathan Coueraud
  */
-public interface ProxyTicketService {
+public interface ProxyTicketRepository {
     Ticket getProxyTicket(Principal principal, URI targetUri) throws IOException;
 }

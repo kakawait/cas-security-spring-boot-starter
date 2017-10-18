@@ -10,17 +10,14 @@ import java.io.IOException;
 /**
  * @author Jonathan Coueraud
  */
-public class CasInterceptor implements ClientHttpRequestInterceptor {
-    final private CasRequestService casRequestService;
-    final private CasRequestSpecification casRequestSpecification;
+public class CasStatelessInterceptor implements ClientHttpRequestInterceptor {
+    final private CasStatelessService casStatelessService;
     final private AuthenticatedPrincipal authenticatedPrincipal;
 
-    public CasInterceptor(AuthenticatedPrincipal authenticatedPrincipal,
-            CasRequestService casRequestService,
-            CasRequestSpecification casRequestSpecification) {
+    public CasStatelessInterceptor(AuthenticatedPrincipal authenticatedPrincipal,
+            CasStatelessService casStatelessService) {
         this.authenticatedPrincipal = authenticatedPrincipal;
-        this.casRequestService = casRequestService;
-        this.casRequestSpecification = casRequestSpecification;
+        this.casStatelessService = casStatelessService;
     }
 
     @Override
@@ -28,12 +25,8 @@ public class CasInterceptor implements ClientHttpRequestInterceptor {
             byte[] bytes,
             ClientHttpRequestExecution execution) throws IOException {
 
-        if (!casRequestSpecification.doItNeedProxyTicket(request)) {
-            return execution.execute(request, bytes);
-        }
-
         return execution.execute(
-                casRequestService.createRequest(authenticatedPrincipal.getAuthenticatedPrincipal(), request),
+                casStatelessService.createRequest(authenticatedPrincipal.getAuthenticatedPrincipal(), request),
                 bytes);
     }
 }

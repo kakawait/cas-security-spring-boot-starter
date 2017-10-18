@@ -15,13 +15,14 @@ import static org.mockito.Mockito.when;
 /**
  * @author Jonathan Coueraud
  */
-public class CasRequestServiceImplTest {
+public class CasStatelessServiceImplTest {
 
     private Principal principal;
     private HttpRequest httpRequest;
-    private ProxyTicketService proxyTicketService;
+    private ProxyTicketRepository proxyTicketRepository;
     private CasClientProperties casClientProperties;
-    private CasRequestService casRequestService;
+    private CasStatelessService casStatelessService;
+    private CasRequestFactory casRequestFactory;
 
     @Before
     public void setUp() throws Throwable {
@@ -35,28 +36,29 @@ public class CasRequestServiceImplTest {
         httpRequest = mock(HttpRequest.class);
         when(httpRequest.getURI()).thenReturn(uri);
 
-        proxyTicketService = mock(ProxyTicketService.class);
-        when(proxyTicketService.getProxyTicket(principal, uri)).thenReturn(proxyTicket);
+        proxyTicketRepository = mock(ProxyTicketRepository.class);
+        when(proxyTicketRepository.getProxyTicket(principal, uri)).thenReturn(proxyTicket);
 
         casClientProperties = mock(CasClientProperties.class);
         when(casClientProperties.getProxyTicketQueryKey()).thenReturn("ticket");
 
-        casRequestService =
-                new CasRequestServiceImpl(proxyTicketService, casClientProperties);
+        casRequestFactory = new CasRequestFactory(casClientProperties);
+
+        casStatelessService = new CasStatelessServiceImpl(proxyTicketRepository, casRequestFactory);
     }
 
     @After
     public void tearDown() {
         principal = null;
         httpRequest = null;
-        proxyTicketService = null;
+        proxyTicketRepository = null;
         casClientProperties = null;
-        casRequestService = null;
+        casStatelessService = null;
     }
 
     @Test
     public void testCreateRequestWithPrincipal() throws Throwable {
-        HttpRequest newHttpRequest = casRequestService.createRequest(principal, httpRequest);
+        HttpRequest newHttpRequest = casStatelessService.createRequest(principal, httpRequest);
         String proxyTicketParamKey = casClientProperties.getProxyTicketQueryKey();
         URI newUri = newHttpRequest.getURI();
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUri(newUri);
