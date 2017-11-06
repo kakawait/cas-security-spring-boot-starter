@@ -1,6 +1,5 @@
 package com.kakawait.spring.security.cas.client;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 
 import java.io.IOException;
@@ -13,19 +12,17 @@ public class CasStatelessServiceImpl implements CasStatelessService {
 
     private final ProxyTicketRepository proxyTicketRepository;
 
-    private final CasRequestFactory casRequestFactory;
+    private final RequestWithProxyTicketFactory requestWithProxyTicketFactory;
 
-
-    @Autowired
     public CasStatelessServiceImpl(ProxyTicketRepository proxyTicketRepository,
-            CasRequestFactory casRequestFactory) {
+            RequestWithProxyTicketFactory requestWithProxyTicketFactory) {
         this.proxyTicketRepository = proxyTicketRepository;
-        this.casRequestFactory = casRequestFactory;
+        this.requestWithProxyTicketFactory = requestWithProxyTicketFactory;
     }
 
     @Override
     public HttpRequest createRequest(Principal principal, HttpRequest request) throws IOException {
         Ticket proxyTicket = proxyTicketRepository.getProxyTicket(principal, request.getURI());
-        return casRequestFactory.createRequest(proxyTicket, request);
+        return requestWithProxyTicketFactory.createRequest(proxyTicket, request);
     }
 }

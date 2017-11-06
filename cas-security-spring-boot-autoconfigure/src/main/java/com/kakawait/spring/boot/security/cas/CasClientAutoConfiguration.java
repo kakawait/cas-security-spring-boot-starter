@@ -62,15 +62,15 @@ public class CasClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CasRequestFactory casRequestFactory(CasClientProperties casClientProperties) {
-        return new CasRequestFactory(casClientProperties);
+    public RequestWithProxyTicketFactory casRequestFactory(CasClientProperties casClientProperties) {
+        return new RequestWithProxyTicketFactory(casClientProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public CasStatelessService casStatelessService(ProxyTicketRepository proxyTicketRepository,
-            CasRequestFactory casRequestFactory) {
-        return new CasStatelessServiceImpl(proxyTicketRepository, casRequestFactory);
+            RequestWithProxyTicketFactory requestWithProxyTicketFactory) {
+        return new CasStatelessServiceImpl(proxyTicketRepository, requestWithProxyTicketFactory);
     }
 
     @Bean

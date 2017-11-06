@@ -9,11 +9,11 @@ import java.net.URI;
 /**
  * @author Jonathan Coueraud
  */
-public class CasRequestFactory {
+public class RequestWithProxyTicketFactory {
 
     private final CasClientProperties casClientProperties;
 
-    public CasRequestFactory(CasClientProperties casClientProperties) {
+    public RequestWithProxyTicketFactory(CasClientProperties casClientProperties) {
         this.casClientProperties = casClientProperties;
     }
 

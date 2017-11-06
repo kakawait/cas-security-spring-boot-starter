@@ -22,7 +22,7 @@ public class CasStatelessServiceImplTest {
     private ProxyTicketRepository proxyTicketRepository;
     private CasClientProperties casClientProperties;
     private CasStatelessService casStatelessService;
-    private CasRequestFactory casRequestFactory;
+    private RequestWithProxyTicketFactory requestWithProxyTicketFactory;
 
     @Before
     public void setUp() throws Throwable {
@@ -42,9 +42,9 @@ public class CasStatelessServiceImplTest {
         casClientProperties = mock(CasClientProperties.class);
         when(casClientProperties.getProxyTicketQueryKey()).thenReturn("ticket");
 
-        casRequestFactory = new CasRequestFactory(casClientProperties);
+        requestWithProxyTicketFactory = new RequestWithProxyTicketFactory(casClientProperties);
 
-        casStatelessService = new CasStatelessServiceImpl(proxyTicketRepository, casRequestFactory);
+        casStatelessService = new CasStatelessServiceImpl(proxyTicketRepository, requestWithProxyTicketFactory);
     }
 
     @After
