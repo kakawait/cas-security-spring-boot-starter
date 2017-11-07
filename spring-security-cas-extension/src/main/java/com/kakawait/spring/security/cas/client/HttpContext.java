@@ -2,10 +2,7 @@ package com.kakawait.spring.security.cas.client;
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Jonathan Coueraud
@@ -23,13 +20,13 @@ public class HttpContext {
         this.principal = principal;
     }
 
-    public HttpContext addCookie(CookieWrapper cookieWrapper) {
-        cookieWrappers.add(cookieWrapper);
+    public HttpContext addCookies(Collection<CookieWrapper> collection) {
+        cookieWrappers.addAll(collection);
         return this;
     }
 
-    public List<CookieWrapper> getCookies() {
-        return new ArrayList<>(cookieWrappers);
+    public Set<CookieWrapper> getCookies() {
+        return new HashSet<>(cookieWrappers);
     }
 
     public URI getUri() {

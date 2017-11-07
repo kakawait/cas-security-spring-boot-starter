@@ -8,8 +8,6 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Jonathan Coueraud
@@ -18,32 +16,34 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
 
     private static final int DEFAULT_FLUSH_INTERVAL = 1000;
 
-    private final ConcurrentHashMap<String, CookieWrapper> cookies = new ConcurrentHashMap<>();
-
-    private final ConcurrentHashMap<Principal, ConcurrentHashMap<URI, Collection<CookieWrapper>>>
-            principalToUriToCookies = new ConcurrentHashMap<>();
-
-    private final ConcurrentHashMap<HttpContextId, Collection<CookieWrapper>> contextIdToCookies =
+    private final ConcurrentHashMap<HttpContextId, Map<String, CookieWrapper>> contextIdToCookies =
             new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<Principal, Collection<URI>> principalToUris =
+    private final ConcurrentHashMap<Principal, Set<URI>> principalToUris =
             new ConcurrentHashMap<>();
 
     private final DelayQueue<CookieExpiry> expiryQueue = new DelayQueue<>();
 
     private final ConcurrentHashMap<String, CookieExpiry> expiryMap = new ConcurrentHashMap<>();
-
-    private int flushInterval = DEFAULT_FLUSH_INTERVAL;
-
+    private final int flushInterval;
     private AtomicInteger flushCounter = new AtomicInteger(0);
+
+    public InMemoryHttpContextRepository() {
+        this(DEFAULT_FLUSH_INTERVAL);
+    }
+
+    public InMemoryHttpContextRepository(int flushInterval) {
+        this.flushInterval = ((flushInterval > 0) ? flushInterval : DEFAULT_FLUSH_INTERVAL);
+    }
 
     @Override
     public HttpContext findByPrincipalAndUri(Principal principal, URI uri) {
 
         return Optional.ofNullable(contextIdToCookies.get(new HttpContextId(principal, uri)))
+                .map(Map::values)
                 .map(cookies -> {
                     HttpContext context = new HttpContext(principal, uri);
-                    cookies.forEach(context::addCookie);
+                    context.addCookies(cookies);
                     return context;
                 })
                 .orElse(null);
@@ -58,18 +58,15 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         }
 
         HttpContextId contextId = new HttpContextId(context.getPrincipal(), context.getUri());
-        context.getCookies().forEach(cookie -> saveCookie(contextId, cookie));
+        saveCookies(contextId, context.getCookies());
     }
 
     @Override
     public void removeByPrincipal(Principal principal) {
-        Collection<URI> uris = principalToUris.get(principal);
-        uris = (uris == null) ? Collections.emptySet() : uris;
-
-        Stream<HttpContextId> contextIdStream = uris.stream()
-                .map(uri -> new HttpContextId(principal, uri));
-
-        contextIdStream.forEach(this::removeCookie);
+        Optional.ofNullable(principalToUris.get(principal)).orElse(Collections.emptySet())
+                .stream()
+                .map(uri -> new HttpContextId(principal, uri))
+                .forEach(this::removeCookie);
     }
 
     @Override
@@ -86,9 +83,7 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         }
     }
 
-    private CookieWrapper saveCookie(HttpContextId contextId, CookieWrapper cookie) {
-
-        cookies.put(cookie.getName(), cookie);
+    private Set<CookieWrapper> saveCookies(HttpContextId contextId, Set<CookieWrapper> cookies) {
 
         Principal principal = contextId.getPrincipal();
         if (!principalToUris.containsKey(principal)) {
@@ -103,46 +98,48 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         if (!contextIdToCookies.containsKey(contextId)) {
             synchronized (contextIdToCookies) {
                 if (!contextIdToCookies.containsKey(contextId)) {
-                    contextIdToCookies.put(contextId, new HashSet<>());
+                    contextIdToCookies.put(contextId, new HashMap<>());
                 }
             }
         }
-        contextIdToCookies.get(contextId).add(cookie);
 
-        if (cookie.getExpiration() > 0) {
-            CookieExpiry expiry =
-                    new CookieExpiry(contextId, cookie.getName(), cookie.getExpiration());
-            // Remove existing expiry for this token if present
-            expiryQueue.remove(expiryMap.put(cookie.getName(), expiry));
-            this.expiryQueue.put(expiry);
-        }
+        cookies.forEach(cookie -> {
+            contextIdToCookies.get(contextId).put(cookie.getName(), cookie);
 
-        return cookie;
+            if (cookie.getExpiration() > 0) {
+                CookieExpiry expiry =
+                        new CookieExpiry(contextId, cookie.getName(), cookie.getExpiration());
+                // Remove existing expiry for this token if present
+                expiryQueue.remove(expiryMap.put(cookie.getName(), expiry));
+                this.expiryQueue.put(expiry);
+            }
+        });
+
+        return cookies;
     }
 
     private Collection<CookieWrapper> removeCookie(HttpContextId contextId) {
-        return Optional.ofNullable(contextIdToCookies.get(contextId))
-                .map(cookies1 -> cookies1.stream()
-                        .map(c -> removeCookie(contextId, c.getName()))
-                        .collect(Collectors.toSet()))
-                .orElseGet(Collections::emptySet);
+        Map<String, CookieWrapper> removed = contextIdToCookies.remove(contextId);
+        Optional.ofNullable(principalToUris.get(contextId.getPrincipal())).ifPresent(uris -> {
+            uris.remove(contextId.getUri());
+        });
+
+        return removed.values();
     }
 
     private CookieWrapper removeCookie(HttpContextId contextId, String cookieName) {
-        CookieWrapper removed = cookies.remove(cookieName);
-
-        Optional.ofNullable(contextIdToCookies.get(contextId))
-                .ifPresent(cookies -> {
-                    cookies.remove(removed);
+        return Optional.ofNullable(contextIdToCookies.get(contextId))
+                .map(cookies -> {
+                    CookieWrapper removed = cookies.remove(cookieName);
 
                     if (cookies.isEmpty()) {
                         contextIdToCookies.remove(contextId);
                         Optional.ofNullable(principalToUris.get(contextId.getPrincipal()))
                                 .ifPresent(uris -> uris.remove(contextId.getUri()));
                     }
-                });
 
-        return removed;
+                    return removed;
+                }).orElse(null);
     }
 
     private static class HttpContextId {
@@ -212,6 +209,47 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
             }
             long diff = getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS);
             return ((diff == 0) ? 0 : ((diff < 0) ? -1 : 1));
+        }
+    }
+
+
+    private static class Cookie {
+
+        private final String name;
+
+        private final String value;
+
+        private final long expiration;
+
+        public Cookie(CookieWrapper wrapper) {
+            name = wrapper.getName();
+            value = wrapper.getValue();
+            expiration = wrapper.getExpiration();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public long getExpiration() {
+            return expiration;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Cookie cookie = (Cookie) o;
+            return Objects.equals(name, cookie.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
         }
     }
 }

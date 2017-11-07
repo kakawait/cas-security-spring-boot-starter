@@ -4,7 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.support.HttpRequestWrapper;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Jonathan Coueraud
@@ -12,7 +12,7 @@ import java.util.List;
 public class RequestWithCookieFactoryImpl implements RequestWithCookieFactory {
 
     @Override
-    public HttpRequest createRequest(HttpRequest request, List<CookieWrapper> cookieWrappers) {
+    public HttpRequest createRequest(HttpRequest request, Set<CookieWrapper> cookieWrappers) {
         HttpHeaders headers = request.getHeaders();
 
         cookieWrappers.stream()

@@ -36,9 +36,9 @@ public class CasStatefulServiceImpl implements CasStatefulService {
 
     @Override
     public HttpRequest createRequest(Principal principal, HttpRequest request) throws IOException {
-        List<CookieWrapper> cookies =
+        Set<CookieWrapper> cookies =
                 Optional.ofNullable(httpContextRepository.findByPrincipalAndUri(principal, request.getURI()))
-                        .map(HttpContext::getCookies).orElse(Collections.emptyList());
+                        .map(HttpContext::getCookies).orElse(Collections.emptySet());
 
         return (cookies.isEmpty() ?
                 casStatelessService.createRequest(principal, request) :
@@ -51,7 +51,7 @@ public class CasStatefulServiceImpl implements CasStatefulService {
         URI uri = request.getURI();
         HttpContext httpContext = Optional.ofNullable(httpContextRepository.findByPrincipalAndUri(principal, uri))
                 .orElse(new HttpContext(principal, uri));
-        cookieWrappers.forEach(httpContext::addCookie);
+        httpContext.addCookies(cookieWrappers);
         httpContextRepository.save(httpContext);
     }
 }
