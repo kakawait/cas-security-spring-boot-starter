@@ -36,4 +36,18 @@ public class HttpContext {
     public Principal getPrincipal() {
         return principal;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HttpContext context = (HttpContext) o;
+        return Objects.equals(uri, context.uri) &&
+                Objects.equals(principal, context.principal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uri, principal);
+    }
 }

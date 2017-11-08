@@ -35,4 +35,6 @@ public class HttpCookieWrapper implements CookieWrapper {
         long maxAge = httpCookie.getMaxAge();
         return ((maxAge > 0) ? maxAge * 1000 : maxAge);
     }
+
+
 }

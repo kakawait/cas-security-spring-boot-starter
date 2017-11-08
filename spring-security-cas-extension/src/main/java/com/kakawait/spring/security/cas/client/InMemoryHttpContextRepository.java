@@ -16,6 +16,8 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
 
     private static final int DEFAULT_FLUSH_INTERVAL = 1000;
 
+    private static final CurrentTimeMillisAdapter CURRENT_TIME_MILLIS_ADAPTER = new CurrentTimeMillisAdapter(){};
+
     private final ConcurrentHashMap<HttpContextId, Map<String, CookieWrapper>> contextIdToCookies =
             new ConcurrentHashMap<>();
 
@@ -25,15 +27,29 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
     private final DelayQueue<CookieExpiry> expiryQueue = new DelayQueue<>();
 
     private final ConcurrentHashMap<String, CookieExpiry> expiryMap = new ConcurrentHashMap<>();
-    private final int flushInterval;
+
     private AtomicInteger flushCounter = new AtomicInteger(0);
 
+    private final int flushInterval;
+
+    private final CurrentTimeMillisAdapter currentTimeMillisAdapter;
+
     public InMemoryHttpContextRepository() {
-        this(DEFAULT_FLUSH_INTERVAL);
+        this(DEFAULT_FLUSH_INTERVAL, CURRENT_TIME_MILLIS_ADAPTER);
     }
 
     public InMemoryHttpContextRepository(int flushInterval) {
+        this(flushInterval, CURRENT_TIME_MILLIS_ADAPTER);
+    }
+
+    public InMemoryHttpContextRepository(CurrentTimeMillisAdapter currentTimeMillisAdapter) {
+        this(DEFAULT_FLUSH_INTERVAL, currentTimeMillisAdapter);
+    }
+
+    public InMemoryHttpContextRepository(int flushInterval,
+            CurrentTimeMillisAdapter currentTimeMillisAdapter) {
         this.flushInterval = ((flushInterval > 0) ? flushInterval : DEFAULT_FLUSH_INTERVAL);
+        this.currentTimeMillisAdapter = currentTimeMillisAdapter;
     }
 
     @Override
@@ -63,15 +79,15 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
 
     @Override
     public void removeByPrincipal(Principal principal) {
-        Optional.ofNullable(principalToUris.get(principal)).orElse(Collections.emptySet())
-                .stream()
-                .map(uri -> new HttpContextId(principal, uri))
-                .forEach(this::removeCookie);
+        Optional.ofNullable(principalToUris.remove(principal))
+                .ifPresent(uris -> uris.stream()
+                        .map(uri -> new HttpContextId(principal, uri))
+                        .forEach(contextIdToCookies::remove));
     }
 
     @Override
     public void removeByPrincipalUri(Principal principal, URI uri) {
-        removeCookie(new HttpContextId(principal, uri));
+        removeCookie(Collections.singleton(new HttpContextId(principal, uri)));
     }
 
     private void flush() {
@@ -83,7 +99,7 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         }
     }
 
-    private Set<CookieWrapper> saveCookies(HttpContextId contextId, Set<CookieWrapper> cookies) {
+    private void saveCookies(HttpContextId contextId, Set<CookieWrapper> cookies) {
 
         Principal principal = contextId.getPrincipal();
         if (!principalToUris.containsKey(principal)) {
@@ -104,6 +120,9 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         }
 
         cookies.forEach(cookie -> {
+
+            if (cookie.getExpiration() == 0) return;
+
             contextIdToCookies.get(contextId).put(cookie.getName(), cookie);
 
             if (cookie.getExpiration() > 0) {
@@ -114,35 +133,34 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
                 this.expiryQueue.put(expiry);
             }
         });
-
-        return cookies;
     }
 
-    private Collection<CookieWrapper> removeCookie(HttpContextId contextId) {
-        Map<String, CookieWrapper> removed = contextIdToCookies.remove(contextId);
-        Optional.ofNullable(principalToUris.get(contextId.getPrincipal())).ifPresent(uris -> {
-            uris.remove(contextId.getUri());
+    private void removeCookie(Set<HttpContextId> contextIds) {
+        contextIds.forEach(contextId -> {
+            contextIdToCookies.remove(contextId);
+            Optional.ofNullable(principalToUris.get(contextId.getPrincipal()))
+                    .ifPresent(uris -> uris.remove(contextId.getUri()));
         });
 
-        return removed.values();
+        // principalToUris.values().removeIf(Set::isEmpty);
+        // potentiellement couteux pour quel gain ? pas de clean dans
+        // org.springframework.security.oauth2.provider.token.store
     }
 
-    private CookieWrapper removeCookie(HttpContextId contextId, String cookieName) {
-        return Optional.ofNullable(contextIdToCookies.get(contextId))
-                .map(cookies -> {
-                    CookieWrapper removed = cookies.remove(cookieName);
+    private void removeCookie(HttpContextId contextId, String cookieName) {
+        Optional.ofNullable(contextIdToCookies.get(contextId))
+                .ifPresent(cookies -> {
+                    cookies.remove(cookieName);
 
                     if (cookies.isEmpty()) {
                         contextIdToCookies.remove(contextId);
                         Optional.ofNullable(principalToUris.get(contextId.getPrincipal()))
                                 .ifPresent(uris -> uris.remove(contextId.getUri()));
                     }
-
-                    return removed;
-                }).orElse(null);
+                });
     }
 
-    private static class HttpContextId {
+    private class HttpContextId {
 
         private final Principal principal;
 
@@ -176,7 +194,7 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
         }
     }
 
-    private static class CookieExpiry implements Delayed {
+    private class CookieExpiry implements Delayed {
 
         private final HttpContextId contextId;
 
@@ -184,14 +202,14 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
 
         private final String name;
 
-        public CookieExpiry(HttpContextId contextId, String name, long maxAge) {
+        public CookieExpiry(HttpContextId contextId, String name, long expiry) {
             this.contextId = contextId;
             this.name = name;
-            this.expiry = maxAge;
+            this.expiry = expiry;
         }
 
         public long getDelay(TimeUnit unit) {
-            return expiry - System.currentTimeMillis();
+            return expiry - currentTimeMillisAdapter.currentTimeMillis();
         }
 
         public String getName() {
@@ -209,47 +227,6 @@ public class InMemoryHttpContextRepository implements HttpContextRepository {
             }
             long diff = getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS);
             return ((diff == 0) ? 0 : ((diff < 0) ? -1 : 1));
-        }
-    }
-
-
-    private static class Cookie {
-
-        private final String name;
-
-        private final String value;
-
-        private final long expiration;
-
-        public Cookie(CookieWrapper wrapper) {
-            name = wrapper.getName();
-            value = wrapper.getValue();
-            expiration = wrapper.getExpiration();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public long getExpiration() {
-            return expiration;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Cookie cookie = (Cookie) o;
-            return Objects.equals(name, cookie.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
         }
     }
 }
