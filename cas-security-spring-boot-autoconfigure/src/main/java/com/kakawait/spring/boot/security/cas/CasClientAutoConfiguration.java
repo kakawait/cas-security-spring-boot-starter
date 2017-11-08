@@ -46,13 +46,12 @@ public class CasClientAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     @Qualifier("casClientHttpRequestInterceptor")
-    public RestTemplateCustomizer restTemplateCustomizer(final ClientHttpRequestInterceptor casInterceptor) {
+    public RestTemplateCustomizer restTemplateCustomizer(final List<ClientHttpRequestInterceptor> casInterceptors) {
         return restTemplate -> {
             List<ClientHttpRequestInterceptor> list = new ArrayList<>(
                     restTemplate.getInterceptors());
-            list.add(casInterceptor);
+            list.addAll(casInterceptors);
             restTemplate.setInterceptors(list);
         };
     }
@@ -94,7 +93,6 @@ public class CasClientAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        @Qualifier("casClientHttpRequestInterceptor")
         @ConditionalOnProperty(value = "cas.client.stateful", havingValue = "false", matchIfMissing = true)
         public CasStatelessInterceptor casStatelessInterceptor(AuthenticatedPrincipal authenticatedPrincipal,
                 CasStatelessService casStatelessService) {
@@ -134,8 +132,7 @@ public class CasClientAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        @Qualifier("casClientHttpRequestInterceptor")
-        public CasStatefulInterceptor casStatefulService(AuthenticatedPrincipal authenticatedPrincipal, CasStatefulService casStatefulService) {
+        public CasStatefulInterceptor casStatefulInterceptor(AuthenticatedPrincipal authenticatedPrincipal, CasStatefulService casStatefulService) {
             return new CasStatefulInterceptor(casStatefulService, authenticatedPrincipal);
         }
     }

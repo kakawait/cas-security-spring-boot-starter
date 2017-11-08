@@ -1,5 +1,6 @@
 import com.kakawait.spring.boot.security.cas.CasClientAutoConfiguration;
 import com.kakawait.spring.security.cas.client.Cas;
+import com.kakawait.spring.security.cas.client.CasStatefulInterceptor;
 import com.kakawait.spring.security.cas.client.CasStatelessInterceptor;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -31,7 +32,20 @@ public class CasClientAutoConfigurationTest {
 
         RestTemplate restTemplate = restTemplates.values().iterator().next();
 
-        assertCas(restTemplate);
+        assertStatelessCas(restTemplate);
+    }
+
+    @Test
+    public void restTemplateGetsCasStatefulInterceptor() {
+        ConfigurableApplicationContext context = initStatefull(OneRestTemplate.class);
+        final Map<String, RestTemplate> restTemplates = context.getBeansOfType(RestTemplate.class);
+
+        Assertions.assertThat(restTemplates).isNotNull();
+        Assertions.assertThat(restTemplates.values()).hasSize(1);
+
+        RestTemplate restTemplate = restTemplates.values().iterator().next();
+
+        assertStatefulCas(restTemplate);
     }
 
     @Test
@@ -41,27 +55,41 @@ public class CasClientAutoConfigurationTest {
 
         Assertions.assertThat(restTemplates).isNotNull();
         Collection<RestTemplate> templates = restTemplates.values();
-        Assertions.assertThat(templates).hasSize(2);
+        Assertions.assertThat(templates).hasSize(3);
 
         TwoRestTemplates.Two two = context.getBean(TwoRestTemplates.Two.class);
 
-        Assertions.assertThat(two.casRestTemplate).isNotNull();
-        assertCas(two.casRestTemplate);
+        Assertions.assertThat(two.casRestTemplates).isNotNull();
+        Assertions.assertThat(two.casRestTemplates).hasSize(2);
+        two.casRestTemplates.forEach(this::assertStatelessCas);
 
         Assertions.assertThat(two.nonCas).isNotNull();
         Assertions.assertThat(two.nonCas.getInterceptors()).isEmpty();
     }
 
-    private void assertCas(RestTemplate restTemplate) {
+    private void assertStatelessCas(RestTemplate restTemplate) {
         List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
         Assertions.assertThat(interceptors).hasSize(1);
         ClientHttpRequestInterceptor interceptor = interceptors.get(0);
         Assertions.assertThat(interceptor).isInstanceOf(CasStatelessInterceptor.class);
     }
 
+    private void assertStatefulCas(RestTemplate restTemplate) {
+        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
+        Assertions.assertThat(interceptors).hasSize(1);
+        ClientHttpRequestInterceptor interceptor = interceptors.get(0);
+        Assertions.assertThat(interceptor).isInstanceOf(CasStatefulInterceptor.class);
+    }
+
     private ConfigurableApplicationContext init(Class<?> config) {
         return new SpringApplicationBuilder().web(false)
                 .sources(config, CasClientAutoConfiguration.class).run();
+    }
+
+    private ConfigurableApplicationContext initStatefull(Class<?> config) {
+        return new SpringApplicationBuilder().web(false)
+                .sources(config, CasClientAutoConfiguration.class)
+                .properties("cas.client.stateful=true").run();
     }
 
     @Configuration
@@ -85,7 +113,13 @@ public class CasClientAutoConfigurationTest {
 
         @Cas
         @Bean
-        RestTemplate casRestTemplate() {
+        RestTemplate casRestTemplate1() {
+            return new RestTemplate();
+        }
+
+        @Cas
+        @Bean
+        RestTemplate casRestTemplate2() {
             return new RestTemplate();
         }
 
@@ -96,7 +130,7 @@ public class CasClientAutoConfigurationTest {
 
             @Autowired
             @Cas
-            RestTemplate casRestTemplate;
+            List<RestTemplate> casRestTemplates;
         }
     }
 }

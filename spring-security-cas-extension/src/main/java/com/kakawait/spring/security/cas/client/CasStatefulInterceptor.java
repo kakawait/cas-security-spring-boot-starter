@@ -1,5 +1,6 @@
 package com.kakawait.spring.security.cas.client;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -11,6 +12,7 @@ import java.security.Principal;
 /**
  * @author Jonathan Coueraud
  */
+@Qualifier("casClientHttpRequestInterceptor")
 public class CasStatefulInterceptor implements ClientHttpRequestInterceptor {
 
     final private CasStatefulService casStatefulService;
