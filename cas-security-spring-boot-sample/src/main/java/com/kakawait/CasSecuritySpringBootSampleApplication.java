@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -40,6 +42,7 @@ import java.util.Optional;
  * @author Thibaud Leprêtre
  */
 @SpringBootApplication
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class CasSecuritySpringBootSampleApplication {
 
     public static void main(String[] args) {
@@ -129,6 +132,12 @@ public class CasSecuritySpringBootSampleApplication {
         @RequestMapping(path = "/ignored")
         public String ignored() {
             return "index";
+        }
+
+        @Secured("ROLE_ADMIN")
+        @RequestMapping(path = "/admin")
+        public @ResponseBody String roleUsingAnnotation() {
+            return "You're admin";
         }
 
         /**
