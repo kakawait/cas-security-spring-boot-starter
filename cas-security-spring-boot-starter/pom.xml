@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-starter</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Cas security spring boot starter</name>
