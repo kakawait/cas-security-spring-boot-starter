@@ -144,7 +144,7 @@ public class CasSecuritySpringBootSampleApplication {
             }
             Field field = ReflectionUtils.findField(AttributePrincipalImpl.class, "proxyGrantingTicket");
             ReflectionUtils.makeAccessible(field);
-            return Optional.of(ReflectionUtils.getField(field, principal).toString());
+            return Optional.ofNullable(ReflectionUtils.getField(field, principal)).map(Object::toString);
         }
     }
 
