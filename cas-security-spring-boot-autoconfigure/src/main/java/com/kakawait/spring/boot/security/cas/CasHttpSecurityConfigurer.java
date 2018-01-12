@@ -3,7 +3,6 @@ package com.kakawait.spring.boot.security.cas;
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -203,13 +202,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
                         .getBean(AuthenticationManager.class);
                 BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);
                 http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
-            }
-            SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
-            if (mode == SecurityAuthorizeMode.ROLE) {
-                List<String> roles = securityProperties.getUser().getRole();
-                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[roles.size()]));
-            } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
-                http.authorizeRequests().anyRequest().authenticated();
             }
         }
 

@@ -9,12 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.boot.autoconfigure.security.SecurityProperties.BASIC_AUTH_ORDER;
+
 /**
  * @author Thibaud Leprêtre
  */
 @Data
 @ConfigurationProperties(prefix = "security.cas")
 public class CasSecurityProperties {
+
+    public static final int CAS_AUTH_ORDER = BASIC_AUTH_ORDER - 1;
 
     private boolean enabled = true;
 

@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.userdetails.AbstractCasAssertionUserDetailsService;
@@ -43,6 +43,7 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DynamicCasSecurityConfiguration;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.StaticCasSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AUTH_ORDER;
 
 /**
  * @author Thibaud Leprêtre
@@ -162,8 +163,9 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     static class DefaultCasSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {
+
+        private final SecurityProperties securityProperties;
 
         private final CasSecurityProperties casSecurityProperties;
 
@@ -173,10 +175,12 @@ public class CasSecurityAutoConfiguration {
 
         private final ProxyGrantingTicketStorage proxyGrantingTicketStorage;
 
-        public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
+        public DefaultCasSecurityConfigurerAdapter(SecurityProperties securityProperties,
+                CasSecurityProperties casSecurityProperties,
                 AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource,
                 ProxyGrantingTicketStorage proxyGrantingTicketStorage) {
+            this.securityProperties = securityProperties;
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
             this.authenticationDetailsSource = authenticationDetailsSource;
@@ -202,6 +206,14 @@ public class CasSecurityAutoConfiguration {
             String logoutSuccessUrl = buildUrl(casSecurityProperties.getServer().getBaseUrl(),
                     casSecurityProperties.getServer().getPaths().getLogout());
             http.logout().permitAll().logoutSuccessUrl(logoutSuccessUrl);
+
+            SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
+            if (mode == SecurityAuthorizeMode.ROLE) {
+                List<String> roles = securityProperties.getUser().getRole();
+                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[roles.size()]));
+            } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
+                http.authorizeRequests().anyRequest().authenticated();
+            }
         }
 
         @Override
@@ -230,7 +242,7 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
-    @Order(SecurityProperties.BASIC_AUTH_ORDER - 1)
+    @Order(CAS_AUTH_ORDER)
     static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         private final List<CasSecurityConfigurer> configurers;
