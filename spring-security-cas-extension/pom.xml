@@ -6,7 +6,7 @@
 
     <groupId>com.kakawait</groupId>
     <artifactId>spring-security-cas-extension</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.6.1</version>
     <packaging>jar</packaging>
 
     <name>Spring security cas extension</name>
