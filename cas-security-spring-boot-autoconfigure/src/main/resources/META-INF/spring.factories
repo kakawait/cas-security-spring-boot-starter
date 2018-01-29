@@ -1,1 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration,\
+  com.kakawait.spring.boot.security.cas.CasClientAutoConfiguration
