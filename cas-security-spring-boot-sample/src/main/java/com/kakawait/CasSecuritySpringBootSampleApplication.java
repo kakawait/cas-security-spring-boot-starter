@@ -2,7 +2,6 @@ package com.kakawait;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
-import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +19,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Field;
 import java.security.Principal;
@@ -60,10 +60,19 @@ public class CasSecuritySpringBootSampleApplication {
     @Profile("!custom-logout")
     @Configuration
     static class LogoutConfiguration extends CasSecurityConfigurerAdapter {
+
+        private final LogoutSuccessHandler casLogoutSuccessHandler;
+
+        public LogoutConfiguration(LogoutSuccessHandler casLogoutSuccessHandler) {
+            this.casLogoutSuccessHandler = casLogoutSuccessHandler;
+        }
+
         @Override
         public void configure(HttpSecurity http) throws Exception {
             // Allow GET method to /logout even if CSRF is enabled
-            http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+            http.logout()
+                .logoutSuccessHandler(casLogoutSuccessHandler)
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
         }
     }
 
@@ -83,23 +92,22 @@ public class CasSecuritySpringBootSampleApplication {
     @Profile("custom-logout")
     @Configuration
     static class CustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
-        private final CasSecurityProperties casSecurityProperties;
 
-        public CustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
-            this.casSecurityProperties = casSecurityProperties;
+        private final LogoutSuccessHandler casLogoutSuccessHandler;
+
+        public CustomLogoutConfiguration(LogoutSuccessHandler casLogoutSuccessHandler) {
+            this.casLogoutSuccessHandler = casLogoutSuccessHandler;
         }
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.logout()
                 .permitAll()
+                // Add null logoutSuccessHandler to disable CasLogoutSuccessHandler
+                .logoutSuccessHandler(null)
                 .logoutSuccessUrl("/logout.html")
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-            String logoutUrl = UriComponentsBuilder
-                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                    .path(casSecurityProperties.getServer().getPaths().getLogout())
-                    .toUriString();
-            LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+            LogoutFilter filter = new LogoutFilter(casLogoutSuccessHandler, new SecurityContextLogoutHandler());
             filter.setFilterProcessesUrl("/cas/logout");
             http.addFilterBefore(filter, LogoutFilter.class);
         }
