@@ -2,6 +2,7 @@ package com.kakawait.spring.boot.security.cas;
 
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.web.RequestAwareCasAuthenticationEntryPoint;
+import com.kakawait.spring.security.cas.web.authentication.CasLogoutSuccessHandler;
 import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetailsSource;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.userdetails.AbstractCasAssertionUserDetailsService;
@@ -30,14 +33,18 @@ import org.springframework.security.cas.web.authentication.ServiceAuthentication
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
@@ -85,6 +92,16 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ProxyGrantingTicketStorage.class)
     ProxyGrantingTicketStorage proxyGrantingTicketStorage() {
         return new ProxyGrantingTicketStorageImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LogoutSuccessHandler.class)
+    LogoutSuccessHandler casLogoutSuccessHandler(CasSecurityProperties casSecurityProperties,
+            ServiceProperties serviceProperties) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUri(casSecurityProperties.getServer().getBaseUrl())
+                .path(casSecurityProperties.getServer().getPaths().getLogout());
+        return new CasLogoutSuccessHandler(builder.build().toUri(), serviceProperties);
     }
 
     @Getter
@@ -163,6 +180,7 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     static class DefaultCasSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {
 
         private final SecurityProperties securityProperties;
@@ -175,16 +193,20 @@ public class CasSecurityAutoConfiguration {
 
         private final ProxyGrantingTicketStorage proxyGrantingTicketStorage;
 
+        private final LogoutSuccessHandler logoutSuccessHandler;
+
         public DefaultCasSecurityConfigurerAdapter(SecurityProperties securityProperties,
                 CasSecurityProperties casSecurityProperties,
                 AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource,
-                ProxyGrantingTicketStorage proxyGrantingTicketStorage) {
+                ProxyGrantingTicketStorage proxyGrantingTicketStorage,
+                LogoutSuccessHandler logoutSuccessHandler) {
             this.securityProperties = securityProperties;
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
             this.authenticationDetailsSource = authenticationDetailsSource;
             this.proxyGrantingTicketStorage = proxyGrantingTicketStorage;
+            this.logoutSuccessHandler = logoutSuccessHandler;
         }
 
         @Override
@@ -203,9 +225,7 @@ public class CasSecurityAutoConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            String logoutSuccessUrl = buildUrl(casSecurityProperties.getServer().getBaseUrl(),
-                    casSecurityProperties.getServer().getPaths().getLogout());
-            http.logout().permitAll().logoutSuccessUrl(logoutSuccessUrl);
+            http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler);
 
             SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
             if (mode == SecurityAuthorizeMode.ROLE) {

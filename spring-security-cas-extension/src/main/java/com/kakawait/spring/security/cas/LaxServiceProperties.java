@@ -8,9 +8,23 @@ import org.springframework.util.Assert;
  */
 public class LaxServiceProperties extends ServiceProperties {
 
+    private final boolean dynamicServiceResolution;
+
+    public LaxServiceProperties() {
+        this(true);
+    }
+
+    public LaxServiceProperties(boolean dynamicServiceResolution) {
+        this.dynamicServiceResolution = dynamicServiceResolution;
+    }
+
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         Assert.hasLength(getArtifactParameter(), "artifactParameter cannot be empty.");
         Assert.hasLength(getServiceParameter(), "serviceParameter cannot be empty.");
+    }
+
+    public boolean isDynamicServiceResolution() {
+        return dynamicServiceResolution;
     }
 }

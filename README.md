@@ -189,21 +189,21 @@ If you want to change those behaviors, for example by adding a logout page that 
 class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
     private final CasSecurityProperties casSecurityProperties;
 
-    public CasCustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
-        this.casSecurityProperties = casSecurityProperties;
+    private final LogoutSuccessHandler casLogoutSuccessHandler;
+    
+    public CustomLogoutConfiguration(LogoutSuccessHandler casLogoutSuccessHandler) {
+        this.casLogoutSuccessHandler = casLogoutSuccessHandler;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.logout()
             .permitAll()
+            // Add null logoutSuccessHandler to disable CasLogoutSuccessHandler
+            .logoutSuccessHandler(null)
             .logoutSuccessUrl("/logout.html")
             .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-        String logoutUrl = UriComponentsBuilder
-                .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                .path(casSecurityProperties.getServer().getPaths().getLogout())
-                .toUriString();
-        LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+        LogoutFilter filter = new LogoutFilter(casLogoutSuccessHandler, new SecurityContextLogoutHandler());
         filter.setFilterProcessesUrl("/cas/logout");
         http.addFilterBefore(filter, LogoutFilter.class);
     }

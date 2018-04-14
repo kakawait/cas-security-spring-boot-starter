@@ -2,11 +2,8 @@ package com.kakawait;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
-import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
@@ -16,16 +13,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,22 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.Optional;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.ServiceResolutionMode;
-import static java.net.URLEncoder.encode;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromContextPath;
 
 /**
  * @author Thibaud Leprêtre
@@ -71,12 +55,6 @@ public class CasSecuritySpringBootSampleApplication {
         filterRegBean.setFilter(new ForwardedHeaderFilter());
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return filterRegBean;
-    }
-
-    @Bean
-    LogoutSuccessHandler casLogoutSuccessHandler(CasSecurityProperties casSecurityProperties,
-            ServiceProperties serviceProperties) {
-        return new CasLogoutSuccessHandler(casSecurityProperties, serviceProperties);
     }
 
     @Profile("!custom-logout")
@@ -114,23 +92,22 @@ public class CasSecuritySpringBootSampleApplication {
     @Profile("custom-logout")
     @Configuration
     static class CustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
-        private final CasSecurityProperties casSecurityProperties;
 
-        public CustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
-            this.casSecurityProperties = casSecurityProperties;
+        private final LogoutSuccessHandler casLogoutSuccessHandler;
+
+        public CustomLogoutConfiguration(LogoutSuccessHandler casLogoutSuccessHandler) {
+            this.casLogoutSuccessHandler = casLogoutSuccessHandler;
         }
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.logout()
                 .permitAll()
+                // Add null logoutSuccessHandler to disable CasLogoutSuccessHandler
+                .logoutSuccessHandler(null)
                 .logoutSuccessUrl("/logout.html")
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-            String logoutUrl = UriComponentsBuilder
-                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                    .path(casSecurityProperties.getServer().getPaths().getLogout())
-                    .toUriString();
-            LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+            LogoutFilter filter = new LogoutFilter(casLogoutSuccessHandler, new SecurityContextLogoutHandler());
             filter.setFilterProcessesUrl("/cas/logout");
             http.addFilterBefore(filter, LogoutFilter.class);
         }
@@ -195,51 +172,6 @@ public class CasSecuritySpringBootSampleApplication {
         @RequestMapping
         public @ResponseBody String hello(Principal principal) {
             return principal == null ? "Hello anonymous" : "Hello " + principal.getName();
-        }
-    }
-
-    private static class CasLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
-            implements LogoutSuccessHandler {
-
-        private static final Logger logger = LoggerFactory.getLogger(CasLogoutSuccessHandler.class);
-
-        private final CasSecurityProperties casSecurityProperties;
-
-        private final ServiceProperties serviceProperties;
-
-        public CasLogoutSuccessHandler(CasSecurityProperties casSecurityProperties, ServiceProperties serviceProperties) {
-            this.casSecurityProperties = casSecurityProperties;
-            this.serviceProperties = serviceProperties;
-        }
-
-        @Override
-        public void onLogoutSuccess(HttpServletRequest httpServletRequest,
-                HttpServletResponse httpServletResponse, Authentication authentication)
-                throws IOException, ServletException {
-            super.handle(httpServletRequest, httpServletResponse, authentication);
-        }
-
-        @Override
-        protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
-            UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                    .path(casSecurityProperties.getServer().getPaths().getLogout());
-
-            String service;
-            if (casSecurityProperties.getService().getResolutionMode() == ServiceResolutionMode.DYNAMIC) {
-                service = fromContextPath(request).build().toUriString();
-            } else {
-                service = casSecurityProperties.getService().getBaseUrl().toASCIIString();
-            }
-
-            if (service != null) {
-                try {
-                    builder.queryParam(serviceProperties.getServiceParameter(), encode(service, UTF_8.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    logger.warn("Unable to encode service url", e);
-                }
-            }
-            return builder.build().toUriString();
         }
     }
 
