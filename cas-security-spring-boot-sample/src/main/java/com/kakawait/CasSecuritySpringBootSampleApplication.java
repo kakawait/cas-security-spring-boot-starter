@@ -4,8 +4,10 @@ import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.security.cas.client.CasClientHttpRequestInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
+import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
+import org.jasig.cas.client.validation.Assertion;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
@@ -25,13 +28,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -72,6 +76,8 @@ public class CasSecuritySpringBootSampleApplication {
             interceptors = new ArrayList<>();
         }
         interceptors.add(new CasClientHttpRequestInterceptor(serviceProperties, proxyTicketProvider));
+        interceptors.add(new BasicAuthorizationInterceptor("test", "test"));
+        restTemplate.setInterceptors(interceptors);
         return restTemplate;
     }
 
@@ -145,6 +151,19 @@ public class CasSecuritySpringBootSampleApplication {
     @RequestMapping(value = "/")
     static class IndexController {
 
+        private final RestTemplate casRestTemplate;
+
+        private final ProxyTicketProvider proxyTicketProvider;
+
+        private final AssertionProvider assertionProvider;
+
+        public IndexController(RestTemplate casRestTemplate, ProxyTicketProvider proxyTicketProvider,
+                AssertionProvider assertionProvider) {
+            this.casRestTemplate = casRestTemplate;
+            this.proxyTicketProvider = proxyTicketProvider;
+            this.assertionProvider = assertionProvider;
+        }
+
         @RequestMapping
         public String hello(Authentication authentication, Model model) {
             if (authentication != null && StringUtils.hasText(authentication.getName())) {
@@ -153,6 +172,29 @@ public class CasSecuritySpringBootSampleApplication {
                 model.addAttribute("pgt", getProxyGrantingTicket(authentication).orElse(null));
             }
             return "index";
+        }
+
+        @RequestMapping("/proxy-ticket")
+        public @ResponseBody String ticket(@RequestParam(value = "service") String service,
+                Authentication authentication, Principal principal) {
+            String template = "Get proxy ticket using %s for service %s = %s";
+            // Simplest
+            String s1 = String.format(template, "ProxyTicketProvider", service,
+                    proxyTicketProvider.getProxyTicket(service));
+            // Simple
+            String s2 = String.format(template, "AssertionProvider", service,
+                    assertionProvider.getAssertion().getPrincipal().getProxyTicketFor(service));
+            // Old school
+            String s3 = String.format(template, "Authentication object", service,
+                    getAttributePrincipal(authentication).map(p -> p.getProxyTicketFor(service)).orElse(null));
+            String s4 = String.format(template, "Principal object", service,
+                    getAttributePrincipal(principal).map(p -> p.getProxyTicketFor(service)).orElse(null));
+            return s1 + "<br/>" + s2 + "<br/>" + s3 + "<br/>" + s4;
+        }
+
+        @RequestMapping({"/httpbin", "/rest-template"})
+        public @ResponseBody String httpbin() {
+            return casRestTemplate.getForEntity("http://httpbin.org/get", String.class).getBody();
         }
 
         @RequestMapping(path = "/ignored")
@@ -166,20 +208,24 @@ public class CasSecuritySpringBootSampleApplication {
             return "You're admin";
         }
 
+        private Optional<AttributePrincipal> getAttributePrincipal(Object o) {
+            if (!(o instanceof CasAuthenticationToken)) {
+                return Optional.empty();
+            }
+            return Optional.of(((CasAuthenticationToken) o).getAssertion().getPrincipal());
+        }
+
         /**
          * Hacky code please do not use that in production
          */
         private Optional<String> getProxyGrantingTicket(Authentication authentication) {
-            if (!(authentication instanceof CasAuthenticationToken)) {
-                return Optional.empty();
-            }
-            AttributePrincipal principal = ((CasAuthenticationToken) authentication).getAssertion().getPrincipal();
-            if (!(principal instanceof AttributePrincipalImpl)) {
+            Optional<AttributePrincipal> attributePrincipal = getAttributePrincipal(authentication);
+            if (!attributePrincipal.isPresent() || !(attributePrincipal.get() instanceof AttributePrincipalImpl)) {
                 return Optional.empty();
             }
             Field field = ReflectionUtils.findField(AttributePrincipalImpl.class, "proxyGrantingTicket");
             ReflectionUtils.makeAccessible(field);
-            return Optional.ofNullable(ReflectionUtils.getField(field, principal)).map(Object::toString);
+            return Optional.ofNullable(ReflectionUtils.getField(field, attributePrincipal.get())).map(Object::toString);
         }
     }
 
