@@ -2,12 +2,11 @@ package com.kakawait;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
-import com.kakawait.spring.security.cas.client.CasClientHttpRequestInterceptor;
+import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
-import org.jasig.cas.client.validation.Assertion;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
@@ -16,8 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
@@ -33,7 +30,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,8 +41,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import java.lang.reflect.Field;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -71,13 +65,7 @@ public class CasSecuritySpringBootSampleApplication {
     @Bean
     RestTemplate casRestTemplate(ServiceProperties serviceProperties, ProxyTicketProvider proxyTicketProvider) {
         RestTemplate restTemplate = new RestTemplate();
-        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
-        if (interceptors == null) {
-            interceptors = new ArrayList<>();
-        }
-        interceptors.add(new CasClientHttpRequestInterceptor(serviceProperties, proxyTicketProvider));
-        interceptors.add(new BasicAuthorizationInterceptor("test", "test"));
-        restTemplate.setInterceptors(interceptors);
+        restTemplate.getInterceptors().add(new CasAuthorizationInterceptor(serviceProperties, proxyTicketProvider));
         return restTemplate;
     }
 
@@ -178,7 +166,7 @@ public class CasSecuritySpringBootSampleApplication {
         public @ResponseBody String ticket(@RequestParam(value = "service") String service,
                 Authentication authentication, Principal principal) {
             String template = "Get proxy ticket using %s for service %s = %s";
-            // Simplest
+            // Simplest (except directly using RestTemplate see method just below)
             String s1 = String.format(template, "ProxyTicketProvider", service,
                     proxyTicketProvider.getProxyTicket(service));
             // Simple

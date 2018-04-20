@@ -15,13 +15,13 @@ import java.net.URI;
 /**
  * @author Thibaud Leprêtre
  */
-public class CasClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+public class CasAuthorizationInterceptor implements ClientHttpRequestInterceptor {
 
     private final ServiceProperties serviceProperties;
 
     private final ProxyTicketProvider proxyTicketProvider;
 
-    public CasClientHttpRequestInterceptor(ServiceProperties serviceProperties,
+    public CasAuthorizationInterceptor(ServiceProperties serviceProperties,
             ProxyTicketProvider proxyTicketProvider) {
         this.serviceProperties = serviceProperties;
         this.proxyTicketProvider = proxyTicketProvider;
