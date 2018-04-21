@@ -7,13 +7,19 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.security.cas.ServiceProperties;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
 
 /**
+ * Implementation of {@link ClientHttpRequestInterceptor} to apply Proxy ticket query parameter.
+ *
+ * @see ProxyTicketProvider
+ * @author Jonathan Coueraud
  * @author Thibaud Leprêtre
+ * @since 0.7.0
  */
 public class CasAuthorizationInterceptor implements ClientHttpRequestInterceptor {
 
@@ -27,13 +33,24 @@ public class CasAuthorizationInterceptor implements ClientHttpRequestInterceptor
         this.proxyTicketProvider = proxyTicketProvider;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalStateException if proxy ticket retrieves from {@link ProxyTicketProvider#getProxyTicket(String)}
+     *                               is null or blank
+     */
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
-        String proxyTicket = proxyTicketProvider.getProxyTicket(request.getURI().toASCIIString());
+        String service = request.getURI().toASCIIString();
+        String proxyTicket = proxyTicketProvider.getProxyTicket(service);
+        if (!StringUtils.hasText(proxyTicket)) {
+            throw new IllegalStateException(
+                    String.format("Proxy ticket provider returned a null proxy ticket for service %s.", service));
+        }
         URI uri = UriComponentsBuilder
                 .fromUri(request.getURI())
-                .queryParam(serviceProperties.getArtifactParameter(), proxyTicket)
+                .replaceQueryParam(serviceProperties.getArtifactParameter(), proxyTicket)
                 .build().toUri();
         return execution.execute(new HttpRequestWrapper(request) {
             @Override
