@@ -277,6 +277,37 @@ security.cas.proxy-validation.chains[1] = http://localhost:8280, http://localhos
 security.cas.proxy-validation.chains[2] = ^http://my\\.domain\\..*
 ```
 
+## RestTemplate integration with Proxy ticket
+
+Since `0.7.0` version, there is a simple integration with `RestTemplate` but not enabled by default.
+
+In order to enabled it you must create your own `RestTemplate` bean and adding an _interceptor_
+
+```java
+@Bean
+RestTemplate casRestTemplate(ServiceProperties serviceProperties, ProxyTicketProvider proxyTicketProvider) {
+    RestTemplate restTemplate = new RestTemplate();
+    restTemplate.getInterceptors().add(new CasAuthorizationInterceptor(serviceProperties, proxyTicketProvider));
+    return restTemplate;
+}
+```
+
+This _interceptor_ is pretty simple, it will simply ask a new _proxy ticket_ for each request and append it to request query parameter.
+For example with: `http://httpbin.org/get` interceptor will modify request uri to become `http://httpbin.org/get?ticket=PT-XX-YYYYYYYYYY`.
+
+**ATTENTION** if _interceptor_ get any issue to get _proxy ticket_ from CAS server, it will throw an `IllegalStateException`.
+
+Please checkout You can found sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java) to get an sample usage.
+
+### AssertionProvider and ProxyTicketProvider
+
+In addition to `RestTemplate` integration, since `0.7.0` there is now two new autoconfigured beans:
+
+1. `AssertionProvider` that will provide you a way to retrieve the current (bounded to current authenticated request) `org.jasig.cas.client.validation.Assertion`
+2. `ProxyTicketProvider` that will provide you a simple way to ask a _proxy ticket_ for a given service (regarding the current authenticated request)
+
+You can found sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java)
+
 ## License
 
 MIT License
