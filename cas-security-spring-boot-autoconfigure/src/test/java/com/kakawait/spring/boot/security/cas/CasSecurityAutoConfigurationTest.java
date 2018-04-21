@@ -1,6 +1,10 @@
 package com.kakawait.spring.boot.security.cas;
 
 
+import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
+import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
+import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
+import com.kakawait.spring.security.cas.client.validation.SecurityContextHolderAssertionProvider;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration;
@@ -13,6 +17,8 @@ import org.springframework.security.config.annotation.configuration.ObjectPostPr
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import java.util.Properties;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thibaud Leprêtre
@@ -29,8 +35,16 @@ public class CasSecurityAutoConfigurationTest {
     }
 
     @Test
-    public void test() {
+    public void autoConfiguration_EmptyConfiguration_SecurityContextHolderAssertionProviderBean() {
         load(EmptyConfiguration.class);
+        assertThat(context.getBean(AssertionProvider.class)).isInstanceOf(SecurityContextHolderAssertionProvider.class);
+    }
+
+    @Test
+    public void autoConfiguration_EmptyConfiguration_AttributePrincipalProxyTicketProviderBean() {
+        load(EmptyConfiguration.class);
+        assertThat(context.getBean(ProxyTicketProvider.class))
+                .isInstanceOf(AttributePrincipalProxyTicketProvider.class);
     }
 
     @Configuration
