@@ -1,6 +1,6 @@
 # Spring Security CAS starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C0.6.1%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C0.7.0%7Cjar)
 [![license](https://img.shields.io/github/license/kakawait/cas-security-spring-boot-starter.svg)](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/LICENSE.md)
 
 > A Spring boot starter that will help you configure [Spring Security Cas](http://docs.spring.io/spring-security/site/docs/current/reference/html/cas.html) within the application security context.
@@ -20,7 +20,7 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>0.6.1</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 
@@ -189,21 +189,21 @@ If you want to change those behaviors, for example by adding a logout page that 
 class CasCustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
     private final CasSecurityProperties casSecurityProperties;
 
-    public CasCustomLogoutConfiguration(CasSecurityProperties casSecurityProperties) {
-        this.casSecurityProperties = casSecurityProperties;
+    private final LogoutSuccessHandler casLogoutSuccessHandler;
+    
+    public CustomLogoutConfiguration(LogoutSuccessHandler casLogoutSuccessHandler) {
+        this.casLogoutSuccessHandler = casLogoutSuccessHandler;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.logout()
             .permitAll()
+            // Add null logoutSuccessHandler to disable CasLogoutSuccessHandler
+            .logoutSuccessHandler(null)
             .logoutSuccessUrl("/logout.html")
             .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-        String logoutUrl = UriComponentsBuilder
-                .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                .path(casSecurityProperties.getServer().getPaths().getLogout())
-                .toUriString();
-        LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
+        LogoutFilter filter = new LogoutFilter(casLogoutSuccessHandler, new SecurityContextLogoutHandler());
         filter.setFilterProcessesUrl("/cas/logout");
         http.addFilterBefore(filter, LogoutFilter.class);
     }
