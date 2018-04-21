@@ -59,7 +59,7 @@
         <spring-boot-dependencies.version>1.5.12.RELEASE</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
-        <lombok.version>1.16.18</lombok.version>
+        <lombok.version>1.16.2O</lombok.version>
 
         <!-- test dependencies -->
         <assertj-core.version>3.9.1</assertj-core.version>
@@ -68,7 +68,7 @@
         <!-- plugins -->
         <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
