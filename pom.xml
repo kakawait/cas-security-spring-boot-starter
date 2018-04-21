@@ -59,7 +59,7 @@
         <spring-boot-dependencies.version>1.5.12.RELEASE</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
-        <lombok.version>1.16.2O</lombok.version>
+        <lombok.version>1.16.18</lombok.version>
 
         <!-- test dependencies -->
         <assertj-core.version>3.9.1</assertj-core.version>
