@@ -1,6 +1,10 @@
 package com.kakawait.spring.boot.security.cas;
 
 import com.kakawait.spring.security.cas.LaxServiceProperties;
+import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
+import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
+import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
+import com.kakawait.spring.security.cas.client.validation.SecurityContextHolderAssertionProvider;
 import com.kakawait.spring.security.cas.web.RequestAwareCasAuthenticationEntryPoint;
 import com.kakawait.spring.security.cas.web.authentication.CasLogoutSuccessHandler;
 import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetailsSource;
@@ -24,7 +28,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.userdetails.AbstractCasAssertionUserDetailsService;
@@ -38,13 +41,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
 
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
 import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
@@ -102,6 +102,18 @@ public class CasSecurityAutoConfiguration {
                 .fromUri(casSecurityProperties.getServer().getBaseUrl())
                 .path(casSecurityProperties.getServer().getPaths().getLogout());
         return new CasLogoutSuccessHandler(builder.build().toUri(), serviceProperties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AssertionProvider.class)
+    AssertionProvider securityContextHolderAssertionProvider() {
+        return new SecurityContextHolderAssertionProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ProxyTicketProvider.class)
+    ProxyTicketProvider attributePrincipalProxyTicketProvider(AssertionProvider assertionProvider) {
+        return new AttributePrincipalProxyTicketProvider(assertionProvider);
     }
 
     @Getter
