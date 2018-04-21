@@ -16,7 +16,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.branch.name=$TRAVIS_BRANCH
+  - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar $([ "$TRAVIS_PULL_REQUEST" = "false" ] && echo "-Dsonar.branch.name=$TRAVIS_BRANCH")
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
