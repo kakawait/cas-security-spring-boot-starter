@@ -11,6 +11,7 @@
 - Support dynamic service resolution based on current `HttpServletRequest`
 - Advance configuration through [CasSecurityConfigurerAdapter](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-autoconfigure/src/main/java/com/kakawait/spring/boot/security/cas/CasSecurityConfigurerAdapter.java)
 - Integration with _Basic authentication_ if `security.basic.enabled=true` that allow you to authenticate using header `Authorization: Basic ...` in addition to _CAS_
+- `RestTemplate` integration
 
 ## Setup
 
