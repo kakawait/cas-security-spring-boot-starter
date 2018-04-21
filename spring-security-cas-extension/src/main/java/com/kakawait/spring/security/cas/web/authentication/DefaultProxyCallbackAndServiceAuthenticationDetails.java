@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 class DefaultProxyCallbackAndServiceAuthenticationDetails
         implements ProxyCallbackAndServiceAuthenticationDetails {
 
-    private final ServiceProperties serviceProperties;
+    private final transient ServiceProperties serviceProperties;
 
     private final transient HttpServletRequest context;
 
