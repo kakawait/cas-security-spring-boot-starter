@@ -11,6 +11,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
 import org.springframework.security.core.Authentication;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -107,7 +110,8 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         verifyZeroInteractions(ticketValidator);
     }
 
-    public void authenticate_() {
+    @Test
+    public void authenticate_EveryRequirements_TicketValidatorProxyCallbackUrlUpdated() {
         Cas20ServiceTicketValidator ticketValidator = mock(Cas20ServiceTicketValidator.class);
 
         DynamicProxyCallbackUrlCasAuthenticationProvider authenticationProvider =
@@ -125,10 +129,11 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
                 return "http://localhost/cas/callback";
             }
         });
+        doNothing().when(ticketValidator).setProxyCallbackUrl(anyString());
 
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(2)).getDetails();
-        verify(ticketValidator, times(1)).setProxyCallbackUrl("http://localhost/cas/callback");
+        verify(ticketValidator, times(1)).setProxyCallbackUrl(eq("http://localhost/cas/callback"));
     }
 }
