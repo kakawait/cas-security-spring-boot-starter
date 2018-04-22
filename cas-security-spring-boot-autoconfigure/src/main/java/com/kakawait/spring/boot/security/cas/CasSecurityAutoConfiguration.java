@@ -170,7 +170,7 @@ public class CasSecurityAutoConfiguration {
         @ConditionalOnMissingBean(CasAuthenticationEntryPoint.class)
         CasAuthenticationEntryPoint casAuthenticationEntryPoint() {
             String loginPath = getCasSecurityProperties().getService().getPaths().getLogin();
-            CasAuthenticationEntryPoint entryPoint = new RequestAwareCasAuthenticationEntryPoint(loginPath);
+            CasAuthenticationEntryPoint entryPoint = new RequestAwareCasAuthenticationEntryPoint(URI.create(loginPath));
             entryPoint.setServiceProperties(getServiceProperties());
             entryPoint.setLoginUrl(getServerLoginUrl());
             return entryPoint;

@@ -3,17 +3,19 @@ package com.kakawait.spring.security.cas.web.authentication;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.*;
+
 /**
  * @author Thibaud Leprêtre
  */
-class DefaultProxyCallbackAndServiceAuthenticationDetails
-        implements ProxyCallbackAndServiceAuthenticationDetails {
+class DefaultProxyCallbackAndServiceAuthenticationDetails implements ProxyCallbackAndServiceAuthenticationDetails {
 
     private final transient ServiceProperties serviceProperties;
 
@@ -36,21 +38,23 @@ class DefaultProxyCallbackAndServiceAuthenticationDetails
         if (proxyCallbackUri.isAbsolute()) {
             return proxyCallbackUri.toASCIIString();
         }
-        String path = context.getContextPath() + proxyCallbackUri.getPath();
-        return UrlUtils.buildFullRequestUrl(context.getScheme(), context.getServerName(),
-                context.getServerPort(), path, null);
+        return fromContextPath(context).path(proxyCallbackUri.toASCIIString()).toUriString();
     }
 
     @Override
     public String getServiceUrl() {
-        String query = UriComponentsBuilder
+        String query = removeArtifactParameterFromQueryString(context.getQueryString());
+        return UrlUtils.buildFullRequestUrl(context.getScheme(), context.getServerName(),
+                context.getServerPort(), context.getRequestURI(), StringUtils.hasText(query) ? query : null);
+    }
+
+    private String removeArtifactParameterFromQueryString(String queryString) {
+        return UriComponentsBuilder
                 .newInstance()
-                .query(context.getQueryString())
+                .query(queryString)
                 .replaceQueryParam(serviceProperties.getArtifactParameter(), new Object[0])
                 .build()
                 .toString()
                 .replaceFirst("^\\?", "");
-        return UrlUtils.buildFullRequestUrl(context.getScheme(), context.getServerName(),
-                context.getServerPort(), context.getRequestURI(), StringUtils.hasText(query) ? query : null);
     }
 }
