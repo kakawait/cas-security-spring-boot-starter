@@ -19,9 +19,13 @@ public class LaxServiceProperties extends ServiceProperties {
     }
 
     @Override
-    public void afterPropertiesSet() {
-        Assert.hasLength(getArtifactParameter(), "artifactParameter cannot be empty.");
-        Assert.hasLength(getServiceParameter(), "serviceParameter cannot be empty.");
+    public void afterPropertiesSet() throws Exception {
+        if (!dynamicServiceResolution) {
+            super.afterPropertiesSet();
+        } else {
+            Assert.hasLength(getArtifactParameter(), "artifactParameter cannot be empty.");
+            Assert.hasLength(getServiceParameter(), "serviceParameter cannot be empty.");
+        }
     }
 
     public boolean isDynamicServiceResolution() {

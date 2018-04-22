@@ -54,9 +54,8 @@ public class CasLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequ
             dynamicServiceResolution = ((LaxServiceProperties) serviceProperties).isDynamicServiceResolution();
         }
 
-        String service = (serviceProperties.getService() == null && dynamicServiceResolution)
-                         ? fromContextPath(request).build().toUriString()
-                         : serviceProperties.getService();
+        String service = dynamicServiceResolution ? fromContextPath(request).build().toUriString()
+                                                  : serviceProperties.getService();
 
         if (service != null) {
             try {

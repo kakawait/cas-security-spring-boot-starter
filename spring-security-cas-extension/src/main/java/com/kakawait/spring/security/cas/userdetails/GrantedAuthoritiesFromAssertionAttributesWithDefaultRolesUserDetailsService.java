@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,8 +34,9 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
 
     public GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(String[] attributes,
             Collection<? extends GrantedAuthority> defaultGrantedAuthorities) {
-        this.attributes = attributes;
-        this.defaultGrantedAuthorities = defaultGrantedAuthorities;
+        this.attributes = (attributes == null) ? new String[0] : attributes;
+        this.defaultGrantedAuthorities = (defaultGrantedAuthorities == null) ? new ArrayList<>()
+                                                                             : defaultGrantedAuthorities;
     }
 
     protected UserDetails loadUserDetails(Assertion assertion) {
@@ -42,9 +45,10 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
             throw new UsernameNotFoundException("Unable to retrieve username from CAS assertion");
         }
 
+        Map<String, Object> principalAttributes = assertion.getPrincipal().getAttributes();
         List<GrantedAuthority> authorities = Arrays
                 .stream(attributes)
-                .map(a -> assertion.getPrincipal().getAttributes().get(a))
+                .map(principalAttributes::get)
                 .filter(Objects::nonNull)
                 .flatMap(v -> (v instanceof Collection) ? ((Collection<?>) v).stream() : Stream.of(v))
                 .map(v -> toUppercase ? v.toString().toUpperCase() : v.toString())
