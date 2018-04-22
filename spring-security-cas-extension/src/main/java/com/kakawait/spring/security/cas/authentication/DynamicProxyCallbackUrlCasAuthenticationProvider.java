@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class DynamicProxyCallbackUrlCasAuthenticationProvider extends CasAuthenticationProvider {
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) {
         if (authentication.getDetails() instanceof ProxyCallbackAndServiceAuthenticationDetails &&
                 getTicketValidator() instanceof Cas20ServiceTicketValidator) {
             String proxyCallbackUrl = ((ProxyCallbackAndServiceAuthenticationDetails) authentication.getDetails())

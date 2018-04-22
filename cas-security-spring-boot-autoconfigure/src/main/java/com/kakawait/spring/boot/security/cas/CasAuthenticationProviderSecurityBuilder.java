@@ -34,15 +34,12 @@ public class CasAuthenticationProviderSecurityBuilder implements SecurityBuilder
     private String key;
 
     @Override
-    public CasAuthenticationProvider build() throws Exception {
+    public CasAuthenticationProvider build() {
         CasAuthenticationProvider provider;
-        switch (serviceResolutionMode) {
-            case DYNAMIC:
-                provider = new DynamicProxyCallbackUrlCasAuthenticationProvider();
-                break;
-            default:
-                provider = new CasAuthenticationProvider();
-                break;
+        if (serviceResolutionMode == CasSecurityProperties.ServiceResolutionMode.DYNAMIC) {
+            provider = new DynamicProxyCallbackUrlCasAuthenticationProvider();
+        } else {
+            provider = new CasAuthenticationProvider();
         }
         provider.setAuthenticationUserDetailsService(authenticationUserDetailsService);
         provider.setKey(key);

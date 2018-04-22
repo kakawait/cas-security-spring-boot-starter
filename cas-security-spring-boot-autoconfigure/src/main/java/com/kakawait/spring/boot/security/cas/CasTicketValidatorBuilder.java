@@ -59,29 +59,51 @@ public class CasTicketValidatorBuilder {
         if (proxyTicketValidator == null && protocolVersion > 1) {
             logger.debug("\"proxyTicketValidator\" configuration is missing, fallback on proxyTicketValidation = true");
         }
-        if (protocolVersion > 3 || protocolVersion < 1) {
+        if (isUnsupportedVersion()) {
             logger.warn("Protocol version {} is not valid protocol, will be fallback to version 3", protocolVersion);
         }
         if (protocolVersion == 1) {
-            if (proxyTicketValidator != null) {
-                logger.warn("Proxy ticket validator isn't possible using protocol version 1, will be omitted!");
-            }
-            builder = new Cas10TicketValidatorBuilder(casServerUrlPrefix);
+            builder = buildCas10TicketValidatorBuilder();
         } else if (protocolVersion == 2) {
-            if (proxyTicketValidator != null && !proxyTicketValidator) {
-                builder = new Cas20ServiceTicketValidatorBuilder(casServerUrlPrefix);
-            } else {
-                builder = new Cas20ProxyTicketValidatorBuilder(casServerUrlPrefix);
-            }
+            builder = buildCas20TicketValidatorBuilder();
         } else {
-            if (proxyTicketValidator != null && !proxyTicketValidator) {
-                builder = new Cas30ServiceTicketValidatorBuilder(casServerUrlPrefix);
-            } else {
-                builder = new Cas30ProxyTicketValidatorBuilder(casServerUrlPrefix);
-            }
+            builder = buildCas30TicketValidatorBuilder();
         }
         configure(builder);
         return builder.build();
+    }
+
+    private CasTicketValidatorBuilder buildCas30TicketValidatorBuilder() {
+        CasTicketValidatorBuilder builder;
+        if (proxyTicketValidator != null && !proxyTicketValidator) {
+            builder = new Cas30ServiceTicketValidatorBuilder(casServerUrlPrefix);
+        } else {
+            builder = new Cas30ProxyTicketValidatorBuilder(casServerUrlPrefix);
+        }
+        return builder;
+    }
+
+    private CasTicketValidatorBuilder buildCas20TicketValidatorBuilder() {
+        CasTicketValidatorBuilder builder;
+        if (proxyTicketValidator != null && !proxyTicketValidator) {
+            builder = new Cas20ServiceTicketValidatorBuilder(casServerUrlPrefix);
+        } else {
+            builder = new Cas20ProxyTicketValidatorBuilder(casServerUrlPrefix);
+        }
+        return builder;
+    }
+
+    private CasTicketValidatorBuilder buildCas10TicketValidatorBuilder() {
+        CasTicketValidatorBuilder builder;
+        if (proxyTicketValidator != null) {
+            logger.warn("Proxy ticket validator isn't possible using protocol version 1, will be omitted!");
+        }
+        builder = new Cas10TicketValidatorBuilder(casServerUrlPrefix);
+        return builder;
+    }
+
+    private boolean isUnsupportedVersion() {
+        return protocolVersion > 3 || protocolVersion < 1;
     }
 
     private void configure(CasTicketValidatorBuilder builder) {
