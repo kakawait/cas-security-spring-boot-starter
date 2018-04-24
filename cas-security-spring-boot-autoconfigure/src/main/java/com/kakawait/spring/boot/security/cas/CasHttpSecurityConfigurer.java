@@ -197,10 +197,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
                 .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
                 .addFilter(filter);
             if (securityProperties.getBasic().isEnabled()) {
-                AuthenticationManager authenticationManager = http
-                        .getSharedObject(ApplicationContext.class)
-                        .getBean(AuthenticationManager.class);
-                BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);
+                BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(
+                        http.getSharedObject(ApplicationContext.class).getBean(AuthenticationManager.class));
                 http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
             }
         }
