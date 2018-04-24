@@ -7,7 +7,7 @@
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
 
     <name>Cas security spring boot parent</name>
     <description>Spring boot starter for Apereo CAS client fully integrated with Spring security</description>
@@ -48,8 +48,6 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-
-        <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- spring managed version -->
         <!-- CVE-2018-7489 -->
@@ -195,5 +193,20 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <name>Sonatype OSS Staging</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <id>oss.sonatype.org</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
