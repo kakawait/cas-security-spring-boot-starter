@@ -14,7 +14,6 @@ import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.ProxyList;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -59,7 +58,7 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AU
 @ConditionalOnWebApplication
 @ConditionalOnClass(EnableWebSecurity.class)
 @AutoConfigureBefore(SecurityAutoConfiguration.class)
-@Conditional(CasSecurityAutoConfiguration.CasSecurityCondition.class)
+@Conditional(CasSecurityCondition.class)
 @EnableConfigurationProperties(CasSecurityProperties.class)
 @Import({CasLoginSecurityConfiguration.class, CasAssertionUserDetailsServiceConfiguration.class,
         CasTicketValidatorConfiguration.class, DefaultCasSecurityConfigurerAdapter.class,
@@ -320,21 +319,7 @@ public class CasSecurityAutoConfiguration {
         }
     }
 
-    @SuppressWarnings("unused")
-    static class CasSecurityCondition extends AllNestedConditions {
-
-        public CasSecurityCondition() {
-            super(ConfigurationPhase.PARSE_CONFIGURATION);
-        }
-
-        @ConditionalOnProperty(value = "security.cas.enabled", havingValue = "true", matchIfMissing = true)
-        static class EnabledProperty {}
-
-        @ConditionalOnProperty(value = "security.cas.server.base-url")
-        static class ServerInstanceProperty {}
-    }
-
-    static String buildUrl(URI baseUrl, @NonNull String path) {
+    private static String buildUrl(URI baseUrl, @NonNull String path) {
         if (baseUrl != null) {
             return UriComponentsBuilder
                     .fromUri(baseUrl)
