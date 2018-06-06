@@ -8,6 +8,7 @@ import com.kakawait.spring.security.cas.client.validation.SecurityContextHolderA
 import com.kakawait.spring.security.cas.web.RequestAwareCasAuthenticationEntryPoint;
 import com.kakawait.spring.security.cas.web.authentication.CasLogoutSuccessHandler;
 import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetailsSource;
+import com.kakawait.spring.security.cas.web.authentication.RequestAwareCasLogoutSuccessHandler;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
@@ -36,6 +37,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -69,21 +71,25 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "static",
             matchIfMissing = true)
-    ServiceProperties serviceProperties(CasSecurityProperties casSecurityProperties) {
+    ServiceProperties serviceProperties(CasSecurityProperties casSecurityProperties) throws Exception {
         ServiceProperties serviceProperties = new ServiceProperties();
 
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
+        Assert.notNull(baseUrl, "Cas service base url must not be null (ref property security.cas.service.base-url)");
+
         serviceProperties.setService(buildUrl(baseUrl, casSecurityProperties.getService().getPaths().getLogin()));
         serviceProperties.setAuthenticateAllArtifacts(true);
+        serviceProperties.afterPropertiesSet();
         return serviceProperties;
     }
 
     @Bean
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "dynamic")
-    ServiceProperties laxServiceProperties() {
+    ServiceProperties laxServiceProperties() throws Exception {
         LaxServiceProperties serviceProperties = new LaxServiceProperties();
         serviceProperties.setAuthenticateAllArtifacts(true);
+        serviceProperties.afterPropertiesSet();
         return serviceProperties;
     }
 
@@ -91,16 +97,6 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ProxyGrantingTicketStorage.class)
     ProxyGrantingTicketStorage proxyGrantingTicketStorage() {
         return new ProxyGrantingTicketStorageImpl();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(LogoutSuccessHandler.class)
-    LogoutSuccessHandler casLogoutSuccessHandler(CasSecurityProperties casSecurityProperties,
-            ServiceProperties serviceProperties) {
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromUri(casSecurityProperties.getServer().getBaseUrl())
-                .path(casSecurityProperties.getServer().getPaths().getLogout());
-        return new CasLogoutSuccessHandler(builder.build().toUri(), serviceProperties);
     }
 
     @Bean
@@ -156,6 +152,16 @@ public class CasSecurityAutoConfiguration {
         ServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource() {
             return new ServiceAuthenticationDetailsSource(getServiceProperties());
         }
+
+        @Bean
+        @ConditionalOnMissingBean(LogoutSuccessHandler.class)
+        LogoutSuccessHandler casLogoutSuccessHandler(CasSecurityProperties casSecurityProperties,
+                ServiceProperties serviceProperties) {
+            UriComponentsBuilder builder = UriComponentsBuilder
+                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
+                    .path(casSecurityProperties.getServer().getPaths().getLogout());
+            return new CasLogoutSuccessHandler(builder.build().toUri(), serviceProperties);
+        }
     }
 
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "dynamic")
@@ -188,6 +194,16 @@ public class CasSecurityAutoConfiguration {
                         : URI.create(proxyCallbackPath);
             }
             return new ProxyCallbackAndServiceAuthenticationDetailsSource(getServiceProperties(), proxyCallbackUri);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean(LogoutSuccessHandler.class)
+        LogoutSuccessHandler casLogoutSuccessHandler(CasSecurityProperties casSecurityProperties,
+                ServiceProperties serviceProperties) {
+            UriComponentsBuilder builder = UriComponentsBuilder
+                    .fromUri(casSecurityProperties.getServer().getBaseUrl())
+                    .path(casSecurityProperties.getServer().getPaths().getLogout());
+            return new RequestAwareCasLogoutSuccessHandler(builder.build().toUri(), serviceProperties);
         }
     }
 
@@ -241,9 +257,11 @@ public class CasSecurityAutoConfiguration {
             SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
             if (mode == SecurityAuthorizeMode.ROLE) {
                 List<String> roles = securityProperties.getUser().getRole();
-                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[roles.size()]));
+                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
             } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
                 http.authorizeRequests().anyRequest().authenticated();
+            } else if (mode == SecurityAuthorizeMode.NONE) {
+                http.authorizeRequests().anyRequest().permitAll();
             }
         }
 
@@ -265,7 +283,7 @@ public class CasSecurityAutoConfiguration {
                         .getProxyValidation()
                         .getChains()
                         .stream()
-                        .map(l -> l.toArray(new String[l.size()]))
+                        .map(l -> l.toArray(new String[0]))
                         .collect(Collectors.toList());
                 ticketValidator.proxyChains(new ProxyList(proxyChains));
             }
@@ -315,18 +333,15 @@ public class CasSecurityAutoConfiguration {
             paths.add(casSecurityProperties.getService().getPaths().getLogin());
             paths.add(casSecurityProperties.getService().getPaths().getLogout());
             paths.add(casSecurityProperties.getService().getPaths().getProxyCallback());
-            return paths.toArray(new String[paths.size()]);
+            return paths.toArray(new String[0]);
         }
     }
 
-    private static String buildUrl(URI baseUrl, @NonNull String path) {
-        if (baseUrl != null) {
-            return UriComponentsBuilder
-                    .fromUri(baseUrl)
-                    .path(path)
-                    .toUriString();
-        }
-        return path;
+    private static String buildUrl(@NonNull URI baseUrl, @NonNull String path) {
+        return UriComponentsBuilder
+                .fromUri(baseUrl)
+                .path(path)
+                .toUriString();
     }
 
 }

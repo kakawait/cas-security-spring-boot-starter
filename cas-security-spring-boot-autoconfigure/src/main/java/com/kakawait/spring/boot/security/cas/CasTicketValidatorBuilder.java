@@ -58,6 +58,7 @@ public class CasTicketValidatorBuilder {
         CasTicketValidatorBuilder builder;
         if (proxyTicketValidator == null && protocolVersion > 1) {
             logger.debug("\"proxyTicketValidator\" configuration is missing, fallback on proxyTicketValidation = true");
+            proxyTicketValidator = true;
         }
         if (isUnsupportedVersion()) {
             logger.warn("Protocol version {} is not valid protocol, will be fallback to version 3", protocolVersion);
