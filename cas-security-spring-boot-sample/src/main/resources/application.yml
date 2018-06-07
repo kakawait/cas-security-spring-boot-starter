@@ -2,9 +2,6 @@ server:
   port: 8081
 
 security:
-  basic:
-    enabled: true
-  ignored: /ignored, /**/favicon.ico
   cas:
     proxy-validation:
       chains:

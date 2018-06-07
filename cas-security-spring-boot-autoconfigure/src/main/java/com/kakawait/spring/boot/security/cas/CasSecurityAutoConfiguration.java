@@ -1,6 +1,5 @@
 package com.kakawait.spring.boot.security.cas;
 
-import com.kakawait.spring.boot.security.cas.CasSecurityProperties.SecurityAuthorizeMode;
 import com.kakawait.spring.boot.security.cas.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
@@ -37,11 +36,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;

@@ -2,7 +2,9 @@ package com.kakawait.sample;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityCondition;
+import com.kakawait.spring.boot.security.cas.CasSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
+import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
 import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
@@ -11,15 +13,20 @@ import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
+import org.springframework.security.cas.web.CasAuthenticationFilter;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -28,6 +35,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.lang.reflect.Field;
@@ -134,11 +143,38 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("custom-logout")
     @Configuration
-    static class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+    static class WebMvcConfiguration implements WebMvcConfigurer {
         @Override
         public void addViewControllers(ViewControllerRegistry registry) {
             registry.addViewController("/logout.html").setViewName("logout");
             registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        }
+    }
+
+    @Configuration
+    static class BackwardSpringBoot1CasSecurityConfiguration extends CasSecurityConfigurerAdapter {
+
+        private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+        public BackwardSpringBoot1CasSecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder) {
+            this.authenticationManagerBuilder = authenticationManagerBuilder;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            enableBasicAuth(http);
+        }
+
+        /**
+         * To be able to use basic auth that could by-pass cas auth (could be useful for debug or admin).
+         * You need to re-inject {@link BasicAuthenticationFilter} just before {@link CasAuthenticationFilter} after
+         * building or getting the default Spring boot {@link AuthenticationManager}.
+         * @param http the {@link HttpSecurity} to modify
+         */
+        private void enableBasicAuth(HttpSecurity http) {
+            AuthenticationManager authenticationManager = authenticationManagerBuilder.getOrBuild();
+            BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);
+            http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
         }
     }
 

@@ -186,6 +186,12 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
 
             for (CasSecurityConfigurer configurer : configurers) {
                 configurer.init(http);
+            }
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            for (CasSecurityConfigurer configurer : configurers) {
                 configurer.configure(http);
             }
         }
