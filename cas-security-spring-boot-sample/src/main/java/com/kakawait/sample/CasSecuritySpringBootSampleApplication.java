@@ -1,4 +1,4 @@
-package com.kakawait;
+package com.kakawait.sample;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.CasSecurityCondition;
@@ -10,14 +10,13 @@ import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
@@ -25,6 +24,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -75,7 +75,7 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("!custom-logout")
     @Configuration
-    @ConditionalOnBean(LogoutSuccessHandler.class)
+    @Conditional(CasSecurityCondition.class)
     static class LogoutConfiguration extends CasSecurityConfigurerAdapter {
 
         private final LogoutSuccessHandler casLogoutSuccessHandler;
@@ -103,7 +103,7 @@ public class CasSecuritySpringBootSampleApplication {
             // I'm not using .apply() from HttpSecurity due to following issue
             // https://github.com/spring-projects/spring-security/issues/4422
             CasHttpSecurityConfigurer.cas().configure(http);
-            http.exceptionHandling().authenticationEntryPoint(new Http401AuthenticationEntryPoint("CAS"));
+            http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         }
     }
 

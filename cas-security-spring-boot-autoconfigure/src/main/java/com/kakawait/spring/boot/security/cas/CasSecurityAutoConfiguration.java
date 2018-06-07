@@ -113,10 +113,11 @@ public class CasSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnClass(name = "org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration")
-    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties) {
+    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties,
+            CasSecurityProperties casSecurityProperties) {
         SpringBoot1SecurityProperties springBoot1SecurityProperties =
                 new SpringBoot1SecurityProperties(securityProperties);
-        return new SpringBoot1CasHttpSecurityConfigurerAdapter(springBoot1SecurityProperties);
+        return new SpringBoot1CasHttpSecurityConfigurerAdapter(springBoot1SecurityProperties, casSecurityProperties);
     }
 
     @Getter
@@ -218,8 +219,6 @@ public class CasSecurityAutoConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     static class DefaultCasSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {
 
-        private final SecurityProperties securityProperties;
-
         private final CasSecurityProperties casSecurityProperties;
 
         private final AbstractCasAssertionUserDetailsService userDetailsService;
@@ -230,13 +229,10 @@ public class CasSecurityAutoConfiguration {
 
         private final LogoutSuccessHandler logoutSuccessHandler;
 
-        public DefaultCasSecurityConfigurerAdapter(SecurityProperties securityProperties,
-                CasSecurityProperties casSecurityProperties,
+        public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
                 AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource,
-                ProxyGrantingTicketStorage proxyGrantingTicketStorage,
-                LogoutSuccessHandler logoutSuccessHandler) {
-            this.securityProperties = securityProperties;
+                ProxyGrantingTicketStorage proxyGrantingTicketStorage, LogoutSuccessHandler logoutSuccessHandler) {
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
             this.authenticationDetailsSource = authenticationDetailsSource;
@@ -260,17 +256,8 @@ public class CasSecurityAutoConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests().anyRequest().authenticated();
             http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler);
-
-            SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
-            if (mode == SecurityAuthorizeMode.ROLE) {
-                List<String> roles = getUserRoles(securityProperties);
-                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
-            } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
-                http.authorizeRequests().anyRequest().authenticated();
-            } else if (mode == SecurityAuthorizeMode.NONE) {
-                http.authorizeRequests().anyRequest().permitAll();
-            }
         }
 
         @Override
@@ -298,15 +285,6 @@ public class CasSecurityAutoConfiguration {
             ticketValidator.proxyGrantingTicketStorage(proxyGrantingTicketStorage);
         }
 
-        private static List<String> getUserRoles(SecurityProperties securityProperties) {
-            Method method = ReflectionUtils.findMethod(securityProperties.getUser().getClass(), "getRole");
-            if (method == null) {
-                return securityProperties.getUser().getRoles();
-            } else {
-                //noinspection unchecked
-                return (List<String>) ReflectionUtils.invokeMethod(method, securityProperties.getUser());
-            }
-        }
     }
 
     @Order(CAS_AUTH_ORDER)

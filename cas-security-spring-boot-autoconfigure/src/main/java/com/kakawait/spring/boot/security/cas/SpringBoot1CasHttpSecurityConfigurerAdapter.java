@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static com.kakawait.spring.boot.security.cas.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties.SECURITY_PROPERTIES_HEADERS_CLASS;
 
@@ -24,8 +25,12 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
 
     private final SpringBoot1SecurityProperties securityProperties;
 
-    SpringBoot1CasHttpSecurityConfigurerAdapter(SpringBoot1SecurityProperties securityProperties) {
+    private final CasSecurityProperties casSecurityProperties;
+
+    SpringBoot1CasHttpSecurityConfigurerAdapter(SpringBoot1SecurityProperties securityProperties,
+            CasSecurityProperties casSecurityProperties) {
         this.securityProperties = securityProperties;
+        this.casSecurityProperties = casSecurityProperties;
     }
 
     @Override
@@ -42,14 +47,26 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
                     http.getSharedObject(ApplicationContext.class).getBean(AuthenticationManager.class));
             http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
         }
+
+        CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
+        if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
+            List<String> roles = securityProperties.getUser().getRoles();
+            http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
+        } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
+            http.authorizeRequests().anyRequest().authenticated();
+        } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
+            http.authorizeRequests().anyRequest().permitAll();
+        }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void configureHeaders(HttpSecurity http) throws Exception {
         Method method = ReflectionUtils.findMethod(Class.forName(SPRING_BOOT_WEB_SECURITY_CONFIGURATION_CLASS),
                 "configureHeaders", HeadersConfigurer.class, Class.forName(SECURITY_PROPERTIES_HEADERS_CLASS));
         ReflectionUtils.invokeMethod(method, null, http.headers(), securityProperties.getHeaders());
     }
 
+    @SuppressWarnings("ConstantConditions")
     static class SpringBoot1SecurityProperties {
 
         static final String SECURITY_PROPERTIES_HEADERS_CLASS =
@@ -81,6 +98,11 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
             return new Basic(ReflectionUtils.invokeMethod(method, securityProperties));
         }
 
+        public User getUser() {
+            Method method = ReflectionUtils.findMethod(securityProperties.getClass(), "getUser");
+            return new User(ReflectionUtils.invokeMethod(method, securityProperties));
+        }
+
         static class Basic {
             private final Object basicProperties;
 
@@ -91,6 +113,20 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
             public boolean isEnabled() {
                 Method method = ReflectionUtils.findMethod(basicProperties.getClass(), "isEnabled");
                 return (boolean) ReflectionUtils.invokeMethod(method, basicProperties);
+            }
+        }
+
+        static class User {
+            private final Object userProperties;
+
+            public User(Object userProperties) {
+                this.userProperties = userProperties;
+            }
+
+            @SuppressWarnings("unchecked")
+            public List<String> getRoles() {
+                Method method = ReflectionUtils.findMethod(userProperties.getClass(), "getRole");
+                return (List<String>) ReflectionUtils.invokeMethod(method, userProperties);
             }
         }
     }
