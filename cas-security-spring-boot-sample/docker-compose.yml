@@ -19,7 +19,7 @@ services:
     build:
       context: ../
       dockerfile: cas-security-spring-boot-sample/Dockerfile
-    image: cas-security-spring-boot-sample:0.6.1
+    image: cas-security-spring-boot-sample:0.8.0
     ports:
       - "8081:8081"
       - "5005"

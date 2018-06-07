@@ -10,7 +10,7 @@
     <parent>
         <groupId>com.kakawait</groupId>
         <artifactId>cas-security-spring-boot-parent</artifactId>
-        <version>0.7.1</version>
+        <version>0.8.0</version>
     </parent>
 
     <name>Spring security cas extension</name>
@@ -48,6 +48,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://github.com/spring-projects/spring-boot/issues/8492 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
