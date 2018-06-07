@@ -1,7 +1,9 @@
 package com.kakawait.spring.boot.security.cas;
 
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class CasSecurityProperties {
     public static final int CAS_AUTH_ORDER = BASIC_AUTH_ORDER - 1;
 
     private boolean enabled = true;
+
+    private Authorization authorization = new Authorization();
 
     private User user = new User();
 
@@ -40,15 +44,45 @@ public class CasSecurityProperties {
     /**
      * Security authorize mode to apply.
      */
-    private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.ROLE;
+    // Until Intellij IDEA (plugins?) fix https://github.com/mplushnikov/lombok-intellij-plugin/issues/382
+    // I prefer using plain old getter/setter to avoid "RED" issue
+    // @Getter(onMethod_ = {@DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")})
+    private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.AUTHENTICATED;
+
+    @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")
+    @Deprecated
+    public SecurityAuthorizeMode getAuthorizeMode() {
+        return authorization.mode;
+    }
+
+    @Deprecated
+    public void setAuthorizeMode(SecurityAuthorizeMode authorizeMode) {
+        authorization.mode = authorizeMode;
+    }
 
     private ProxyValidation proxyValidation = new ProxyValidation();
+
+    @Data
+    public static class Authorization {
+        private SecurityAuthorizeMode mode = SecurityAuthorizeMode.AUTHENTICATED;
+
+        private String[] roles = new String[] { "USER" };
+    }
 
     @Data
     public static class User {
         private String[] rolesAttributes = new String[0];
 
-        private String[] defaultRoles = new String[] { "USER" };
+        /**
+         * Default roles are roles that will be automatically appends to other roles definitions
+         * For example if you defined: {@code security.cas.user.roles = USER}
+         * and {@code security.cas.user.defaultRoles = MEMBER}. At the end the user will have both {@code USER} and
+         * {@code MEMBER} role.
+         * <p>
+         * Same thing if you're using {@link #rolesAttributes}, {@code defaultRoles} will be append to the list of
+         * roles retrieve from {@code CAS Attributes}.
+         */
+        private String[] defaultRoles = new String[0];
     }
 
     @Data

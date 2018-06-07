@@ -110,11 +110,8 @@ public class CasSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnClass(name = "org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration")
-    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties,
-            CasSecurityProperties casSecurityProperties) {
-        SpringBoot1SecurityProperties springBoot1SecurityProperties =
-                new SpringBoot1SecurityProperties(securityProperties);
-        return new SpringBoot1CasHttpSecurityConfigurerAdapter(springBoot1SecurityProperties, casSecurityProperties);
+    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties) {
+        return new SpringBoot1CasHttpSecurityConfigurerAdapter(new SpringBoot1SecurityProperties(securityProperties));
     }
 
     @Getter
@@ -253,8 +250,17 @@ public class CasSecurityAutoConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.authorizeRequests().anyRequest().authenticated();
             http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler);
+
+            CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorization().getMode();
+            if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
+                String[] roles = casSecurityProperties.getAuthorization().getRoles();
+                http.authorizeRequests().anyRequest().hasAnyRole(roles);
+            } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
+                http.authorizeRequests().anyRequest().authenticated();
+            } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
+                http.authorizeRequests().anyRequest().permitAll();
+            }
         }
 
         @Override

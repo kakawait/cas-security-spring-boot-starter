@@ -151,6 +151,13 @@ public class CasSecuritySpringBootSampleApplication {
         }
     }
 
+    /**
+     * Security has changed from Spring Boot 1 and Spring Boot 2, see
+     * https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#security
+     * <p>
+     * That configuration try to expose you how could you <i>simulate</i> some Spring Boot 1 behavior with
+     * Spring Boot 2 application
+     */
     @Configuration
     static class BackwardSpringBoot1CasSecurityConfiguration extends CasSecurityConfigurerAdapter {
 
@@ -162,6 +169,7 @@ public class CasSecuritySpringBootSampleApplication {
 
         @Override
         public void configure(HttpSecurity http) {
+            // You can create property or whatever to toggle those features
             enableBasicAuth(http);
         }
 

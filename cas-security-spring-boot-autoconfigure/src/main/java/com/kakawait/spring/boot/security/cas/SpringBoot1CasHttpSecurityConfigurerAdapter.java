@@ -25,12 +25,8 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
 
     private final SpringBoot1SecurityProperties securityProperties;
 
-    private final CasSecurityProperties casSecurityProperties;
-
-    SpringBoot1CasHttpSecurityConfigurerAdapter(SpringBoot1SecurityProperties securityProperties,
-            CasSecurityProperties casSecurityProperties) {
+    SpringBoot1CasHttpSecurityConfigurerAdapter(SpringBoot1SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
-        this.casSecurityProperties = casSecurityProperties;
     }
 
     @Override
@@ -46,16 +42,6 @@ class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerA
             BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(
                     http.getSharedObject(ApplicationContext.class).getBean(AuthenticationManager.class));
             http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
-        }
-
-        CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
-        if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
-            List<String> roles = securityProperties.getUser().getRoles();
-            http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
-        } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
-            http.authorizeRequests().anyRequest().authenticated();
-        } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
-            http.authorizeRequests().anyRequest().permitAll();
         }
     }
 
