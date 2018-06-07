@@ -1,5 +1,7 @@
 package com.kakawait.spring.boot.security.cas;
 
+import com.kakawait.spring.boot.security.cas.CasSecurityProperties.SecurityAuthorizeMode;
+import com.kakawait.spring.boot.security.cas.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -14,13 +16,10 @@ import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.ProxyList;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,9 +37,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +60,6 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AU
 @Configuration
 @ConditionalOnWebApplication
 @ConditionalOnClass(EnableWebSecurity.class)
-@AutoConfigureBefore(SecurityAutoConfiguration.class)
 @Conditional(CasSecurityCondition.class)
 @EnableConfigurationProperties(CasSecurityProperties.class)
 @Import({CasLoginSecurityConfiguration.class, CasAssertionUserDetailsServiceConfiguration.class,
@@ -109,6 +109,14 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ProxyTicketProvider.class)
     ProxyTicketProvider attributePrincipalProxyTicketProvider(AssertionProvider assertionProvider) {
         return new AttributePrincipalProxyTicketProvider(assertionProvider);
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration")
+    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties) {
+        SpringBoot1SecurityProperties springBoot1SecurityProperties =
+                new SpringBoot1SecurityProperties(securityProperties);
+        return new SpringBoot1CasHttpSecurityConfigurerAdapter(springBoot1SecurityProperties);
     }
 
     @Getter
@@ -256,7 +264,7 @@ public class CasSecurityAutoConfiguration {
 
             SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
             if (mode == SecurityAuthorizeMode.ROLE) {
-                List<String> roles = securityProperties.getUser().getRole();
+                List<String> roles = getUserRoles(securityProperties);
                 http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
             } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
                 http.authorizeRequests().anyRequest().authenticated();
@@ -289,18 +297,24 @@ public class CasSecurityAutoConfiguration {
             }
             ticketValidator.proxyGrantingTicketStorage(proxyGrantingTicketStorage);
         }
+
+        private static List<String> getUserRoles(SecurityProperties securityProperties) {
+            Method method = ReflectionUtils.findMethod(securityProperties.getUser().getClass(), "getRole");
+            if (method == null) {
+                return securityProperties.getUser().getRoles();
+            } else {
+                //noinspection unchecked
+                return (List<String>) ReflectionUtils.invokeMethod(method, securityProperties.getUser());
+            }
+        }
     }
 
     @Order(CAS_AUTH_ORDER)
     static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-        private final List<CasSecurityConfigurer> configurers;
-
         private final CasSecurityProperties casSecurityProperties;
 
-        public CasLoginSecurityConfiguration(List<CasSecurityConfigurer> configurers,
-                CasSecurityProperties casSecurityProperties) {
-            this.configurers = configurers;
+        public CasLoginSecurityConfiguration(CasSecurityProperties casSecurityProperties) {
             this.casSecurityProperties = casSecurityProperties;
         }
 
@@ -309,11 +323,7 @@ public class CasSecurityAutoConfiguration {
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
                 http.requestMatchers().antMatchers(paths);
-                CasHttpSecurityConfigurer.cas().init(http);
-                for (CasSecurityConfigurer configurer : configurers) {
-                    configurer.init(http);
-                    configurer.configure(http);
-                }
+                CasHttpSecurityConfigurer.cas().configure(http);
             }
         }
 

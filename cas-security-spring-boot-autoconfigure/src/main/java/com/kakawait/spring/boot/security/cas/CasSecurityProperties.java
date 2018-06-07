@@ -1,7 +1,6 @@
 package com.kakawait.spring.boot.security.cas;
 
 import lombok.Data;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.net.URI;
@@ -182,6 +181,23 @@ public class CasSecurityProperties {
     public enum ServiceResolutionMode {
         STATIC,
         DYNAMIC
+    }
+
+    public enum SecurityAuthorizeMode {
+        /**
+         * Must be a member of one of the security roles.
+         */
+        ROLE,
+
+        /**
+         * Must be an authenticated user.
+         */
+        AUTHENTICATED,
+
+        /**
+         * No security authorization is setup.
+         */
+        NONE
     }
 
 }
