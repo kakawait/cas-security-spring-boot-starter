@@ -68,7 +68,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
      * instead of
      *
      * <pre>{@code
-     * http.apply(CasHttpSecurityConfigurer.cas());
+     * http.apply(CasHttpSecurityConfigurera.cas());
      * }</pre>
      */
     @Override
@@ -77,11 +77,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         if (!isInitialized) {
             ApplicationContext context = http.getSharedObject(ApplicationContext.class);
             getCasHttpSecurityConfigurerAdapter(context).init(http);
-//            // TODO
-//            SecurityProperties securityProperties = context.getBean(SecurityProperties.class);
-//            new SpringBoot1CasHttpSecurityConfigurerAdapter(new SpringBoot1SecurityProperties(securityProperties))
-//                    .init(http);
-//            // END TODO
             isInitialized = true;
         }
     }
@@ -111,12 +106,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         init(http);
         ApplicationContext context = http.getSharedObject(ApplicationContext.class);
         getCasHttpSecurityConfigurerAdapter(context).configure(http);
-
-//        // TODO
-//        SecurityProperties securityProperties = context.getBean(SecurityProperties.class);
-//        new SpringBoot1CasHttpSecurityConfigurerAdapter(new SpringBoot1SecurityProperties(securityProperties))
-//                .configure(http);
-//        // END TODO
     }
 
     private CasHttpSecurityConfigurerAdapter getCasHttpSecurityConfigurerAdapter(ApplicationContext context) {

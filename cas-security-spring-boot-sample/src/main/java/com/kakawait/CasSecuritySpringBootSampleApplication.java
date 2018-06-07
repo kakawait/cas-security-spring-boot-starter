@@ -1,6 +1,7 @@
 package com.kakawait;
 
 import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
+import com.kakawait.spring.boot.security.cas.CasSecurityCondition;
 import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -9,9 +10,11 @@ import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
@@ -63,6 +66,7 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Bean
+    @Conditional(CasSecurityCondition.class)
     RestTemplate casRestTemplate(ServiceProperties serviceProperties, ProxyTicketProvider proxyTicketProvider) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(new CasAuthorizationInterceptor(serviceProperties, proxyTicketProvider));
@@ -71,6 +75,7 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("!custom-logout")
     @Configuration
+    @ConditionalOnBean(LogoutSuccessHandler.class)
     static class LogoutConfiguration extends CasSecurityConfigurerAdapter {
 
         private final LogoutSuccessHandler casLogoutSuccessHandler;
@@ -89,6 +94,7 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Configuration
+    @Conditional(CasSecurityCondition.class)
     static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -103,6 +109,7 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("custom-logout")
     @Configuration
+    @Conditional(CasSecurityCondition.class)
     static class CustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
 
         private final LogoutSuccessHandler casLogoutSuccessHandler;
@@ -136,6 +143,7 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Controller
+    @Conditional(CasSecurityCondition.class)
     @RequestMapping(value = "/")
     static class IndexController {
 
