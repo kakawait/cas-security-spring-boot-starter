@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kakawait</groupId>
-    <artifactId>cas-security-spring-boot-2-sample</artifactId>
+    <artifactId>cas-security-spring-boot-sample</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <name>Cas security spring boot sample</name>
