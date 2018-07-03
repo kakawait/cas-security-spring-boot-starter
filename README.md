@@ -29,6 +29,26 @@ Add the Spring boot starter to your project
 </dependency>
 ```
 
+**Attention** if you want to use that starter with `Spring boot 2` (still compatible with `Spring boot 1`), you must use (currently in development) following version:
+
+```xml
+<dependency>
+  <groupId>com.kakawait</groupId>
+  <artifactId>cas-security-spring-boot-starter</artifactId>
+  <version>1.0.0-beta-1</version>
+</dependency>
+```
+
+But be careful `1.x.x` version has some **breaking changes** if you comes from `0.x.x` version.
+
+Please checkout [CHANGELOG.md](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/CHANGELOG.md), in particular `breaking changes` sections.
+
+\* breaking changes should be only possible between two major version, example:
+
+- from `0.x.x` to `1.x.x`
+- from `1.x.x` to `2.x.x`
+- ...
+
 ## Usage
 
 In order to trigger auto-configuration you must fill, at least, the following properties regarding the resolution mode you want to use
