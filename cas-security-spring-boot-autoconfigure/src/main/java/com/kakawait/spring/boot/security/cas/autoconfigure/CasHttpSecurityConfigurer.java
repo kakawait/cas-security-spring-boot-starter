@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;

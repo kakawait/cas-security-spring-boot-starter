@@ -1,5 +1,6 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSingleSignOutFilterConfigurer;
 import org.jasig.cas.client.session.SessionMappingStorage;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.junit.Test;

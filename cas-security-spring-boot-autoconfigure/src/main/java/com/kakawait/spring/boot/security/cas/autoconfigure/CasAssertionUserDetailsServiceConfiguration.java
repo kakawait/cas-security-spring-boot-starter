@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import com.kakawait.spring.security.cas.userdetails.GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
