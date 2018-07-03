@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
@@ -12,7 +12,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static com.kakawait.spring.boot.security.cas.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties.SECURITY_PROPERTIES_HEADERS_CLASS;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties.SECURITY_PROPERTIES_HEADERS_CLASS;
 
 /**
  * @author Thibaud Leprêtre

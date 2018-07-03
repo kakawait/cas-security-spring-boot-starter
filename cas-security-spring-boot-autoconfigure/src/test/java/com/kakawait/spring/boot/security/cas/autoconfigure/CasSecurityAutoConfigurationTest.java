@@ -1,6 +1,7 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -16,7 +17,6 @@ import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -173,7 +173,7 @@ public class CasSecurityAutoConfigurationTest {
     public void autoConfigure_EmptyConfiguration_DefaultCasSecurityConfigurerAdapterBean() {
         load(EmptyConfiguration.class);
 
-        String beanName ="com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration$" +
+        String beanName ="com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration$" +
                 "DefaultCasSecurityConfigurerAdapter";
         context.getBean(beanName);
     }

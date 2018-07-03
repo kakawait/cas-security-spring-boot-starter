@@ -1,5 +1,6 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasTicketValidatorBuilder;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyRetriever;
 import org.jasig.cas.client.ssl.HttpURLConnectionFactory;
@@ -36,11 +37,11 @@ public class CasTicketValidatorBuilderTest {
     private static final String CAS_SERVER_URL_PREFIX = "http://my.cas.server.base.url/";
 
     private static final String V1_WARN_MESSAGE_TEMPLATE =
-            "WARN com.kakawait.spring.boot.security.cas.CasTicketValidatorBuilder - " +
+            "WARN com.kakawait.spring.boot.security.cas.autoconfigure.CasTicketValidatorBuilder - " +
                     "Configuration \"%s\" isn't possible using protocol version 1, will be omitted!";
 
     private static final String SERVICE_VALIDATOR_WARN_MESSAGE_TEMPLATE =
-            "WARN com.kakawait.spring.boot.security.cas.CasTicketValidatorBuilder - " +
+            "WARN com.kakawait.spring.boot.security.cas.autoconfigure.CasTicketValidatorBuilder - " +
                     "Configuration \"%s\" isn't possible using service ticket validator " +
                     "(please consider proxy ticket validator), will be omitted!";
 

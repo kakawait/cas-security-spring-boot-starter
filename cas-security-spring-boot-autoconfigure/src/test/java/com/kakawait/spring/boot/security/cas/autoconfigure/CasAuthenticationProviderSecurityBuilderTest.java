@@ -1,5 +1,7 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasAuthenticationProviderSecurityBuilder;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityProperties;
 import com.kakawait.spring.security.cas.authentication.DynamicProxyCallbackUrlCasAuthenticationProvider;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.junit.Before;

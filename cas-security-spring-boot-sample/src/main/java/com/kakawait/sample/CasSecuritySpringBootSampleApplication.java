@@ -1,10 +1,8 @@
 package com.kakawait.sample;
 
-import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
-import com.kakawait.spring.boot.security.cas.CasSecurityCondition;
-import com.kakawait.spring.boot.security.cas.CasSecurityConfigurer;
-import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
-import com.kakawait.spring.boot.security.cas.CasSecurityProperties;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasHttpSecurityConfigurer;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityCondition;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
@@ -13,13 +11,11 @@ import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +45,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.lang.reflect.Field;
 import java.security.Principal;

@@ -1,6 +1,6 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
-import com.kakawait.spring.boot.security.cas.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties;
+import com.kakawait.spring.boot.security.cas.autoconfigure.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -45,11 +45,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DynamicCasSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.StaticCasSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AUTH_ORDER;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.DynamicCasSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.StaticCasSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityProperties.CAS_AUTH_ORDER;
 
 /**
  * @author Thibaud Leprêtre
