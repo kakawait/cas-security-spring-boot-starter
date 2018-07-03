@@ -258,6 +258,7 @@ public class CasSecuritySpringBootSampleApplication {
         /**
          * Hacky code please do not use that in production
          */
+        @SuppressWarnings("Duplicates")
         private Optional<String> getProxyGrantingTicket(Authentication authentication) {
             Optional<AttributePrincipal> attributePrincipal = getAttributePrincipal(authentication);
             if (!attributePrincipal.isPresent() || !(attributePrincipal.get() instanceof AttributePrincipalImpl)) {
