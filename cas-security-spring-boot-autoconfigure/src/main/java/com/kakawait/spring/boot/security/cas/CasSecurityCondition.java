@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 public class CasSecurityCondition extends AllNestedConditions {
 
     public CasSecurityCondition() {
-        super(ConfigurationPhase.PARSE_CONFIGURATION);
+        super(ConfigurationPhase.REGISTER_BEAN);
     }
 
     @ConditionalOnProperty(value = "security.cas.enabled", havingValue = "true", matchIfMissing = true)

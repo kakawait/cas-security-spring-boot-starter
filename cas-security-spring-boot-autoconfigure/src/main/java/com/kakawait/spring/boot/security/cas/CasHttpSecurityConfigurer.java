@@ -3,8 +3,6 @@ package com.kakawait.spring.boot.security.cas;
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
@@ -17,7 +15,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -58,6 +55,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated use {@link #configure(HttpSecurity)} instead.
      * Will not be removed but until this issue was not treat
      * https://github.com/spring-projects/spring-security/issues/4422 I still prefer using this
@@ -66,11 +64,11 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
      * <pre>{@code
      * CasHttpSecurityConfigurer.cas().configure(http);
      * }</pre>
-     *
+     * <p>
      * instead of
      *
      * <pre>{@code
-     * http.apply(CasHttpSecurityConfigurer.cas());
+     * http.apply(CasHttpSecurityConfigurera.cas());
      * }</pre>
      */
     @Override
@@ -88,13 +86,13 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
      * In addition {@link #configure(HttpSecurity)} will call {@link #init(HttpSecurity)} in order to be used without
      * {@link HttpSecurity#apply(SecurityConfigurerAdapter)} usage, related to
      * https://github.com/spring-projects/spring-security/issues/4422 issue.
-     *
+     * <p>
      * Thus when using
      *
      * <pre>{@code
      * CasHttpSecurityConfigurer.cas().configure(http);
      * }</pre>
-     *
+     * <p>
      * {@code configure(http)} will also call {@link CasHttpSecurityConfigurerAdapter#init(HttpSecurity)} and no need
      * to write following duplicates
      *
@@ -135,8 +133,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
 
         private final List<CasSecurityConfigurer> configurers;
 
-        private final SecurityProperties securityProperties;
-
         private final CasSecurityProperties casSecurityProperties;
 
         private final CasAuthenticationEntryPoint authenticationEntryPoint;
@@ -152,11 +148,10 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         private boolean authenticationManagerInitialized;
 
         public CasHttpSecurityConfigurerAdapter(List<CasSecurityConfigurer> configurers,
-                SecurityProperties securityProperties, CasSecurityProperties casSecurityProperties,
-                CasAuthenticationEntryPoint authenticationEntryPoint, ServiceProperties serviceProperties,
-                TicketValidator ticketValidator, ObjectPostProcessor<Object> objectPostProcessor) {
+                CasSecurityProperties casSecurityProperties, CasAuthenticationEntryPoint authenticationEntryPoint,
+                ServiceProperties serviceProperties, TicketValidator ticketValidator,
+                ObjectPostProcessor<Object> objectPostProcessor) {
             this.configurers = configurers;
-            this.securityProperties = securityProperties;
             this.casSecurityProperties = casSecurityProperties;
             this.authenticationEntryPoint = authenticationEntryPoint;
             this.serviceProperties = serviceProperties;
@@ -165,7 +160,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         }
 
         @PostConstruct
-        private void init() {
+        private void postConstruct() {
             configurers.forEach(c -> {
                 c.configure(filterConfigurer);
                 c.configure(singleSignOutFilterConfigurer);
@@ -184,22 +179,20 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
 
-            if (securityProperties.isRequireSsl()) {
-                http.requiresChannel().anyRequest().requiresSecure();
-            }
-            if (!securityProperties.isEnableCsrf()) {
-                http.csrf().disable();
-            }
-            SpringBootWebSecurityConfiguration.configureHeaders(http.headers(), securityProperties.getHeaders());
-
             http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
                 .addFilter(filter);
-            if (securityProperties.getBasic().isEnabled()) {
-                BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(
-                        http.getSharedObject(ApplicationContext.class).getBean(AuthenticationManager.class));
-                http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
+
+            for (CasSecurityConfigurer configurer : configurers) {
+                configurer.init(http);
+            }
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            for (CasSecurityConfigurer configurer : configurers) {
+                configurer.configure(http);
             }
         }
 
@@ -233,4 +226,5 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             return new AntPathRequestMatcher(casSecurityProperties.getService().getPaths().getLogin());
         }
     }
+
 }

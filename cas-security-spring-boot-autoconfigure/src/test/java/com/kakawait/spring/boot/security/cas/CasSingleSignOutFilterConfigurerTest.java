@@ -23,7 +23,6 @@ public class CasSingleSignOutFilterConfigurerTest {
 
         CasSingleSignOutFilterConfigurer configurer = new CasSingleSignOutFilterConfigurer();
         configurer.artifactParameterName("dummyArtifactParameterName")
-                  .frontLogoutParameterName("dummyFrontLogoutParameterName")
                   .logoutParameterName("dummyLogoutParameterName")
                   .relayStateParameterName("dummyRelayStateParameterName")
                   .sessionMappingStorage(sessionMappingStorage)
@@ -31,7 +30,6 @@ public class CasSingleSignOutFilterConfigurerTest {
 
         assertThat(ReflectionTestUtils.getField(filter, "HANDLER"))
                 .hasFieldOrPropertyWithValue("artifactParameterName", "dummyArtifactParameterName")
-                .hasFieldOrPropertyWithValue("frontLogoutParameterName", "dummyFrontLogoutParameterName")
                 .hasFieldOrPropertyWithValue("logoutParameterName", "dummyLogoutParameterName")
                 .hasFieldOrPropertyWithValue("relayStateParameterName", "dummyRelayStateParameterName")
                 .extracting("sessionMappingStorage")

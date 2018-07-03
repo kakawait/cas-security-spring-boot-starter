@@ -2,10 +2,12 @@ server:
   port: 8081
 
 security:
-  basic:
-    enabled: true
-  ignored: /ignored, /**/favicon.ico
   cas:
+    authorization:
+      mode: role
+      roles: USER
+    user:
+      default-roles: USER
     proxy-validation:
       chains:
         - http://localhost:8180, http://localhost:8181
@@ -16,7 +18,6 @@ security:
       protocol-version: 3
     service:
       resolution-mode: dynamic
-
 ---
 
 spring:
