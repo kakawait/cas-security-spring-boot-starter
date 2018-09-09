@@ -211,6 +211,9 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         AuthenticationManager authenticationManager() throws Exception {
             if (!authenticationManagerInitialized) {
                 configure(authenticationManagerBuilder);
+                for (CasSecurityConfigurer configurer : configurers) {
+                    configurer.configure(authenticationManagerBuilder);
+                }
                 authenticationManager = authenticationManagerBuilder.build();
                 authenticationManagerInitialized = true;
             }
