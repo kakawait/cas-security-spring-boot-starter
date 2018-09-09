@@ -2,6 +2,7 @@ package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.SecurityConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 /**
@@ -25,4 +26,6 @@ public interface CasSecurityConfigurer {
     void init(HttpSecurity http) throws Exception;
 
     void configure(CasTicketValidatorBuilder ticketValidator);
+
+    void configure(AuthenticationManagerBuilder auth);
 }
