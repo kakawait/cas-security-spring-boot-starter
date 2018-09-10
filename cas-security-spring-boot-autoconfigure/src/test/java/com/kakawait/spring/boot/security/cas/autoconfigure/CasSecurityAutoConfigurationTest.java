@@ -178,6 +178,14 @@ public class CasSecurityAutoConfigurationTest {
         context.getBean(beanName);
     }
 
+    @Test
+    public void autoConfigure_WithCustomSecurityPath_NoIllegalArgumentException() {
+        Properties properties = getDefaultProperties();
+        properties.put("security.cas.paths", "/secured");
+
+        load(properties, EmptyConfiguration.class);
+    }
+
     @Configuration
     static class EmptyConfiguration {}
 

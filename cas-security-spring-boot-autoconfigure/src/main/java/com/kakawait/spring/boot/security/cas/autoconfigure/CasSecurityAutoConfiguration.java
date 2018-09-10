@@ -324,6 +324,8 @@ public class CasSecurityAutoConfiguration {
             paths.add(casSecurityProperties.getService().getPaths().getLogin());
             paths.add(casSecurityProperties.getService().getPaths().getLogout());
             paths.add(casSecurityProperties.getService().getPaths().getProxyCallback());
+            // Prevent having null value that will cause IllegalArgumentException
+            paths.remove(null);
             return paths.toArray(new String[0]);
         }
     }
