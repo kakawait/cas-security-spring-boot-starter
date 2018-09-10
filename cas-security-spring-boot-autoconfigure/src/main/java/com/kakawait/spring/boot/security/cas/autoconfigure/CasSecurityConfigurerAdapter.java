@@ -34,6 +34,6 @@ public abstract class CasSecurityConfigurerAdapter implements CasSecurityConfigu
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) {
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
     }
 }
