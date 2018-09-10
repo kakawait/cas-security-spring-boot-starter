@@ -27,5 +27,5 @@ public interface CasSecurityConfigurer {
 
     void configure(CasTicketValidatorBuilder ticketValidator);
 
-    void configure(AuthenticationManagerBuilder auth);
+    void configure(AuthenticationManagerBuilder auth) throws Exception;
 }
