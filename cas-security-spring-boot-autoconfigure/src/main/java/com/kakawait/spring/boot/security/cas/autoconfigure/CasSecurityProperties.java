@@ -32,7 +32,7 @@ public class CasSecurityProperties {
     private Service service = new Service();
 
     /**
-     * @see org.springframework.security.cas.authentication.CasAuthenticationProvider#key
+     * @see org.springframework.security.cas.authentication.CasAuthenticationProvider
      */
     private String key = UUID.randomUUID().toString();
 
@@ -132,7 +132,7 @@ public class CasSecurityProperties {
             /**
              * CAS Server login path that will be append to {@link Server#baseUrl}
              *
-             * @see org.springframework.security.cas.web.CasAuthenticationEntryPoint#loginUrl
+             * @see org.springframework.security.cas.web.CasAuthenticationEntryPoint
              */
             private String login = "/login";
 
@@ -188,7 +188,7 @@ public class CasSecurityProperties {
             /**
              * CAS Service logout path that will be append to {@link Service#baseUrl}
              *
-             * @see org.springframework.security.web.authentication.logout.LogoutFilter#logoutRequestMatcher
+             * @see org.springframework.security.web.authentication.logout.LogoutFilter
              */
             private String logout = "/logout";
 
@@ -197,7 +197,7 @@ public class CasSecurityProperties {
              * fallback to {@link Service#baseUrl}
              *
              * @see Service#callbackBaseUrl
-             * @see org.jasig.cas.client.validation.Cas20ServiceTicketValidator#proxyCallbackUrl
+             * @see org.jasig.cas.client.validation.Cas20ServiceTicketValidator
              */
             private String proxyCallback;
         }

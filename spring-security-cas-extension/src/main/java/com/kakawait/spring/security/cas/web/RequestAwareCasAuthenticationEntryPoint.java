@@ -17,7 +17,8 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
  */
 public class RequestAwareCasAuthenticationEntryPoint extends CasAuthenticationEntryPoint {
 
-    private final URI loginPath;
+    @SuppressWarnings("WeakerAccess")
+    protected final URI loginPath;
 
     public RequestAwareCasAuthenticationEntryPoint(URI loginPath) {
         Assert.notNull(loginPath, "login path is required, it must not be null");
@@ -37,7 +38,8 @@ public class RequestAwareCasAuthenticationEntryPoint extends CasAuthenticationEn
                 getServiceProperties().getServiceParameter(), getServiceProperties().getArtifactParameter(), true);
     }
 
-    private static Optional<String> buildUrl(HttpServletRequest request, URI path) {
+    @SuppressWarnings("WeakerAccess")
+    protected static Optional<String> buildUrl(HttpServletRequest request, URI path) {
         Assert.notNull(request, "request is required; it must not be null");
         if (!path.isAbsolute()) {
             return Optional.of(fromContextPath(request).path(path.toASCIIString()).toUriString());
