@@ -177,6 +177,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             filterConfigurer.configure(filter);
 
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
+            singleSignOutFilter.setCasServerUrlPrefix(casSecurityProperties.getServer().getBaseUrl().toASCIIString());
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
 
             http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
