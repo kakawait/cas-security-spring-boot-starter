@@ -35,7 +35,7 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>1.0.0-beta-1</version>
+  <version>1.0.0-beta-2</version>
 </dependency>
 ```
 
