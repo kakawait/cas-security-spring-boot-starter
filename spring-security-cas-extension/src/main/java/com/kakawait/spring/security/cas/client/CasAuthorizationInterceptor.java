@@ -51,7 +51,7 @@ public class CasAuthorizationInterceptor implements ClientHttpRequestInterceptor
         URI uri = UriComponentsBuilder
                 .fromUri(request.getURI())
                 .replaceQueryParam(serviceProperties.getArtifactParameter(), proxyTicket)
-                .build().toUri();
+                .build(true).toUri();
         return execution.execute(new HttpRequestWrapper(request) {
             @Override
             public URI getURI() {
