@@ -6,10 +6,11 @@ import org.jasig.cas.client.validation.TicketValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
 import org.springframework.security.core.Authentication;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -68,6 +69,8 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.setTicketValidator(null);
 
         when(authentication.getDetails()).thenReturn(new ProxyCallbackAndServiceAuthenticationDetails() {
+            private static final long serialVersionUID = 2171667909966987793L;
+
             @Override
             public String getServiceUrl() {
                 return "http://localhost";
@@ -76,6 +79,11 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
             @Override
             public String getProxyCallbackUrl() {
                 return "http://localhost/cas/callback";
+            }
+
+            @Override
+            public void setContext(HttpServletRequest context) {
+                // do nothing
             }
         });
 
@@ -93,6 +101,8 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.setTicketValidator(ticketValidator);
 
         when(authentication.getDetails()).thenReturn(new ProxyCallbackAndServiceAuthenticationDetails() {
+            private static final long serialVersionUID = 700055871632490815L;
+
             @Override
             public String getServiceUrl() {
                 return "http://localhost";
@@ -101,6 +111,11 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
             @Override
             public String getProxyCallbackUrl() {
                 return "http://localhost/cas/callback";
+            }
+
+            @Override
+            public void setContext(HttpServletRequest context) {
+                // do nothing
             }
         });
 
@@ -119,6 +134,8 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.setTicketValidator(ticketValidator);
 
         when(authentication.getDetails()).thenReturn(new ProxyCallbackAndServiceAuthenticationDetails() {
+            private static final long serialVersionUID = -541835714542292545L;
+
             @Override
             public String getServiceUrl() {
                 return "http://localhost";
@@ -127,6 +144,11 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
             @Override
             public String getProxyCallbackUrl() {
                 return "http://localhost/cas/callback";
+            }
+
+            @Override
+            public void setContext(HttpServletRequest context) {
+                // do nothing
             }
         });
         doNothing().when(ticketValidator).setProxyCallbackUrl(anyString());
