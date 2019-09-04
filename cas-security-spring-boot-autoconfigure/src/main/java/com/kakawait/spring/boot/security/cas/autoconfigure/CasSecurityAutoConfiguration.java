@@ -64,6 +64,10 @@ import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityPro
         DynamicCasSecurityConfiguration.class, StaticCasSecurityConfiguration.class})
 public class CasSecurityAutoConfiguration {
 
+    private static String buildUrl(@NonNull URI baseUrl, @NonNull String path) {
+        return UriComponentsBuilder.fromUri(baseUrl).path(path).toUriString();
+    }
+
     @Bean
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "static",
@@ -251,16 +255,6 @@ public class CasSecurityAutoConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler);
-
-            CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorization().getMode();
-            if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
-                String[] roles = casSecurityProperties.getAuthorization().getRoles();
-                http.authorizeRequests().anyRequest().hasAnyRole(roles);
-            } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
-                http.authorizeRequests().anyRequest().authenticated();
-            } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
-                http.authorizeRequests().anyRequest().permitAll();
-            }
         }
 
         @Override
@@ -305,6 +299,16 @@ public class CasSecurityAutoConfiguration {
             if (paths.length > 0) {
                 http.requestMatchers().antMatchers(paths);
                 CasHttpSecurityConfigurer.cas().configure(http);
+
+                CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorization().getMode();
+                if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
+                    String[] roles = casSecurityProperties.getAuthorization().getRoles();
+                    http.authorizeRequests().anyRequest().hasAnyRole(roles);
+                } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
+                    http.authorizeRequests().anyRequest().authenticated();
+                } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
+                    http.authorizeRequests().anyRequest().permitAll();
+                }
             }
         }
 
@@ -328,13 +332,6 @@ public class CasSecurityAutoConfiguration {
             paths.remove(null);
             return paths.toArray(new String[0]);
         }
-    }
-
-    private static String buildUrl(@NonNull URI baseUrl, @NonNull String path) {
-        return UriComponentsBuilder
-                .fromUri(baseUrl)
-                .path(path)
-                .toUriString();
     }
 
 }
