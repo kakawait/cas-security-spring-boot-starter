@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - First release that supporting Spring boot 2 ([#32](https://github.com/kakawait/cas-security-spring-boot-starter/issues/32))
 - Remove deprecated module `cas-security-dynamic-service-resolver` ([#35](https://github.com/kakawait/cas-security-spring-boot-starter/issues/35))
+- Open some api to facilitate extensibility ([#122](https://github.com/kakawait/cas-security-spring-boot-starter/pull/122), [#109](https://github.com/kakawait/cas-security-spring-boot-starter/pull/109))
 
 ### Breaking changes
 
@@ -13,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Related to [#33 
 Rename package com.kakawait.spring.boot.security.cas to com.kakawait.spring.boot.security.cas.autoconfigure](https://github.com/kakawait/cas-security-spring-boot-starter/issues/33), you must rewrite your `import` statements to append `.autoconfigure.`.
 - Property `security.cas.authorize-mode` has been renamed `security.cas.authorization.mode`
+- `CasHttpSecurityConfigurer.cas().configure(http)` will no secure paths, only configure CAS authentication 
 
 #### Spring boot 2 support breaking changes
 

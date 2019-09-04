@@ -10,7 +10,7 @@
     <parent>
         <groupId>com.kakawait</groupId>
         <artifactId>cas-security-spring-boot-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <name>Cas security spring boot starter</name>
@@ -30,12 +30,6 @@
             <groupId>com.kakawait</groupId>
             <artifactId>spring-security-cas-extension</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <!-- Deprecated since 0.4.0, will be removed on 1.0.0 -->
-        <dependency>
-            <groupId>com.kakawait</groupId>
-            <artifactId>cas-security-dynamic-service-resolver</artifactId>
-            <version>0.4.0</version>
         </dependency>
     </dependencies>
 

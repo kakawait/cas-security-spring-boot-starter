@@ -184,10 +184,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
                 .and()
                 .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
                 .addFilter(filter);
-
-            for (CasSecurityConfigurer configurer : configurers) {
-                configurer.init(http);
-            }
         }
 
         @Override

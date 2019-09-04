@@ -25,11 +25,6 @@ public abstract class CasSecurityConfigurerAdapter implements CasSecurityConfigu
     }
 
     @Override
-    @Deprecated
-    public void init(HttpSecurity http) throws Exception {
-    }
-
-    @Override
     public void configure(CasTicketValidatorBuilder ticketValidator) {
     }
 
