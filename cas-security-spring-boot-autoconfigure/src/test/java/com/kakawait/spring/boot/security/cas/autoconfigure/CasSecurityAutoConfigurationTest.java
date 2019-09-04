@@ -1,7 +1,6 @@
 package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 
-import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -22,6 +21,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -54,8 +54,8 @@ public class CasSecurityAutoConfigurationTest {
 
     @After
     public void tearDown() {
-        if (this.context != null) {
-            this.context.close();
+        if (context != null) {
+            context.close();
         }
     }
 
@@ -155,7 +155,10 @@ public class CasSecurityAutoConfigurationTest {
         properties.put("security.cas.service.callback-base-url", "http://app:8081/test/");
 
         load(properties, EmptyConfiguration.class);
-        assertThat(context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class))
+
+        ProxyCallbackAndServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource =
+                context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class);
+        assertThat(serviceAuthenticationDetailsSource.buildDetails(new MockHttpServletRequest()))
                 .hasFieldOrPropertyWithValue("proxyCallbackUri", URI.create("http://app:8081/test/cas/proxy-callback"));
     }
 
@@ -165,7 +168,10 @@ public class CasSecurityAutoConfigurationTest {
         properties.put("security.cas.service.paths.proxy-callback", "/cas/proxy-callback");
 
         load(properties, EmptyConfiguration.class);
-        assertThat(context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class))
+
+        ProxyCallbackAndServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource =
+                context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class);
+        assertThat(serviceAuthenticationDetailsSource.buildDetails(new MockHttpServletRequest()))
                 .hasFieldOrPropertyWithValue("proxyCallbackUri", URI.create("/cas/proxy-callback"));
     }
 
@@ -185,9 +191,6 @@ public class CasSecurityAutoConfigurationTest {
 
         load(properties, EmptyConfiguration.class);
     }
-
-    @Configuration
-    static class EmptyConfiguration {}
 
     private Properties getDefaultProperties() {
         Properties properties = new Properties();
@@ -224,6 +227,9 @@ public class CasSecurityAutoConfigurationTest {
         context.refresh();
         this.context = context;
     }
+
+    @Configuration
+    static class EmptyConfiguration {}
 
     private static class DummyAuthenticationManagerConfiguration {
         @Bean

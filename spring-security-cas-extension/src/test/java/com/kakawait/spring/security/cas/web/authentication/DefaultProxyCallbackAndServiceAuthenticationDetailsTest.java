@@ -28,7 +28,8 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
     @Test
     public void getProxyCallbackUrl_NullProxyCallbackUri_Null() {
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request, null);
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, null);
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getProxyCallbackUrl()).isNull();
     }
@@ -36,8 +37,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
     @Test
     public void getProxyCallbackUrl_AbsoluteProxyCallbackUri_NoTransformation() {
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request,
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties,
                         URI.create("http://localhost/cas/callback"));
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getProxyCallbackUrl()).isEqualTo("http://localhost/cas/callback");
     }
@@ -46,8 +48,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
     public void getProxyCallbackUrl_ProxyCallbackUriAndWithoutContextPath_AppendToBaseUrl() {
         request.setRequestURI("/john/wick");
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request,
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties,
                         URI.create("/cas/callback"));
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getProxyCallbackUrl()).isEqualTo("http://localhost/cas/callback");
     }
@@ -57,8 +60,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
         request.setContextPath("/john");
         request.setRequestURI("/john/wick");
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request,
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties,
                         URI.create("/cas/callback"));
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getProxyCallbackUrl()).isEqualTo("http://localhost/john/cas/callback");
     }
@@ -67,8 +71,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
     public void getServiceUrl_WithoutArtifactParameterQueryString_HttpServletRequestUrl() {
         request.setQueryString("foo=a&bar=b");
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request,
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties,
                         URI.create("/cas/callback"));
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getServiceUrl()).isEqualTo("http://localhost?foo=a&bar=b");
     }
@@ -78,8 +83,9 @@ public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
         request.setQueryString("foo=a&bar=b&"
                 + serviceProperties.getArtifactParameter() + "=ST-21-c1gk6jBcfYnatLbNExfx-0623277bc36a");
         ProxyCallbackAndServiceAuthenticationDetails authenticationDetails =
-                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, request,
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties,
                         URI.create("/cas/callback"));
+        authenticationDetails.setContext(request);
 
         assertThat(authenticationDetails.getServiceUrl()).isEqualTo("http://localhost?foo=a&bar=b");
     }

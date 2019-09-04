@@ -1,13 +1,10 @@
 package com.kakawait.spring.boot.security.cas.autoconfigure;
 
-import com.kakawait.spring.boot.security.cas.autoconfigure.CasSingleSignOutFilterConfigurer;
 import org.jasig.cas.client.session.SessionMappingStorage;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,9 +30,7 @@ public class CasSingleSignOutFilterConfigurerTest {
                 .hasFieldOrPropertyWithValue("artifactParameterName", "dummyArtifactParameterName")
                 .hasFieldOrPropertyWithValue("logoutParameterName", "dummyLogoutParameterName")
                 .hasFieldOrPropertyWithValue("relayStateParameterName", "dummyRelayStateParameterName")
-                .extracting("sessionMappingStorage")
-                .usingElementComparator((Comparator<Object>) (o1, o2) -> (o1 == o2) ? 0 : -1)
-                .containsOnly(sessionMappingStorage);
+                .hasFieldOrPropertyWithValue("sessionMappingStorage", sessionMappingStorage);
     }
 
 }

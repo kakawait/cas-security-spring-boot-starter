@@ -12,19 +12,25 @@ import javax.servlet.http.HttpServletRequest;
  * @author Thibaud Leprêtre
  */
 public class ProxyCallbackAndServiceAuthenticationDetailsSource extends ServiceAuthenticationDetailsSource {
-    private final ServiceProperties serviceProperties;
 
-    private final URI proxyCallbackUri;
+    private final ProxyCallbackAndServiceAuthenticationDetails serviceAuthenticationDetails;
+
+    public ProxyCallbackAndServiceAuthenticationDetailsSource(ServiceProperties serviceProperties,
+            ProxyCallbackAndServiceAuthenticationDetails serviceAuthenticationDetails) {
+        super(serviceProperties);
+        this.serviceAuthenticationDetails = serviceAuthenticationDetails;
+    }
 
     public ProxyCallbackAndServiceAuthenticationDetailsSource(ServiceProperties serviceProperties,
             URI proxyCallbackUri) {
         super(serviceProperties);
-        this.serviceProperties = serviceProperties;
-        this.proxyCallbackUri = proxyCallbackUri;
+        serviceAuthenticationDetails =
+                new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, proxyCallbackUri);
     }
 
     @Override
     public ServiceAuthenticationDetails buildDetails(HttpServletRequest context) {
-        return new DefaultProxyCallbackAndServiceAuthenticationDetails(serviceProperties, context, proxyCallbackUri);
+        serviceAuthenticationDetails.setContext(context);
+        return serviceAuthenticationDetails;
     }
 }
