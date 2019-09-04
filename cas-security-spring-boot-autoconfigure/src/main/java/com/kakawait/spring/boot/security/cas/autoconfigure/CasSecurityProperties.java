@@ -44,23 +44,32 @@ public class CasSecurityProperties {
     /**
      * Security authorize mode to apply.
      */
-    // Until Intellij IDEA (plugins?) fix https://github.com/mplushnikov/lombok-intellij-plugin/issues/382
-    // I prefer using plain old getter/setter to avoid "RED" issue
-    // @Getter(onMethod_ = {@DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")})
+    @Getter(onMethod_ = {@Deprecated,
+            @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")})
     private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.AUTHENTICATED;
 
-    @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")
-    @Deprecated
-    public SecurityAuthorizeMode getAuthorizeMode() {
-        return authorization.mode;
-    }
-
-    @Deprecated
-    public void setAuthorizeMode(SecurityAuthorizeMode authorizeMode) {
-        authorization.mode = authorizeMode;
-    }
-
     private ProxyValidation proxyValidation = new ProxyValidation();
+
+    public enum ServiceResolutionMode {
+        STATIC, DYNAMIC
+    }
+
+    public enum SecurityAuthorizeMode {
+        /**
+         * Must be a member of one of the security roles.
+         */
+        ROLE,
+
+        /**
+         * Must be an authenticated user.
+         */
+        AUTHENTICATED,
+
+        /**
+         * No security authorization is setup.
+         */
+        NONE
+    }
 
     @Data
     public static class Authorization {
@@ -210,28 +219,6 @@ public class CasSecurityProperties {
         private boolean enabled = true;
 
         private List<List<String>> chains = new ArrayList<>();
-    }
-
-    public enum ServiceResolutionMode {
-        STATIC,
-        DYNAMIC
-    }
-
-    public enum SecurityAuthorizeMode {
-        /**
-         * Must be a member of one of the security roles.
-         */
-        ROLE,
-
-        /**
-         * Must be an authenticated user.
-         */
-        AUTHENTICATED,
-
-        /**
-         * No security authorization is setup.
-         */
-        NONE
     }
 
 }

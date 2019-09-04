@@ -13,7 +13,7 @@ addons:
       secure: "SyIkIVU3JBtfSmOzhRt3lKPkMMvIke8YD07Js/Umaikqtao1bMRenqGv4AKUJS7TC3sQE+XRs8IL/mu73+RNsUyJzNY1CCbhIwzDHGk87S8qFpai6/FOmQzDvfdlBqRGCwVlw+YBVkf+2PLsGaTKR0TSziimKOwGlprMJ3Ib6YjQ13uifB6BsHjOoB66qPQ5Z0fBqKIaAlFR2v/LH/0bDw5KP8FKClFxz/TaL/qiHPIF4UCqEtn+ro4JWBnlDhlVTV3hmlFKxCaPdiVF1YyaHPBjfXh0LgjSywy2tcVEPBEBoPqG3H9mUefzDISBuJXm8JuznNLMAIuTLG0JAM0aiSWpDCrGdSlGZNrKamhdhtDUWE3DPYt6FNoSDA6YUx+OjZNXHuTNrbtDlBVQsl7R5hdU+zm/dEwHgD0FIrqyjOo6btBC6hm7HZHw0yOg6ujNQSVuW4OpmVNPGjz0zI28O2miSY3lj1VlLK4GDmMxd64kK7pP8rNW3sGd7apmtGXtGchHtPpWEp5ctXbda4hRI9oQrZQwQ5WVlFTllV/AtPr+HkbxLHLxrtxzwvY5oMDIyuaWmxycquNjT5maE1yvQYotytHaiyG5+MEdm2xJy/h2uJ3a95xtllH0EXM/RoxaqdDIjV6k5IgBEx0UUZ9z5uKiwRagtNj5+Ld7wFwqr2M="
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 script:
   - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar $([ "$TRAVIS_PULL_REQUEST" = "false" ] && echo "-Dsonar.branch.name=$TRAVIS_BRANCH")
