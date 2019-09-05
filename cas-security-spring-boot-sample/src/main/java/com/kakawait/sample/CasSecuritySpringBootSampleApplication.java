@@ -1,7 +1,8 @@
-package com.kakawait;
+package com.kakawait.sample;
 
-import com.kakawait.spring.boot.security.cas.CasHttpSecurityConfigurer;
-import com.kakawait.spring.boot.security.cas.CasSecurityConfigurerAdapter;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasHttpSecurityConfigurer;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityCondition;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityConfigurerAdapter;
 import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
@@ -9,22 +10,28 @@ import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
+import org.springframework.security.cas.web.CasAuthenticationFilter;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Field;
 import java.security.Principal;
@@ -63,6 +70,7 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Bean
+    @Conditional(CasSecurityCondition.class)
     RestTemplate casRestTemplate(ServiceProperties serviceProperties, ProxyTicketProvider proxyTicketProvider) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(new CasAuthorizationInterceptor(serviceProperties, proxyTicketProvider));
@@ -71,6 +79,7 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("!custom-logout")
     @Configuration
+    @Conditional(CasSecurityCondition.class)
     static class LogoutConfiguration extends CasSecurityConfigurerAdapter {
 
         private final LogoutSuccessHandler casLogoutSuccessHandler;
@@ -89,6 +98,7 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Configuration
+    @Conditional(CasSecurityCondition.class)
     static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -97,12 +107,13 @@ public class CasSecuritySpringBootSampleApplication {
             // I'm not using .apply() from HttpSecurity due to following issue
             // https://github.com/spring-projects/spring-security/issues/4422
             CasHttpSecurityConfigurer.cas().configure(http);
-            http.exceptionHandling().authenticationEntryPoint(new Http401AuthenticationEntryPoint("CAS"));
+            http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         }
     }
 
     @Profile("custom-logout")
     @Configuration
+    @Conditional(CasSecurityCondition.class)
     static class CustomLogoutConfiguration extends CasSecurityConfigurerAdapter {
 
         private final LogoutSuccessHandler casLogoutSuccessHandler;
@@ -127,7 +138,7 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Profile("custom-logout")
     @Configuration
-    static class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+    static class WebMvcConfiguration implements WebMvcConfigurer {
         @Override
         public void addViewControllers(ViewControllerRegistry registry) {
             registry.addViewController("/logout.html").setViewName("logout");
@@ -135,7 +146,43 @@ public class CasSecuritySpringBootSampleApplication {
         }
     }
 
+    /**
+     * Security has changed from Spring Boot 1 and Spring Boot 2, see
+     * https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#security
+     * <p>
+     * That configuration try to expose you how could you <i>simulate</i> some Spring Boot 1 behavior with
+     * Spring Boot 2 application
+     */
+    @Configuration
+    static class BackwardSpringBoot1CasSecurityConfiguration extends CasSecurityConfigurerAdapter {
+
+        private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+        public BackwardSpringBoot1CasSecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder) {
+            this.authenticationManagerBuilder = authenticationManagerBuilder;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            // You can create property or whatever to toggle those features
+            enableBasicAuth(http);
+        }
+
+        /**
+         * To be able to use basic auth that could by-pass cas auth (could be useful for debug or admin).
+         * You need to re-inject {@link BasicAuthenticationFilter} just before {@link CasAuthenticationFilter} after
+         * building or getting the default Spring boot {@link AuthenticationManager}.
+         * @param http the {@link HttpSecurity} to modify
+         */
+        private void enableBasicAuth(HttpSecurity http) {
+            AuthenticationManager authenticationManager = authenticationManagerBuilder.getOrBuild();
+            BasicAuthenticationFilter basicAuthFilter = new BasicAuthenticationFilter(authenticationManager);
+            http.addFilterBefore(basicAuthFilter, CasAuthenticationFilter.class);
+        }
+    }
+
     @Controller
+    @Conditional(CasSecurityCondition.class)
     @RequestMapping(value = "/")
     static class IndexController {
 

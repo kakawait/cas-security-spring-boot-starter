@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import lombok.NonNull;
 import lombok.Setter;
@@ -21,9 +21,6 @@ public class CasSingleSignOutFilterConfigurer {
     private String relayStateParameterName;
 
     @NonNull
-    private String frontLogoutParameterName;
-
-    @NonNull
     private String logoutParameterName;
 
     @NonNull
@@ -36,10 +33,6 @@ public class CasSingleSignOutFilterConfigurer {
 
         if (StringUtils.hasText(relayStateParameterName)) {
             filter.setRelayStateParameterName(relayStateParameterName);
-        }
-
-        if (StringUtils.hasText(frontLogoutParameterName)) {
-            filter.setFrontLogoutParameterName(frontLogoutParameterName);
         }
 
         if (StringUtils.hasText(logoutParameterName)) {

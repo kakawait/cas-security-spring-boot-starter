@@ -1,5 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
-
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.junit.Test;
@@ -10,8 +9,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-
-import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,20 +44,14 @@ public class CasAuthenticationFilterConfigurerTest {
         configurer.configure(filter);
 
         assertThat(filter)
-                .extracting("proxyGrantingTicketStorage", "authenticationDetailsSource", "successHandler",
-                        "proxyFailureHandler", "requiresAuthenticationRequestMatcher")
-                .usingElementComparator((Comparator<Object>) (o1, o2) -> (o1 == o2) ? 0 : -1)
-                .containsOnly(proxyGrantingTicketStorage, serviceAuthenticationDetailsSource,
-                        authenticationSuccessHandler, proxyAuthenticationFailureHandler, requestMatcher);
-
-        assertThat(filter)
+                .hasFieldOrPropertyWithValue("proxyGrantingTicketStorage", proxyGrantingTicketStorage)
+                .hasFieldOrPropertyWithValue("authenticationDetailsSource", serviceAuthenticationDetailsSource)
+                .hasFieldOrPropertyWithValue("successHandler", authenticationSuccessHandler)
+                .hasFieldOrPropertyWithValue("proxyFailureHandler", proxyAuthenticationFailureHandler)
+                .hasFieldOrPropertyWithValue("requiresAuthenticationRequestMatcher", requestMatcher)
                 .hasFieldOrPropertyWithValue("proxyReceptorMatcher",
-                        new AntPathRequestMatcher("/**" + proxyReceptorUrl));
-
-        assertThat(filter)
-                .extracting("failureHandler")
-                .extracting("serviceTicketFailureHandler")
-                .usingElementComparator((Comparator<Object>) (o1, o2) -> (o1 == o2) ? 0 : -1)
-                .containsOnly(authenticationFailureHandler);
+                        new AntPathRequestMatcher("/**" + proxyReceptorUrl))
+                .hasFieldOrPropertyWithValue("failureHandler.serviceTicketFailureHandler",
+                        authenticationFailureHandler);
     }
 }

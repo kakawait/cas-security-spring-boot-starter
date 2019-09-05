@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;

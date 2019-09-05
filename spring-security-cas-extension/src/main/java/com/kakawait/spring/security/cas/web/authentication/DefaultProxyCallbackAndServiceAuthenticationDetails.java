@@ -3,31 +3,36 @@ package com.kakawait.spring.security.cas.web.authentication;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.*;
+import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromContextPath;
 
 /**
  * @author Thibaud Leprêtre
  */
-class DefaultProxyCallbackAndServiceAuthenticationDetails implements ProxyCallbackAndServiceAuthenticationDetails {
+public class DefaultProxyCallbackAndServiceAuthenticationDetails
+        implements ProxyCallbackAndServiceAuthenticationDetails {
+
+    private static final long serialVersionUID = -88469969834244098L;
 
     private final transient ServiceProperties serviceProperties;
 
-    private final transient HttpServletRequest context;
-
     private final URI proxyCallbackUri;
 
-    DefaultProxyCallbackAndServiceAuthenticationDetails(ServiceProperties serviceProperties, HttpServletRequest context,
-            URI proxyCallbackUri) {
+    protected transient HttpServletRequest context;
+
+    public DefaultProxyCallbackAndServiceAuthenticationDetails(ServiceProperties serviceProperties, URI proxyCallbackUri) {
         this.serviceProperties = serviceProperties;
-        this.context = context;
         this.proxyCallbackUri = proxyCallbackUri;
+    }
+
+    @Override
+    public void setContext(HttpServletRequest context) {
+        this.context = context;
     }
 
     @Override

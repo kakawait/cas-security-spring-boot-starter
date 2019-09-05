@@ -1,7 +1,7 @@
 # Spring Security CAS starter
 
 [![Travis](https://img.shields.io/travis/kakawait/cas-security-spring-boot-starter.svg)](https://travis-ci.org/kakawait/cas-security-spring-boot-starter)
-[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C0.8.1%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C1.0.0%7Cjar)
 [![License](https://img.shields.io/github/license/kakawait/cas-security-spring-boot-starter.svg)](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/LICENSE.md)
 [![Codecov](https://img.shields.io/codecov/c/github/kakawait/cas-security-spring-boot-starter.svg)](https://codecov.io/gh/kakawait/cas-security-spring-boot-starter)
 [![SonarQube Tech Debt](https://img.shields.io/sonar/https/sonarcloud.io/com.kakawait%3Acas-security-spring-boot-parent/tech_debt.svg)](https://sonarcloud.io/dashboard?id=com.kakawait%3Acas-security-spring-boot-parent)
@@ -11,6 +11,7 @@
 
 ## Features
 
+- Spring boot 1 and 2 support
 - Configures CAS authentication and authorization
 - Support dynamic service resolution based on current `HttpServletRequest`
 - Advance configuration through [CasSecurityConfigurerAdapter](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-autoconfigure/src/main/java/com/kakawait/spring/boot/security/cas/CasSecurityConfigurerAdapter.java)
@@ -25,17 +26,7 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>0.8.1</version>
-</dependency>
-```
-
-**Attention** if you want to use that starter with `Spring boot 2` (still compatible with `Spring boot 1`), you must use (currently in development) following version:
-
-```xml
-<dependency>
-  <groupId>com.kakawait</groupId>
-  <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>1.0.0-beta-2</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 

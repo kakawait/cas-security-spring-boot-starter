@@ -1,5 +1,6 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 /**
@@ -24,11 +25,10 @@ public abstract class CasSecurityConfigurerAdapter implements CasSecurityConfigu
     }
 
     @Override
-    @Deprecated
-    public void init(HttpSecurity http) throws Exception {
+    public void configure(CasTicketValidatorBuilder ticketValidator) {
     }
 
     @Override
-    public void configure(CasTicketValidatorBuilder ticketValidator) {
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
     }
 }

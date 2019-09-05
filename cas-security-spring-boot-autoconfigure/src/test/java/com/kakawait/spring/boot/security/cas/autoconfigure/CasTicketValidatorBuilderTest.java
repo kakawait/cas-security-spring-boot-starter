@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyRetriever;
@@ -36,11 +36,11 @@ public class CasTicketValidatorBuilderTest {
     private static final String CAS_SERVER_URL_PREFIX = "http://my.cas.server.base.url/";
 
     private static final String V1_WARN_MESSAGE_TEMPLATE =
-            "WARN com.kakawait.spring.boot.security.cas.CasTicketValidatorBuilder - " +
+            "WARN com.kakawait.spring.boot.security.cas.autoconfigure.CasTicketValidatorBuilder - " +
                     "Configuration \"%s\" isn't possible using protocol version 1, will be omitted!";
 
     private static final String SERVICE_VALIDATOR_WARN_MESSAGE_TEMPLATE =
-            "WARN com.kakawait.spring.boot.security.cas.CasTicketValidatorBuilder - " +
+            "WARN com.kakawait.spring.boot.security.cas.autoconfigure.CasTicketValidatorBuilder - " +
                     "Configuration \"%s\" isn't possible using service ticket validator " +
                     "(please consider proxy ticket validator), will be omitted!";
 
@@ -167,7 +167,6 @@ public class CasTicketValidatorBuilderTest {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private CasTicketValidatorBuilder fulfilledBuilder() {
         HttpURLConnectionFactory urlConnectionFactory = Mockito.mock(HttpURLConnectionFactory.class);
         ProxyList proxyList = new ProxyList();
@@ -191,7 +190,6 @@ public class CasTicketValidatorBuilderTest {
         return builder;
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void testBuilder(int protocolVersion) {
         HttpURLConnectionFactory urlConnectionFactory = Mockito.mock(HttpURLConnectionFactory.class);
         ProxyList proxyList = new ProxyList();
@@ -248,10 +246,10 @@ public class CasTicketValidatorBuilderTest {
                 .containsExactly(values.toArray());
 
         if (protocolVersion > 1) {
-            assertThat(ticketValidator).extracting("allowEmptyProxyChain").containsOnly(allowEmptyProxyChain);
-            assertThat(ticketValidator).extracting("acceptAnyProxy").containsOnly(!proxyChainsValidation);
+            assertThat(ticketValidator).hasFieldOrPropertyWithValue("allowEmptyProxyChain", allowEmptyProxyChain);
+            assertThat(ticketValidator).hasFieldOrPropertyWithValue("acceptAnyProxy", !proxyChainsValidation);
         }
-        assertThat(ticketValidator).extracting("renew").containsOnly(renew);
+        assertThat(ticketValidator).hasFieldOrPropertyWithValue("renew", renew);
     }
 
 }

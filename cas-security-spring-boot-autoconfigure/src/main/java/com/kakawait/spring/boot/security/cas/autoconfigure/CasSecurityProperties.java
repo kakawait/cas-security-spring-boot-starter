@@ -1,8 +1,9 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import lombok.Data;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class CasSecurityProperties {
 
     private boolean enabled = true;
 
+    private Authorization authorization = new Authorization();
+
     private User user = new User();
 
     private Server server = new Server();
@@ -29,7 +32,7 @@ public class CasSecurityProperties {
     private Service service = new Service();
 
     /**
-     * @see org.springframework.security.cas.authentication.CasAuthenticationProvider#key
+     * @see org.springframework.security.cas.authentication.CasAuthenticationProvider
      */
     private String key = UUID.randomUUID().toString();
 
@@ -41,15 +44,54 @@ public class CasSecurityProperties {
     /**
      * Security authorize mode to apply.
      */
-    private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.ROLE;
+    @Getter(onMethod_ = {@Deprecated,
+            @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")})
+    private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.AUTHENTICATED;
 
     private ProxyValidation proxyValidation = new ProxyValidation();
+
+    public enum ServiceResolutionMode {
+        STATIC, DYNAMIC
+    }
+
+    public enum SecurityAuthorizeMode {
+        /**
+         * Must be a member of one of the security roles.
+         */
+        ROLE,
+
+        /**
+         * Must be an authenticated user.
+         */
+        AUTHENTICATED,
+
+        /**
+         * No security authorization is setup.
+         */
+        NONE
+    }
+
+    @Data
+    public static class Authorization {
+        private SecurityAuthorizeMode mode = SecurityAuthorizeMode.AUTHENTICATED;
+
+        private String[] roles = new String[] { "USER" };
+    }
 
     @Data
     public static class User {
         private String[] rolesAttributes = new String[0];
 
-        private String[] defaultRoles = new String[] { "USER" };
+        /**
+         * Default roles are roles that will be automatically appends to other roles definitions
+         * For example if you defined: {@code security.cas.user.roles = USER}
+         * and {@code security.cas.user.defaultRoles = MEMBER}. At the end the user will have both {@code USER} and
+         * {@code MEMBER} role.
+         * <p>
+         * Same thing if you're using {@link #rolesAttributes}, {@code defaultRoles} will be append to the list of
+         * roles retrieve from {@code CAS Attributes}.
+         */
+        private String[] defaultRoles = new String[0];
     }
 
     @Data
@@ -99,7 +141,7 @@ public class CasSecurityProperties {
             /**
              * CAS Server login path that will be append to {@link Server#baseUrl}
              *
-             * @see org.springframework.security.cas.web.CasAuthenticationEntryPoint#loginUrl
+             * @see org.springframework.security.cas.web.CasAuthenticationEntryPoint
              */
             private String login = "/login";
 
@@ -155,7 +197,7 @@ public class CasSecurityProperties {
             /**
              * CAS Service logout path that will be append to {@link Service#baseUrl}
              *
-             * @see org.springframework.security.web.authentication.logout.LogoutFilter#logoutRequestMatcher
+             * @see org.springframework.security.web.authentication.logout.LogoutFilter
              */
             private String logout = "/logout";
 
@@ -164,7 +206,7 @@ public class CasSecurityProperties {
              * fallback to {@link Service#baseUrl}
              *
              * @see Service#callbackBaseUrl
-             * @see org.jasig.cas.client.validation.Cas20ServiceTicketValidator#proxyCallbackUrl
+             * @see org.jasig.cas.client.validation.Cas20ServiceTicketValidator
              */
             private String proxyCallback;
         }
@@ -177,11 +219,6 @@ public class CasSecurityProperties {
         private boolean enabled = true;
 
         private List<List<String>> chains = new ArrayList<>();
-    }
-
-    public enum ServiceResolutionMode {
-        STATIC,
-        DYNAMIC
     }
 
 }

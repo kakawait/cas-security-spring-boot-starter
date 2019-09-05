@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import com.kakawait.spring.security.cas.authentication.DynamicProxyCallbackUrlCasAuthenticationProvider;
 import org.jasig.cas.client.validation.TicketValidator;
@@ -39,7 +39,6 @@ public class CasAuthenticationProviderSecurityBuilderTest {
         assertThat(builder.build()).isExactlyInstanceOf(DynamicProxyCallbackUrlCasAuthenticationProvider.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void build_AnyParameters_InjectInsideCasAuthenticationProvider() {
         String key = "key";
@@ -62,10 +61,6 @@ public class CasAuthenticationProviderSecurityBuilderTest {
                 .usingElementComparator((Comparator<Object>) (o1, o2) -> (o1 == o2) ? 0 : -1)
                 .containsOnly(key, userDetailsService, grantedAuthoritiesMapper, statelessTicketCache, ticketValidator);
 
-        assertThat(builder.build())
-                .extracting("messages")
-                .extracting("messageSource")
-                .usingElementComparator((Comparator<Object>) (o1, o2) -> (o1 == o2) ? 0 : -1)
-                .containsOnly(messageSource);
+        assertThat(builder.build()).hasFieldOrPropertyWithValue("messages.messageSource", messageSource);
     }
 }

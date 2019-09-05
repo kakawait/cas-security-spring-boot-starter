@@ -1,4 +1,4 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 
 import com.kakawait.spring.security.cas.LaxServiceProperties;
@@ -14,13 +14,14 @@ import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
-import org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -53,8 +54,8 @@ public class CasSecurityAutoConfigurationTest {
 
     @After
     public void tearDown() {
-        if (this.context != null) {
-            this.context.close();
+        if (context != null) {
+            context.close();
         }
     }
 
@@ -81,7 +82,7 @@ public class CasSecurityAutoConfigurationTest {
         properties.remove("security.cas.service.base-url");
 
         assertThatThrownBy(() -> load(properties, EmptyConfiguration.class))
-                .isInstanceOf(UnsatisfiedDependencyException.class)
+                .isInstanceOf(BeanCreationException.class)
                 .hasRootCauseExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageEndingWith("java.lang.IllegalArgumentException: Cas service base url must not be null " +
                         "(ref property security.cas.service.base-url)");
@@ -154,7 +155,10 @@ public class CasSecurityAutoConfigurationTest {
         properties.put("security.cas.service.callback-base-url", "http://app:8081/test/");
 
         load(properties, EmptyConfiguration.class);
-        assertThat(context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class))
+
+        ProxyCallbackAndServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource =
+                context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class);
+        assertThat(serviceAuthenticationDetailsSource.buildDetails(new MockHttpServletRequest()))
                 .hasFieldOrPropertyWithValue("proxyCallbackUri", URI.create("http://app:8081/test/cas/proxy-callback"));
     }
 
@@ -164,7 +168,10 @@ public class CasSecurityAutoConfigurationTest {
         properties.put("security.cas.service.paths.proxy-callback", "/cas/proxy-callback");
 
         load(properties, EmptyConfiguration.class);
-        assertThat(context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class))
+
+        ProxyCallbackAndServiceAuthenticationDetailsSource serviceAuthenticationDetailsSource =
+                context.getBean(ProxyCallbackAndServiceAuthenticationDetailsSource.class);
+        assertThat(serviceAuthenticationDetailsSource.buildDetails(new MockHttpServletRequest()))
                 .hasFieldOrPropertyWithValue("proxyCallbackUri", URI.create("/cas/proxy-callback"));
     }
 
@@ -172,7 +179,7 @@ public class CasSecurityAutoConfigurationTest {
     public void autoConfigure_EmptyConfiguration_DefaultCasSecurityConfigurerAdapterBean() {
         load(EmptyConfiguration.class);
 
-        String beanName ="com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration$" +
+        String beanName ="com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration$" +
                 "DefaultCasSecurityConfigurerAdapter";
         context.getBean(beanName);
     }
@@ -184,9 +191,6 @@ public class CasSecurityAutoConfigurationTest {
 
         load(properties, EmptyConfiguration.class);
     }
-
-    @Configuration
-    static class EmptyConfiguration {}
 
     private Properties getDefaultProperties() {
         Properties properties = new Properties();
@@ -223,6 +227,9 @@ public class CasSecurityAutoConfigurationTest {
         context.refresh();
         this.context = context;
     }
+
+    @Configuration
+    static class EmptyConfiguration {}
 
     private static class DummyAuthenticationManagerConfiguration {
         @Bean

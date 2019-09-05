@@ -1,5 +1,6 @@
-package com.kakawait.spring.boot.security.cas;
+package com.kakawait.spring.boot.security.cas.autoconfigure;
 
+import com.kakawait.spring.boot.security.cas.autoconfigure.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties;
 import com.kakawait.spring.security.cas.LaxServiceProperties;
 import com.kakawait.spring.security.cas.client.ticket.AttributePrincipalProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
@@ -14,13 +15,10 @@ import lombok.NonNull;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.ProxyList;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAuthorizeMode;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -47,11 +45,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.DynamicCasSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityAutoConfiguration.StaticCasSecurityConfiguration;
-import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AUTH_ORDER;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.CasLoginSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.DefaultCasSecurityConfigurerAdapter;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.DynamicCasSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAutoConfiguration.StaticCasSecurityConfiguration;
+import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityProperties.CAS_AUTH_ORDER;
 
 /**
  * @author Thibaud Leprêtre
@@ -59,13 +57,16 @@ import static com.kakawait.spring.boot.security.cas.CasSecurityProperties.CAS_AU
 @Configuration
 @ConditionalOnWebApplication
 @ConditionalOnClass(EnableWebSecurity.class)
-@AutoConfigureBefore(SecurityAutoConfiguration.class)
 @Conditional(CasSecurityCondition.class)
 @EnableConfigurationProperties(CasSecurityProperties.class)
 @Import({CasLoginSecurityConfiguration.class, CasAssertionUserDetailsServiceConfiguration.class,
         CasTicketValidatorConfiguration.class, DefaultCasSecurityConfigurerAdapter.class,
         DynamicCasSecurityConfiguration.class, StaticCasSecurityConfiguration.class})
 public class CasSecurityAutoConfiguration {
+
+    private static String buildUrl(@NonNull URI baseUrl, @NonNull String path) {
+        return UriComponentsBuilder.fromUri(baseUrl).path(path).toUriString();
+    }
 
     @Bean
     @ConditionalOnMissingBean(ServiceProperties.class)
@@ -109,6 +110,12 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ProxyTicketProvider.class)
     ProxyTicketProvider attributePrincipalProxyTicketProvider(AssertionProvider assertionProvider) {
         return new AttributePrincipalProxyTicketProvider(assertionProvider);
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration")
+    CasSecurityConfigurer springBoot1CasSecurityConfigurerAdapter(SecurityProperties securityProperties) {
+        return new SpringBoot1CasHttpSecurityConfigurerAdapter(new SpringBoot1SecurityProperties(securityProperties));
     }
 
     @Getter
@@ -210,8 +217,6 @@ public class CasSecurityAutoConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     static class DefaultCasSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {
 
-        private final SecurityProperties securityProperties;
-
         private final CasSecurityProperties casSecurityProperties;
 
         private final AbstractCasAssertionUserDetailsService userDetailsService;
@@ -222,13 +227,10 @@ public class CasSecurityAutoConfiguration {
 
         private final LogoutSuccessHandler logoutSuccessHandler;
 
-        public DefaultCasSecurityConfigurerAdapter(SecurityProperties securityProperties,
-                CasSecurityProperties casSecurityProperties,
+        public DefaultCasSecurityConfigurerAdapter(CasSecurityProperties casSecurityProperties,
                 AbstractCasAssertionUserDetailsService userDetailsService,
                 ServiceAuthenticationDetailsSource authenticationDetailsSource,
-                ProxyGrantingTicketStorage proxyGrantingTicketStorage,
-                LogoutSuccessHandler logoutSuccessHandler) {
-            this.securityProperties = securityProperties;
+                ProxyGrantingTicketStorage proxyGrantingTicketStorage, LogoutSuccessHandler logoutSuccessHandler) {
             this.casSecurityProperties = casSecurityProperties;
             this.userDetailsService = userDetailsService;
             this.authenticationDetailsSource = authenticationDetailsSource;
@@ -253,16 +255,6 @@ public class CasSecurityAutoConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler);
-
-            SecurityAuthorizeMode mode = casSecurityProperties.getAuthorizeMode();
-            if (mode == SecurityAuthorizeMode.ROLE) {
-                List<String> roles = securityProperties.getUser().getRole();
-                http.authorizeRequests().anyRequest().hasAnyRole(roles.toArray(new String[0]));
-            } else if (mode == SecurityAuthorizeMode.AUTHENTICATED) {
-                http.authorizeRequests().anyRequest().authenticated();
-            } else if (mode == SecurityAuthorizeMode.NONE) {
-                http.authorizeRequests().anyRequest().permitAll();
-            }
         }
 
         @Override
@@ -289,18 +281,15 @@ public class CasSecurityAutoConfiguration {
             }
             ticketValidator.proxyGrantingTicketStorage(proxyGrantingTicketStorage);
         }
+
     }
 
     @Order(CAS_AUTH_ORDER)
     static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-        private final List<CasSecurityConfigurer> configurers;
-
         private final CasSecurityProperties casSecurityProperties;
 
-        public CasLoginSecurityConfiguration(List<CasSecurityConfigurer> configurers,
-                CasSecurityProperties casSecurityProperties) {
-            this.configurers = configurers;
+        public CasLoginSecurityConfiguration(CasSecurityProperties casSecurityProperties) {
             this.casSecurityProperties = casSecurityProperties;
         }
 
@@ -309,10 +298,16 @@ public class CasSecurityAutoConfiguration {
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
                 http.requestMatchers().antMatchers(paths);
-                CasHttpSecurityConfigurer.cas().init(http);
-                for (CasSecurityConfigurer configurer : configurers) {
-                    configurer.init(http);
-                    configurer.configure(http);
+                CasHttpSecurityConfigurer.cas().configure(http);
+
+                CasSecurityProperties.SecurityAuthorizeMode mode = casSecurityProperties.getAuthorization().getMode();
+                if (mode == CasSecurityProperties.SecurityAuthorizeMode.ROLE) {
+                    String[] roles = casSecurityProperties.getAuthorization().getRoles();
+                    http.authorizeRequests().anyRequest().hasAnyRole(roles);
+                } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.AUTHENTICATED) {
+                    http.authorizeRequests().anyRequest().authenticated();
+                } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
+                    http.authorizeRequests().anyRequest().permitAll();
                 }
             }
         }
@@ -337,13 +332,6 @@ public class CasSecurityAutoConfiguration {
             paths.remove(null);
             return paths.toArray(new String[0]);
         }
-    }
-
-    private static String buildUrl(@NonNull URI baseUrl, @NonNull String path) {
-        return UriComponentsBuilder
-                .fromUri(baseUrl)
-                .path(path)
-                .toUriString();
     }
 
 }
