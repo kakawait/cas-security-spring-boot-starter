@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/9) - TBD
+## [1.0.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/9) - 5 sept 2019
 
 - First release that supporting Spring boot 2 ([#32](https://github.com/kakawait/cas-security-spring-boot-starter/issues/32))
 - Remove deprecated module `cas-security-dynamic-service-resolver` ([#35](https://github.com/kakawait/cas-security-spring-boot-starter/issues/35))
