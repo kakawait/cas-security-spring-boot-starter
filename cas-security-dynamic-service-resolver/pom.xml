@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cas-security-dynamic-service-resolver</artifactId>
+    <version>0.4.0</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>com.kakawait</groupId>
+        <artifactId>cas-security-spring-boot-parent</artifactId>
+        <version>0.8.1</version>
+    </parent>
+
+    <name>Cas security dynamic service resolver</name>
+    <description>Spring security and Apereo override implementation to support dynamic service resolution</description>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+    </properties>
+
+    <distributionManagement>
+        <relocation>
+            <artifactId>spring-security-cas-extension</artifactId>
+            <version>0.4.4</version>
+        </relocation>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-cas</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
