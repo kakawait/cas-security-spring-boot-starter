@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 Rename package com.kakawait.spring.boot.security.cas to com.kakawait.spring.boot.security.cas.autoconfigure](https://github.com/kakawait/cas-security-spring-boot-starter/issues/33), you must rewrite your `import` statements to append `.autoconfigure.`.
 - Property `security.cas.authorize-mode` has been renamed `security.cas.authorization.mode`
 - `CasHttpSecurityConfigurer.cas().configure(http)` will no secure paths, only configure CAS authentication 
+- Autoconfiguration java class package was moved from `com.kakawait.spring.boot.security.cas` to `com.kakawait.spring.boot.security.cas.autoconfigure`
 
 #### Spring boot 2 support breaking changes
 
