@@ -49,8 +49,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- spring managed version -->
-        <!-- CVE-2018-7489 -->
-        <jackson.version>2.9.9.3</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
+        <jackson-databind.version>2.9.9.3</jackson-databind.version>
 
         <!-- dependencies -->
         <spring-boot-dependencies.version>2.1.7.RELEASE</spring-boot-dependencies.version>
@@ -80,6 +80,11 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
