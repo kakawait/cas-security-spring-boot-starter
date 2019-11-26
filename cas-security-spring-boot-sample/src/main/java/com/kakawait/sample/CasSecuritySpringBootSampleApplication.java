@@ -3,6 +3,7 @@ package com.kakawait.sample;
 import com.kakawait.spring.boot.security.cas.autoconfigure.CasHttpSecurityConfigurer;
 import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityCondition;
 import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityConfigurerAdapter;
+import com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityProperties;
 import com.kakawait.spring.security.cas.client.CasAuthorizationInterceptor;
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +27,7 @@ import org.springframework.security.cas.web.CasAuthenticationFilter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -75,6 +78,37 @@ public class CasSecuritySpringBootSampleApplication {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(new CasAuthorizationInterceptor(serviceProperties, proxyTicketProvider));
         return restTemplate;
+    }
+
+    @Configuration
+    @Order(CasSecurityProperties.CAS_AUTH_ORDER + 1)
+    static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+        /**
+         * Ignoring path by completely remove security filter on /ignored endpoint.
+         * That method should be use when you really need security/authentication.
+         * For example for resources/static endpoints
+         * <p>
+         * If you would just like to {@code permitAll()} an endpoint you should instead check
+         * {@see OverrideDefaultCasSecurity#configure} method.
+         */
+        @Override
+        public void configure(WebSecurity web) {
+            web.ignoring().antMatchers("/ignored");
+        }
+    }
+
+    @Configuration
+    @Conditional(CasSecurityCondition.class)
+    static class OverrideDefaultCasSecurity extends CasSecurityConfigurerAdapter {
+
+        /**
+         * Permit all an specific endpoint
+         */
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests().antMatchers("/permit-all").permitAll();
+        }
     }
 
     @Profile("!custom-logout")
@@ -139,6 +173,7 @@ public class CasSecuritySpringBootSampleApplication {
     @Profile("custom-logout")
     @Configuration
     static class WebMvcConfiguration implements WebMvcConfigurer {
+
         @Override
         public void addViewControllers(ViewControllerRegistry registry) {
             registry.addViewController("/logout.html").setViewName("logout");
@@ -230,6 +265,11 @@ public class CasSecuritySpringBootSampleApplication {
         @RequestMapping({"/httpbin", "/rest-template"})
         public @ResponseBody String httpbin() {
             return casRestTemplate.getForEntity("http://httpbin.org/get", String.class).getBody();
+        }
+
+        @RequestMapping(path = "/permit-all")
+        public String permitAll() {
+            return "index";
         }
 
         @RequestMapping(path = "/ignored")
