@@ -26,11 +26,7 @@ import java.util.Map;
 @Slf4j
 public class CasTicketValidatorBuilder {
 
-    private int protocolVersion = 3;
-
-    private Boolean proxyTicketValidator;
-
-    final String casServerUrlPrefix;
+    private final String casServerUrlPrefix;
 
     String proxyCallbackUrl;
 
@@ -50,8 +46,16 @@ public class CasTicketValidatorBuilder {
 
     Boolean allowEmptyProxyChain;
 
+    private int protocolVersion = 3;
+
+    private Boolean proxyTicketValidator;
+
     CasTicketValidatorBuilder(String casServerUrlPrefix) {
         this.casServerUrlPrefix = casServerUrlPrefix;
+    }
+
+    public String getCasServerUrlPrefix() {
+        return casServerUrlPrefix;
     }
 
     public TicketValidator build() {
@@ -148,7 +152,7 @@ public class CasTicketValidatorBuilder {
 
         @Override
         public TicketValidator build() {
-            Cas10TicketValidator ticketValidator = new Cas10TicketValidator(casServerUrlPrefix);
+            Cas10TicketValidator ticketValidator = new Cas10TicketValidator(getCasServerUrlPrefix());
             if (StringUtils.hasText(proxyCallbackUrl)) {
                 logger.warn(OMISSION_MESSAGE_TEMPLATE, "proxyCallbackUrl");
             }
@@ -184,7 +188,7 @@ public class CasTicketValidatorBuilder {
 
         @Override
         public TicketValidator build() {
-            Cas20ServiceTicketValidator ticketValidator = new Cas20ServiceTicketValidator(casServerUrlPrefix);
+            Cas20ServiceTicketValidator ticketValidator = new Cas20ServiceTicketValidator(getCasServerUrlPrefix());
             if (proxyChainsValidation != null) {
                 logger.warn(OMISSION_MESSAGE_TEMPLATE, "proxyChainsValidation");
             }
@@ -221,7 +225,7 @@ public class CasTicketValidatorBuilder {
 
         @Override
         public TicketValidator build() {
-            Cas20ProxyTicketValidator ticketValidator = new Cas20ProxyTicketValidator(casServerUrlPrefix);
+            Cas20ProxyTicketValidator ticketValidator = new Cas20ProxyTicketValidator(getCasServerUrlPrefix());
             super.configure(ticketValidator);
 
             if (proxyChainsValidation != null) {
@@ -246,7 +250,7 @@ public class CasTicketValidatorBuilder {
 
         @Override
         public TicketValidator build() {
-            Cas30ServiceTicketValidator ticketValidator = new Cas30ServiceTicketValidator(casServerUrlPrefix);
+            Cas30ServiceTicketValidator ticketValidator = new Cas30ServiceTicketValidator(getCasServerUrlPrefix());
             if (proxyChainsValidation != null) {
                 logger.warn(OMISSION_MESSAGE_TEMPLATE, "proxyChainsValidation");
             }
@@ -269,7 +273,7 @@ public class CasTicketValidatorBuilder {
 
         @Override
         public Cas30ProxyTicketValidator build() {
-            Cas30ProxyTicketValidator ticketValidator = new Cas30ProxyTicketValidator(casServerUrlPrefix);
+            Cas30ProxyTicketValidator ticketValidator = new Cas30ProxyTicketValidator(getCasServerUrlPrefix());
             super.configure(ticketValidator);
 
             if (proxyChainsValidation != null) {
