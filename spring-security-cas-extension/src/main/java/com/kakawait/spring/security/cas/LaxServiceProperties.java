@@ -19,7 +19,7 @@ public class LaxServiceProperties extends ServiceProperties {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         if (!dynamicServiceResolution) {
             super.afterPropertiesSet();
         } else {

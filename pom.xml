@@ -7,7 +7,7 @@
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>Cas security spring boot parent</name>
     <description>Spring boot starter for Apereo CAS client fully integrated with Spring security</description>
@@ -49,22 +49,22 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- spring managed version -->
-        <jackson.version>2.9.9</jackson.version>
-        <jackson-databind.version>2.9.9.3</jackson-databind.version>
+        <jackson.version>2.10.2</jackson.version>
+        <jackson-databind.version>2.10.2</jackson-databind.version>
 
         <!-- dependencies -->
-        <spring-boot-dependencies.version>2.1.7.RELEASE</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>2.2.4.RELEASE</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
-        <lombok.version>1.18.8</lombok.version>
+        <lombok.version>1.18.10</lombok.version>
 
         <!-- test dependencies -->
-        <assertj-core.version>3.13.2</assertj-core.version>
-        <mockito-core.version>3.0.0</mockito-core.version>
+        <assertj-core.version>3.15.0</assertj-core.version>
+        <mockito-core.version>3.2.4</mockito-core.version>
 
         <!-- plugins -->
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
-        <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
