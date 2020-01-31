@@ -1,7 +1,7 @@
 # Spring Security CAS starter
 
 [![Travis](https://img.shields.io/travis/kakawait/cas-security-spring-boot-starter.svg)](https://travis-ci.org/kakawait/cas-security-spring-boot-starter)
-[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C1.0.0%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C1.0.1%7Cjar)
 [![License](https://img.shields.io/github/license/kakawait/cas-security-spring-boot-starter.svg)](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/LICENSE.md)
 [![Codecov](https://img.shields.io/codecov/c/github/kakawait/cas-security-spring-boot-starter.svg)](https://codecov.io/gh/kakawait/cas-security-spring-boot-starter)
 [![SonarQube Tech Debt](https://img.shields.io/sonar/https/sonarcloud.io/com.kakawait%3Acas-security-spring-boot-parent/tech_debt.svg)](https://sonarcloud.io/dashboard?id=com.kakawait%3Acas-security-spring-boot-parent)
@@ -26,7 +26,7 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 

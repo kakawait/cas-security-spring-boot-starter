@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/24) - 31 jan 2020
+
+- Happy new year :tada:
+- Move some method to become `public` in order to facilate customization (https://github.com/kakawait/cas-security-spring-boot-starter/pull/135/commits/02e1e805998f92216753cc87c6f3e99d6f6ff17e)
+
 ## [1.0.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/9) - 5 sept 2019
 
 - First release that supporting Spring boot 2 ([#32](https://github.com/kakawait/cas-security-spring-boot-starter/issues/32))
