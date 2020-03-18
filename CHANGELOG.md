@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/25) - 12 mar 2020
+
+- Update dependencies for security fixes
+
 ## [1.0.1](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/24) - 31 jan 2020
 
 - Happy new year :tada:
@@ -16,10 +20,10 @@ All notable changes to this project will be documented in this file.
 ### Breaking changes
 
 - Related to [#35 Remove cas-security-dynamic-service-resolver module](https://github.com/kakawait/cas-security-spring-boot-starter/issues/35), you must use [spring-security-cas-extension](https://github.com/kakawait/cas-security-spring-boot-starter/tree/master/spring-security-cas-extension) instead.
-- Related to [#33 
+- Related to [#33
 Rename package com.kakawait.spring.boot.security.cas to com.kakawait.spring.boot.security.cas.autoconfigure](https://github.com/kakawait/cas-security-spring-boot-starter/issues/33), you must rewrite your `import` statements to append `.autoconfigure.`.
 - Property `security.cas.authorize-mode` has been renamed `security.cas.authorization.mode`
-- `CasHttpSecurityConfigurer.cas().configure(http)` will no secure paths, only configure CAS authentication 
+- `CasHttpSecurityConfigurer.cas().configure(http)` will no secure paths, only configure CAS authentication
 - Autoconfiguration java class package was moved from `com.kakawait.spring.boot.security.cas` to `com.kakawait.spring.boot.security.cas.autoconfigure`
 
 #### Spring boot 2 support breaking changes
