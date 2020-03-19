@@ -308,6 +308,8 @@ public class CasSecurityAutoConfiguration {
                     http.authorizeRequests().anyRequest().authenticated();
                 } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.NONE) {
                     http.authorizeRequests().anyRequest().permitAll();
+                } else if (mode == CasSecurityProperties.SecurityAuthorizeMode.CUSTOM) {
+                    // Do nothing. This is added in for readability
                 }
             }
         }

@@ -68,7 +68,12 @@ public class CasSecurityProperties {
         /**
          * No security authorization is setup.
          */
-        NONE
+        NONE,
+
+        /**
+         * No authorization is setup by default, User is required to configure request authorization
+         */
+        CUSTOM,
     }
 
     @Data
