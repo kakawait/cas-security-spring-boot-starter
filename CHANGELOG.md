@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/26) - 30 jul 2020
+
+- Add new interface `ProxyCallbackUrlAwareTicketValidator` if you'd like to create your own `TicketValidator` but do not
+want to extends `Cas20ServiceTicketValidator` (or others) because they added `final` everywhere and so is impossible
+to extends...
+
 ## [1.0.2](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/25) - 12 mar 2020
 
 - Update dependencies for security fixes
