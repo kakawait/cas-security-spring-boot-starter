@@ -1,7 +1,6 @@
 package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import lombok.Data;
-import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
@@ -39,16 +38,20 @@ public class CasSecurityProperties {
     /**
      * Comma-separated list of paths to secure.
      */
-    private String[] paths = new String[] { "/**" };
+    private String[] paths = new String[]{"/**"};
 
     /**
      * Security authorize mode to apply.
      */
-    @Getter(onMethod_ = {@Deprecated,
-            @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")})
     private SecurityAuthorizeMode authorizeMode = SecurityAuthorizeMode.AUTHENTICATED;
 
     private ProxyValidation proxyValidation = new ProxyValidation();
+
+    @Deprecated
+    @DeprecatedConfigurationProperty(replacement = "security.cas.authorization.mode")
+    public SecurityAuthorizeMode getAuthorizeMode() {
+        return authorizeMode;
+    }
 
     public enum ServiceResolutionMode {
         STATIC, DYNAMIC
