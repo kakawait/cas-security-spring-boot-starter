@@ -3,6 +3,7 @@ package com.kakawait.spring.boot.security.cas.autoconfigure;
 import lombok.NonNull;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.cas.ServiceProperties;
@@ -22,8 +23,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author Thibaud Leprêtre
@@ -121,7 +120,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
     }
 
     static class CasHttpSecurityConfigurerAdapter
-            extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+            extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> implements InitializingBean {
 
         private final CasAuthenticationFilterConfigurer filterConfigurer = new CasAuthenticationFilterConfigurer();
 
@@ -159,8 +158,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             authenticationManagerBuilder = new AuthenticationManagerBuilder(objectPostProcessor);
         }
 
-        @PostConstruct
-        private void postConstruct() {
+        @Override
+        public void afterPropertiesSet() throws Exception {
             configurers.forEach(c -> {
                 c.configure(filterConfigurer);
                 c.configure(singleSignOutFilterConfigurer);
