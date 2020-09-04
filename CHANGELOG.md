@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/27) - 04 sept 2020
+
+- Replace `@PostConstruct` to avoid mess with JDK8 / JDK11
+
 ## [1.0.3](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/26) - 30 jul 2020
 
 - Add new interface `ProxyCallbackUrlAwareTicketValidator` if you'd like to create your own `TicketValidator` but do not
