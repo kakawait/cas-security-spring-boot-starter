@@ -23,6 +23,8 @@ public class LaxServiceProperties extends ServiceProperties {
         if (!dynamicServiceResolution) {
             try {
                 super.afterPropertiesSet();
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
                 // Old version of spring security throw Exception for afterPropertiesSet()
                 throw new RuntimeException(e);
