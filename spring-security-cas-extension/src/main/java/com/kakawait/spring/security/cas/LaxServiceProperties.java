@@ -21,7 +21,12 @@ public class LaxServiceProperties extends ServiceProperties {
     @Override
     public void afterPropertiesSet() {
         if (!dynamicServiceResolution) {
-            super.afterPropertiesSet();
+            try {
+                super.afterPropertiesSet();
+            } catch (Exception e) {
+                // Old version of spring security throw Exception for afterPropertiesSet()
+                throw new RuntimeException(e);
+            }
         } else {
             Assert.hasLength(getArtifactParameter(), "artifactParameter cannot be empty.");
             Assert.hasLength(getServiceParameter(), "serviceParameter cannot be empty.");
