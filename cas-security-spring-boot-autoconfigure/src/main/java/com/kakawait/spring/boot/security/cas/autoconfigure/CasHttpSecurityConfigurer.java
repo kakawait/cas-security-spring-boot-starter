@@ -1,6 +1,11 @@
 package com.kakawait.spring.boot.security.cas.autoconfigure;
 
-import lombok.NonNull;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+
+import org.jasig.cas.client.configuration.ConfigurationKey;
+import org.jasig.cas.client.configuration.ConfigurationKeys;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,13 +25,15 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Thibaud Leprêtre
  */
+@Slf4j
 public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSecurityConfigurer, HttpSecurity> {
 
     private final AuthenticationManager authenticationManager;
@@ -176,7 +183,19 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             filterConfigurer.configure(filter);
 
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
-            singleSignOutFilter.setCasServerUrlPrefix(casSecurityProperties.getServer().getBaseUrl().toASCIIString());
+            try {
+                ConfigurationKey<String> key = ConfigurationKeys.CAS_SERVER_URL_PREFIX;
+                //Field field = FieldUtils.getField(SingleSignOutHandler.class, key.getName());
+                Method setter = singleSignOutFilter.getClass()
+                        .getDeclaredMethod("set" + StringUtils.capitalize(key.getName()));
+                setter.invoke(singleSignOutFilter, casSecurityProperties.getServer().getBaseUrl().toASCIIString());
+            } catch (NoSuchMethodException | SecurityException e) {
+                // since commit :
+                // https://github.com/apereo/java-cas-client/commit/fdc948b8ec697be0ae04da2f91c66c6526d463b5#diff-676b9d196aacd4b54bc978c62ccbacd8d29552fcd694061355bd930405560fb5
+                // setCasServerUrlPrefix(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX)); does NOT exists anymore
+                logger.info(
+                        "Since apereo CAS client 3.6.0 setCasServerUrlPrefix(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX)); does NOT exists anymore");
+            }
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
 
             http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
