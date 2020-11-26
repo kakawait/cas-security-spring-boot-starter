@@ -185,7 +185,6 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
             try {
                 ConfigurationKey<String> key = ConfigurationKeys.CAS_SERVER_URL_PREFIX;
-                //Field field = FieldUtils.getField(SingleSignOutHandler.class, key.getName());
                 Method setter = singleSignOutFilter.getClass()
                         .getDeclaredMethod("set" + StringUtils.capitalize(key.getName()));
                 setter.invoke(singleSignOutFilter, casSecurityProperties.getServer().getBaseUrl().toASCIIString());
