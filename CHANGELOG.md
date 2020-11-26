@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/28) - 26 nov 2020
+
+- Add support for CAS client >= 3.6 ([#147](https://github.com/kakawait/cas-security-spring-boot-starter/issues/147))
+
 ## [1.0.5](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/28) - 04 sept 2020
 
 - Fix java 11 build error due to incompatibility between lombok and javadoc ([#146](https://github.com/kakawait/cas-security-spring-boot-starter/issues/146))
