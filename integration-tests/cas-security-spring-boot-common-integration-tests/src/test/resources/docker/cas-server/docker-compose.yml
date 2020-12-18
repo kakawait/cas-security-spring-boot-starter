@@ -1,0 +1,18 @@
+version: '2.3'
+services:
+  app:
+    # Tag version does not really represent CAS server version. Please check pom.xml to get real version.
+    image: apereo/cas:v5.2.2
+    ports:
+      - "8080"
+    volumes:
+      - ./data:/root/.m2/repository/
+      - ./cas.properties:/cas-overlay/etc/cas/config/cas.properties:ro
+      - ./All-10000005.json:/cas-overlay/etc/cas/services/All-10000005.json:ro
+      - ./pom.xml:/cas-overlay/pom.xml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/cas/status/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 5m
