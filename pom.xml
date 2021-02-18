@@ -50,7 +50,7 @@
 
         <!-- spring managed version -->
         <jackson.version>2.10.3</jackson.version>
-        <jackson-databind.version>2.10.3</jackson-databind.version>
+        <jackson-databind.version>2.10.5.1</jackson-databind.version>
 
         <!-- dependencies -->
         <spring-boot-dependencies.version>2.2.5.RELEASE</spring-boot-dependencies.version>
