@@ -18,7 +18,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,7 +43,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test
