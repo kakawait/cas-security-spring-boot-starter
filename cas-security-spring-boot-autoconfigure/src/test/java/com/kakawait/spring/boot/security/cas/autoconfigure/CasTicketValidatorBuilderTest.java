@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class CasTicketValidatorBuilderTest {
                     "(please consider proxy ticket validator), will be omitted!";
 
     @Rule
-    public OutputCapture outputCapture = new OutputCapture();
+    public OutputCaptureRule outputCaptureRule = new OutputCaptureRule();
 
     private CasTicketValidatorBuilder builder;
 
@@ -135,7 +135,7 @@ public class CasTicketValidatorBuilderTest {
         warns.add(String.format(V1_WARN_MESSAGE_TEMPLATE, "allowEmptyProxyChain"));
 
         for (String warn : warns) {
-            outputCapture.expect(containsString(warn));
+            outputCaptureRule.expect(containsString(warn));
         }
     }
 
@@ -154,7 +154,7 @@ public class CasTicketValidatorBuilderTest {
         warns.add(String.format(SERVICE_VALIDATOR_WARN_MESSAGE_TEMPLATE, "allowEmptyProxyChain"));
 
         for (String warn : warns) {
-            outputCapture.expect(containsString(warn));
+            outputCaptureRule.expect(containsString(warn));
         }
 
         protocolVersion = 3;
@@ -163,7 +163,7 @@ public class CasTicketValidatorBuilderTest {
         builder.build();
 
         for (String warn : warns) {
-            outputCapture.expect(containsString(warn));
+            outputCaptureRule.expect(containsString(warn));
         }
     }
 
