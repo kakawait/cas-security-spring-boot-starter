@@ -38,5 +38,3 @@ security:
 logging:
   level:
     org.jasig.cas.client.validation: debug
-
-

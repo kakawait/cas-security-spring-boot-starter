@@ -136,7 +136,7 @@ public class CasSecuritySpringBootSampleApplication {
     static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/api/**").authorizeRequests().anyRequest().authenticated();
+            http.antMatcher("/api/**").authorizeRequests() /* TODO anyRequest().authenticated()*/;
             // Applying CAS security on current HttpSecurity (FilterChain)
             // I'm not using .apply() from HttpSecurity due to following issue
             // https://github.com/spring-projects/spring-security/issues/4422

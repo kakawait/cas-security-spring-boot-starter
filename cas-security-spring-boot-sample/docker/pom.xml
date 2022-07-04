@@ -119,7 +119,8 @@
                     <recompressZippedFiles>false</recompressZippedFiles>
                     <archive>
                         <compress>false</compress>
-                        <manifestFile>${project.build.directory}/war/work/org.apereo.cas/cas-server-webapp${app.server}/META-INF/MANIFEST.MF
+                        <manifestFile>
+                            ${project.build.directory}/war/work/org.apereo.cas/cas-server-webapp${app.server}/META-INF/MANIFEST.MF
                         </manifestFile>
                     </archive>
                     <overlays>
