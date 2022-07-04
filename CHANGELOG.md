@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestones) (miliestone number of v2.0.0 to be determined by owner) - 04 jul 2022
+
+- Apply pom code convention (https://maven.apache.org/developers/conventions/code.html#pom-code-convention)
+- Use java 11
+- Use spring-boot 2.6.9. (When 2.7.0 or higher will be used, it will become a breaking change thus the upgrade to a major version)
+
 ## [1.0.6](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/28) - 26 nov 2020
 
 - Add support for CAS client >= 3.6 ([#147](https://github.com/kakawait/cas-security-spring-boot-starter/issues/147))
@@ -37,6 +43,7 @@ to extends...
 
 ### Breaking changes
 
+- Related to [#161 Use springboot 2.7.0+ with SecurityFilterChain instead of deprecated WebSecurityConfigurerAdapter](https://github.com/kakawait/cas-security-spring-boot-starter/issues/161), when we upgrade to spring-boot v2.7.0+ we will get a warning when we use the WebSecurityConfigurerAdapter class. This will have to be addressed before we upgrade.
 - Related to [#35 Remove cas-security-dynamic-service-resolver module](https://github.com/kakawait/cas-security-spring-boot-starter/issues/35), you must use [spring-security-cas-extension](https://github.com/kakawait/cas-security-spring-boot-starter/tree/master/spring-security-cas-extension) instead.
 - Related to [#33
 Rename package com.kakawait.spring.boot.security.cas to com.kakawait.spring.boot.security.cas.autoconfigure](https://github.com/kakawait/cas-security-spring-boot-starter/issues/33), you must rewrite your `import` statements to append `.autoconfigure.`.
@@ -82,3 +89,15 @@ security:
 ```
 
 Where `security.cas.authorization.roles` (which only useful when using `security.cas.authorization.mode=ROLE`) is _list_ of roles that use must have to be accepted.
+
+##### As of _Spring Boot 2.7.0_ the WebSecurityConfigurerAdapter is deprecated
+
+See [HttpSecurity](https://docs.spring.io/spring-security/reference/servlet/configuration/java.html#jc-httpsecurity)
+
+You will have to change your application SecurityConfiguration:
+* remove the _extends WebSecurityConfigurerAdapter_
+* change your _public void configure(HtppSecurity http)_ method to _public SecurityFilterChain filterChain(HttpSecurity http)_
+* Annotatate this method with _@Bean_
+* keep the content, but using LambdaDSL is preferred
+
+See [HttpSecurity](https://docs.spring.io/spring-security/reference/servlet/configuration/java.html#jc-httpsecurity)

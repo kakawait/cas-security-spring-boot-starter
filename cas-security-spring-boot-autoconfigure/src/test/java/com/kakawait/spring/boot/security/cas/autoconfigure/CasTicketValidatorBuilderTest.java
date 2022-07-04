@@ -10,13 +10,12 @@ import org.jasig.cas.client.validation.Cas30ProxyTicketValidator;
 import org.jasig.cas.client.validation.Cas30ServiceTicketValidator;
 import org.jasig.cas.client.validation.ProxyList;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * @author Thibaud Leprêtre
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(OutputCaptureExtension.class)
 public class CasTicketValidatorBuilderTest {
 
     private static final String CAS_SERVER_URL_PREFIX = "http://my.cas.server.base.url/";
@@ -44,12 +42,9 @@ public class CasTicketValidatorBuilderTest {
                     "Configuration \"%s\" isn't possible using service ticket validator " +
                     "(please consider proxy ticket validator), will be omitted!";
 
-    @Rule
-    public OutputCaptureRule outputCaptureRule = new OutputCaptureRule();
-
     private CasTicketValidatorBuilder builder;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         builder = new CasTicketValidatorBuilder(CAS_SERVER_URL_PREFIX);
     }
@@ -118,7 +113,7 @@ public class CasTicketValidatorBuilderTest {
     }
 
     @Test
-    public void build_ProtocolVersion1WithIncompatibleParameter_LogWarnMessage() {
+    public void build_ProtocolVersion1WithIncompatibleParameter_LogWarnMessage(CapturedOutput output) {
         int protocolVersion = 1;
 
         CasTicketValidatorBuilder builder = fulfilledBuilder();
@@ -135,12 +130,12 @@ public class CasTicketValidatorBuilderTest {
         warns.add(String.format(V1_WARN_MESSAGE_TEMPLATE, "allowEmptyProxyChain"));
 
         for (String warn : warns) {
-            outputCaptureRule.expect(containsString(warn));
+            assertThat(output).contains(warn);
         }
     }
 
     @Test
-    public void build_ServiceValidatorProtocolWithIncompatibleParameter_LogWarnMessage() {
+    public void build_ServiceValidatorProtocolWithIncompatibleParameter_LogWarnMessage(CapturedOutput output) {
         int protocolVersion = 2;
 
         CasTicketValidatorBuilder builder = fulfilledBuilder();
@@ -154,7 +149,7 @@ public class CasTicketValidatorBuilderTest {
         warns.add(String.format(SERVICE_VALIDATOR_WARN_MESSAGE_TEMPLATE, "allowEmptyProxyChain"));
 
         for (String warn : warns) {
-            outputCaptureRule.expect(containsString(warn));
+            assertThat(output).contains(warn);
         }
 
         protocolVersion = 3;
@@ -163,7 +158,7 @@ public class CasTicketValidatorBuilderTest {
         builder.build();
 
         for (String warn : warns) {
-            outputCaptureRule.expect(containsString(warn));
+            assertThat(output).contains(warn);
         }
     }
 

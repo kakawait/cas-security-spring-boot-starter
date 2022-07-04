@@ -1,13 +1,13 @@
 package com.kakawait.spring.security.cas.client;
 
 import com.kakawait.spring.security.cas.client.ticket.ProxyTicketProvider;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequest;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Thibaud Leprêtre
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CasAuthorizationInterceptorTest {
 
     @Mock
@@ -43,7 +43,7 @@ public class CasAuthorizationInterceptorTest {
     @Captor
     private ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ServiceProperties serviceProperties = new ServiceProperties();
         serviceProperties.setService("http://localhost:8080/");

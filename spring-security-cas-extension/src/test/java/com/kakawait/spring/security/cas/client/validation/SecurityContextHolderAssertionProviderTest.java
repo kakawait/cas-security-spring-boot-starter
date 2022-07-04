@@ -1,7 +1,7 @@
 package com.kakawait.spring.security.cas.client.validation;
 
 import org.jasig.cas.client.validation.AssertionImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,28 +14,28 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Thibaud Leprêtre
  */
 public class SecurityContextHolderAssertionProviderTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void getAssertion_NullAuthentication_IllegalStateException() {
         SecurityContextHolder.getContext().setAuthentication(null);
 
         AssertionProvider provider = new SecurityContextHolderAssertionProvider();
-        provider.getAssertion();
+        assertThrows(IllegalStateException.class, provider::getAssertion);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void getAssertion_UnwantedAuthenticationType_IllegalStateException() {
         Authentication authentication = new UsernamePasswordAuthenticationToken("casuser", "Mellon");
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         AssertionProvider provider = new SecurityContextHolderAssertionProvider();
-        provider.getAssertion();
+        assertThrows(IllegalStateException.class, provider::getAssertion);
     }
 
     @Test
@@ -52,4 +52,5 @@ public class SecurityContextHolderAssertionProviderTest {
         assertThat(provider.getAssertion()).isNotNull();
         assertThat(provider.getAssertion().getPrincipal().getName()).isEqualTo(user);
     }
+
 }

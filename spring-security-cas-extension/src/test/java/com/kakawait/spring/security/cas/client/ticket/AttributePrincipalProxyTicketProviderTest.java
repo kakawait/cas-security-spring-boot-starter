@@ -3,11 +3,11 @@ package com.kakawait.spring.security.cas.client.ticket;
 import com.kakawait.spring.security.cas.client.validation.AssertionProvider;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.validation.Assertion;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Thibaud Leprêtre
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AttributePrincipalProxyTicketProviderTest {
 
     @Mock
@@ -27,7 +27,7 @@ public class AttributePrincipalProxyTicketProviderTest {
 
     private ProxyTicketProvider proxyTicketProvider;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         proxyTicketProvider = new AttributePrincipalProxyTicketProvider(assertionProvider);
     }

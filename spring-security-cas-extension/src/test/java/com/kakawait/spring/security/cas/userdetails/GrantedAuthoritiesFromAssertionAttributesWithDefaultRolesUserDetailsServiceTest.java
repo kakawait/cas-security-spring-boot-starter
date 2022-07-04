@@ -2,10 +2,10 @@ package com.kakawait.spring.security.cas.userdetails;
 
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.validation.Assertion;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Thibaud Leprêtre
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsServiceTest {
 
     private static final Collection<? extends GrantedAuthority> DEFAULT_ROLES = Collections.unmodifiableCollection(
@@ -50,7 +50,7 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
     public void loadUserDetails_NullOrBlankPrincipalName_UsernameNotFoundException() {
         // JDK10 var needed :)
         GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService userDetailsService =
-                new GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(new String[] {"role"},
+                new GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(new String[]{"role"},
                         DEFAULT_ROLES);
 
         when(assertion.getPrincipal()).thenReturn(principal);
@@ -100,7 +100,7 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
         // JDK10 var needed :)
         GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService userDetailsService =
                 new GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(
-                        new String[] {"doesNotExists"}, DEFAULT_ROLES);
+                        new String[]{"doesNotExists"}, DEFAULT_ROLES);
 
         when(assertion.getPrincipal()).thenReturn(principal);
         when(principal.getName()).thenReturn("JohnWick");
@@ -120,7 +120,7 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
         // JDK10 var needed :)
         GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService userDetailsService =
                 new GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(
-                        new String[] {"role", "group"}, DEFAULT_ROLES);
+                        new String[]{"role", "group"}, DEFAULT_ROLES);
 
         when(assertion.getPrincipal()).thenReturn(principal);
         when(principal.getName()).thenReturn("JohnWick");

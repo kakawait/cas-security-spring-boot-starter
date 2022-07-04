@@ -1,11 +1,12 @@
 package com.kakawait.spring.security.cas;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.cas.ServiceProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Thibaud Leprêtre
@@ -13,21 +14,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class LaxServicePropertiesTest {
 
     @Test
-    public void afterPropertiesSet_WithDynamicServiceResolutionAndNullOrEmptyService_Ok() throws Exception {
+    public void afterPropertiesSet_WithDynamicServiceResolutionAndNullOrEmptyService_Ok() {
         LaxServiceProperties serviceProperties = new LaxServiceProperties(true);
         serviceProperties.afterPropertiesSet();
         assertThat(serviceProperties.isDynamicServiceResolution()).isTrue();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void afterPropertiesSet_WithoutDynamicServiceResolutionValueAndNullOrEmptyService_IllegalArgumentException()
-            throws Exception {
+    @Test
+    public void afterPropertiesSet_WithoutDynamicServiceResolutionValueAndNullOrEmptyService_IllegalArgumentException() {
         LaxServiceProperties serviceProperties = new LaxServiceProperties(false);
-        serviceProperties.afterPropertiesSet();
+        assertThrows(IllegalArgumentException.class, serviceProperties::afterPropertiesSet);
     }
 
     @Test
-    public void afterPropertiesSet_WithNullService_NoException() throws Exception {
+    public void afterPropertiesSet_WithNullService_NoException() {
         ServiceProperties serviceProperties = new LaxServiceProperties();
         serviceProperties.setService(null);
         serviceProperties.afterPropertiesSet();
