@@ -4,17 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Do NOT change then order of tags or plugins as this might affect the results of the build. -->
+    <!-- See https://maven.apache.org/developers/conventions/code.html#pom-code-convention -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.3.RELEASE</version>
+        <relativePath/><!-- lookup parent from repository -->
+    </parent>
+
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-sample</artifactId>
     <version>1.0.6</version>
 
     <name>Cas security spring boot sample</name>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.3.RELEASE</version>
-    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
