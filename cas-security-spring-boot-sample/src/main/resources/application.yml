@@ -21,7 +21,9 @@ security:
 ---
 
 spring:
-  profiles: docker
+  config:
+    activate:
+      on-profile: docker
 
 security:
   cas:
