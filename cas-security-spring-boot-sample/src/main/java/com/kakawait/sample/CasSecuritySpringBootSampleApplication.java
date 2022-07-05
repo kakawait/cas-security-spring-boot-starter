@@ -12,10 +12,7 @@ import org.jasig.cas.client.authentication.AttributePrincipalImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -102,12 +99,19 @@ public class CasSecuritySpringBootSampleApplication {
     @Conditional(CasSecurityCondition.class)
     static class OverrideDefaultCasSecurity extends CasSecurityConfigurerAdapter {
 
+        private boolean configured = false;
+
         /**
          * Permit all on specific endpoint.
          */
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.authorizeRequests().antMatchers("/permit-all").permitAll();
+            // We make sure the antMatchers method in configure is called only once.
+            // This prevents an error if we use antMatchers after the .anyRequest().authenticated() in ApiSecurityConfiguration.
+            if (!configured) {
+                http.authorizeRequests().antMatchers("/permit-all").permitAll();
+                configured = true;
+            }
         }
     }
 
@@ -133,10 +137,14 @@ public class CasSecuritySpringBootSampleApplication {
 
     @Configuration
     @Conditional(CasSecurityCondition.class)
+    // The configure method contains .anyRequest().authenticated() after which no antMatchers can used ever again.
+    // So we use the @Order(CasSecurityProperties.CAS_AUTH_ORDER + 2) to make this configure excute after all the other configure methods.
+    @Order(CasSecurityProperties.CAS_AUTH_ORDER + 2)
     static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/api/**").authorizeRequests() /* TODO anyRequest().authenticated()*/;
+            http.antMatcher("/api/**").authorizeRequests().anyRequest().authenticated();
             // Applying CAS security on current HttpSecurity (FilterChain)
             // I'm not using .apply() from HttpSecurity due to following issue
             // https://github.com/spring-projects/spring-security/issues/4422
