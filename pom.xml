@@ -68,7 +68,7 @@
         <jackson-databind.version>2.10.3</jackson-databind.version>
 
         <!-- dependencies -->
-        <spring-boot-dependencies.version>2.6.9</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>2.7.1</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
         <lombok.version>1.18.12</lombok.version>
