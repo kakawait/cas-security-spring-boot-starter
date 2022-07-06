@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Apply pom code convention (https://maven.apache.org/developers/conventions/code.html#pom-code-convention)
 - Use java 11
-- Use spring-boot 2.7.x (this causes a breaking change thus the upgrade to a major version)
+- Use spring-boot 2.7.1 (this causes a breaking change thus the upgrade to a major version)
 
 ## [1.0.6](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/28) - 26 nov 2020
 
