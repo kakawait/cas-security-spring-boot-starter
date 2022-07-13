@@ -1,7 +1,7 @@
 # Spring Security CAS starter
 
 [![Travis](https://img.shields.io/travis/kakawait/cas-security-spring-boot-starter.svg)](https://travis-ci.org/kakawait/cas-security-spring-boot-starter)
-[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C1.0.6%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kakawait/cas-security-spring-boot-starter.svg)](https://search.maven.org/#artifactdetails%7Ccom.kakawait%7Ccas-security-spring-boot-starter%7C1.1.0%7Cjar)
 [![License](https://img.shields.io/github/license/kakawait/cas-security-spring-boot-starter.svg)](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/LICENSE.md)
 [![Codecov](https://img.shields.io/codecov/c/github/kakawait/cas-security-spring-boot-starter.svg)](https://codecov.io/gh/kakawait/cas-security-spring-boot-starter)
 [![SonarQube Tech Debt](https://img.shields.io/sonar/https/sonarcloud.io/com.kakawait%3Acas-security-spring-boot-parent/tech_debt.svg)](https://sonarcloud.io/dashboard?id=com.kakawait%3Acas-security-spring-boot-parent)
@@ -11,11 +11,11 @@
 
 ## Features
 
-- Spring boot 1 and 2 support
+- Spring boot 1 and 2 support.
 - Configures CAS authentication and authorization
 - Support dynamic service resolution based on current `HttpServletRequest`
 - Advance configuration through [CasSecurityConfigurerAdapter](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-autoconfigure/src/main/java/com/kakawait/spring/boot/security/cas/CasSecurityConfigurerAdapter.java)
-- Integration with _Basic authentication_ if `security.basic.enabled=true` that allow you to authenticate using header `Authorization: Basic ...` in addition to _CAS_
+- Integration with _Basic authentication_ if `security.basic.enabled=true` will allow you to authenticate using header `Authorization: Basic ...` in addition to _CAS_
 - `RestTemplate` integration
 
 ## Setup
@@ -26,11 +26,12 @@ Add the Spring boot starter to your project
 <dependency>
   <groupId>com.kakawait</groupId>
   <artifactId>cas-security-spring-boot-starter</artifactId>
-  <version>1.0.6</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 But be careful `1.x.x` version has some **breaking changes** if you comes from `0.x.x` version.
+But be careful `2.x.x` version will have some **breaking changes** if you comes from `1.x.x` version.
 
 Please checkout [CHANGELOG.md](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/CHANGELOG.md), in particular `breaking changes` sections.
 
@@ -68,7 +69,7 @@ security:
 
 _dynamic_ resolution mode is a novel mode from that starter that will allow you to do not hard-code service url in your configuration. Thereby your configuration will be more portable and easy to use.
 
-**ATTENTION** _dynamic_ resolution mode use information from `HttpServletRequest` to build service url, that can be a security breach if you do not control headers like `Host` or `X-Forwarded-*` that why _dynamic_ resolution mode **is not the default mode** and you must activate it as describe on below properties.
+**ATTENTION** _dynamic_ resolution mode use information from `HttpServletRequest` to build service url, that can be a security breach if you do not control headers like `Host` or `X-Forwarded-*` that why _dynamic_ resolution mode **is not the default mode** and you must activate it as described in below properties.
 
 ```yml
 security:
@@ -104,7 +105,7 @@ The supported properties are:
 |---------------------------------------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `security.cas.enabled`                      | `true`                         | Enable CAS security                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `security.cas.key`                          | `UUID.randomUUID().toString()` | An id used by the [`CasAuthenticationProvider`](https://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/cas/authentication/CasAuthenticationProvider.html#setKey-java.lang.String-)                                                                                                                                                                                                                                                                                                                                                                             |
-| `security.cas.paths`                        | `/**`                          | Comma-separated list of paths to secure (work as same way as `security.basic.path`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `security.cas.paths`                        | `/**`                          | Comma-separated list of paths to secure (works the same way as `security.basic.path`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `security.cas.user.default-roles`           | `USER`                         | Comma-separated list of default user roles. If roles have been found from `security.cas.user.roles-attributes` default roles will be append to the list of users roles                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `security.cas.user.roles-attributes`        |                                | Comma-separated list of CAS attributes to be used to determine user roles                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `security.cas.proxy-validation.enabled`     | `true`                         | Defines if proxy should be checked again chains `security.cas.proxy-validation.chains`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -113,13 +114,13 @@ The supported properties are:
 | `security.cas.server.base-url`              |                                | The start of the CAS server url, i.e. https://localhost:8443/cas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `security.cas.server.validation-base-url`   |                                | Optional, `security.cas.server.base-url` is used if missing. The start of the CAS server url (similar to `security.cas.server.base-url`) used during ticket validation flow. Could be useful when server (your service) to server (CAS server) network is different from your external/browser network (i.e. docker environment, see [docker profile properties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/resources/application.yml)).                                                                                       |
 | `security.cas.server.paths.login`           | `/login`                       | Defines the location of the CAS server login path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `security.cas.server.paths.logout`          | `/logout`                      | Defines the location of the CAS server logout path that will be append to the existing `security.cas.server.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `security.cas.service.resolution-mode`      | `static`                       | Resolution modes can be `static` or `dynamic`, by default is `static` and you must fill `security.cas.service.base-url` whereas in `dynamic` mode service url will be generated from receiving `HttpServletRequest`. **Attention** will not override `security.cas.server.validation-base-url` and `security.cas.service.callback-base-url` if defined, see [docker profile properties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/resources/application.yml) to get an example.                                               |
+| `security.cas.server.paths.logout`          | `/logout`                      | Defines the location of the CAS server logout path that will be appended to the existing `security.cas.server.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `security.cas.service.resolution-mode`      | `static`                       | Resolution modes can be `static` or `dynamic`, the default is `static` and you must fill `security.cas.service.base-url` whereas in `dynamic` mode service url will be generated from receiving `HttpServletRequest`. **Attention** will not override `security.cas.server.validation-base-url` and `security.cas.service.callback-base-url` if defined, see [docker profile properties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/resources/application.yml) to get an example.                                               |
 | `security.cas.service.base-url`             |                                | The name of the server this application is hosted on. Service URL will be dynamically constructed using this, i.e. https://localhost:8443 (you must include the protocol, but port is optional if it's a standard port). Skipped if resolution mode is `dynamic`.                                                                                                                                                                                                                                                                                                                                     |
 | `security.cas.service.callback-base-url`    |                                | Optional, `security.cas.service.base-url` is used if missing. Represents the base url that will be used to compute _Proxy granting ticket callback_ (see `security.cas.service.paths.proxy-callback`). It could be useful to be different from `security.cas.service.base-url` when server (CAS server) to server (your service) network is different from your external/browser network (i.e. docker environment, see see [docker profile properties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/resources/application.yml)). |
-| `security.cas.service.paths.login`          | `/login`                       | Defines the application login path that will be append to the existing `security.cas.service.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `security.cas.service.paths.logout`         | `/logout`                      | Defines the application logout path that will be append to the existing `security.cas.service.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `security.cas.service.paths.proxy-callback` |                                | The callback path that will be, if present, append to the `security.cas.service.callback-base-url` or `security.cas.service.base-url` and add to as parameter inside request validation. **It must be set if you want to receive _Proxy Granting Ticket_ `PGT`**.                                                                                                                                                                                                                                                                                                                                     |
+| `security.cas.service.paths.login`          | `/login`                       | Defines the application login path that will be appended to the existing `security.cas.service.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `security.cas.service.paths.logout`         | `/logout`                      | Defines the application logout path that will be appended to the existing `security.cas.service.base-url` url                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `security.cas.service.paths.proxy-callback` |                                | The callback path that will be, if present, appended to the `security.cas.service.callback-base-url` or `security.cas.service.base-url` and added to as parameter inside request validation. **It must be set if you want to receive _Proxy Granting Ticket_ `PGT`**.                                                                                                                                                                                                                                                                                                                                     |
 
 Otherwise you can checkout [CasSecurityProperties](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-autoconfigure/src/main/java/com/kakawait/spring/boot/security/cas/CasSecurityProperties.java) class.
 
@@ -163,7 +164,7 @@ Otherwise many beans defined in that starter are annotated with `@ConditionOnMis
 
 Starter does not provide any additional _proxy granting storage_ (yet), by default an _in memory_ storage is used [`ProxyGrantingTicketStorageImpl`](https://github.com/apereo/java-cas-client/blob/master/cas-client-core/src/main/java/org/jasig/cas/client/proxy/ProxyGrantingTicketStorageImpl.java).
 
-To override it you can expose a `ProxyGrantingTicketStorage` beans like following:
+To override it you can expose a `ProxyGrantingTicketStorage` bean like following:
 
 ```java
 @Bean
@@ -256,7 +257,7 @@ You can checkout & run sample module [`cas-security-spring-boot-sample`](https:/
 
 ## Proxy chains validation
 
-By default client configuration is `security.cas.proxy-validation.enabled = true` with empty proxy chains (`security.cas.proxy-validation.chains`). That mean you will not be able to validate proxy ticket since proxy chains is empty.
+By default client configuration is `security.cas.proxy-validation.enabled = true` with empty proxy chains (`security.cas.proxy-validation.chains`). That means you will not be able to validate proxy ticket since proxy chains is empty.
 
 You should disable proxy validation using:
 
@@ -297,7 +298,7 @@ security.cas.proxy-validation.chains[2] = ^http://my\\.domain\\..*
 
 Since `0.7.0` version, there is a simple integration with `RestTemplate` but not enabled by default.
 
-In order to enabled it you must create your own `RestTemplate` bean and adding an _interceptor_
+In order to enable it you must create your own `RestTemplate` bean and add an _interceptor_
 
 ```java
 @Bean
@@ -311,18 +312,18 @@ RestTemplate casRestTemplate(ServiceProperties serviceProperties, ProxyTicketPro
 This _interceptor_ is pretty simple, it will simply ask a new _proxy ticket_ for each request and append it to request query parameter.
 For example with: `http://httpbin.org/get` interceptor will modify request uri to become `http://httpbin.org/get?ticket=PT-XX-YYYYYYYYYY`.
 
-**ATTENTION** if _interceptor_ get any issue to get _proxy ticket_ from CAS server, it will throw an `IllegalStateException`.
+**ATTENTION** if _interceptor_ gets any issue to get _proxy ticket_ from CAS server, it will throw an `IllegalStateException`.
 
-Please checkout You can found sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java) to get an sample usage.
+Please checkout You can find sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java)
 
 ### AssertionProvider and ProxyTicketProvider
 
-In addition to `RestTemplate` integration, since `0.7.0` there is now two new autoconfigured beans:
+In addition to `RestTemplate` integration, since `0.7.0` there are now two new autoconfigured beans:
 
 1. `AssertionProvider` that will provide you a way to retrieve the current (bounded to current authenticated request) `org.jasig.cas.client.validation.Assertion`
 2. `ProxyTicketProvider` that will provide you a simple way to ask a _proxy ticket_ for a given service (regarding the current authenticated request)
 
-You can found sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java)
+You can find sample usage for both on [`CasSecuritySpringBootSampleApplication`](https://github.com/kakawait/cas-security-spring-boot-starter/blob/master/cas-security-spring-boot-sample/src/main/java/com/kakawait/CasSecuritySpringBootSampleApplication.java)
 
 ## License
 

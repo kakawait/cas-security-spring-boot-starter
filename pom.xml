@@ -4,15 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Do NOT change the order of tags or plugins as this might affect the results of the build. -->
+    <!-- See https://maven.apache.org/developers/conventions/code.html#pom-code-convention -->
     <groupId>com.kakawait</groupId>
     <artifactId>cas-security-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.6</version>
+    <version>1.1.0</version>
 
     <name>Cas security spring boot parent</name>
     <description>Spring boot starter for Apereo CAS client fully integrated with Spring security</description>
     <url>https://github.com/kakawait/cas-security-spring-boot-starter</url>
-
     <licenses>
         <license>
             <name>MIT License</name>
@@ -28,32 +29,46 @@
         </developer>
     </developers>
 
-    <scm>
-        <url>https://github.com/kakawait/cas-security-spring-boot-starter</url>
-        <connection>scm:git:git@github.com:kakawait/cas-security-spring-boot-starter.git</connection>
-        <developerConnection>scm:git:git@github.com:kakawait/cas-security-spring-boot-starter.git</developerConnection>
-    </scm>
-
     <modules>
         <module>spring-security-cas-extension</module>
         <module>cas-security-spring-boot-starter</module>
         <module>cas-security-spring-boot-autoconfigure</module>
     </modules>
 
+    <scm>
+        <url>https://github.com/kakawait/cas-security-spring-boot-starter</url>
+        <connection>scm:git:git@github.com:kakawait/cas-security-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:kakawait/cas-security-spring-boot-starter.git</developerConnection>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <name>Sonatype OSS Staging</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <id>oss.sonatype.org</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <!-- spring managed version -->
         <jackson.version>2.10.3</jackson.version>
         <jackson-databind.version>2.10.3</jackson-databind.version>
 
         <!-- dependencies -->
-        <spring-boot-dependencies.version>2.2.5.RELEASE</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>2.6.9</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
         <lombok.version>1.18.12</lombok.version>
@@ -81,6 +96,18 @@
             </dependency>
 
             <dependency>
+                <groupId>com.kakawait</groupId>
+                <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.kakawait</groupId>
+                <artifactId>spring-security-cas-extension</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson-databind.version}</version>
@@ -89,20 +116,16 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
-                <optional>true</optional>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj-core.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito-core.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -195,20 +218,4 @@
             </build>
         </profile>
     </profiles>
-
-    <distributionManagement>
-        <repository>
-            <id>oss.sonatype.org</id>
-            <name>Sonatype OSS Staging</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-            <layout>default</layout>
-        </repository>
-        <snapshotRepository>
-            <id>oss.sonatype.org</id>
-            <name>Sonatype OSS Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <layout>default</layout>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>

@@ -1,8 +1,8 @@
 package com.kakawait.spring.security.cas.web.authentication;
 
 import com.kakawait.spring.security.cas.LaxServiceProperties;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -26,7 +26,7 @@ public class RequestAwareCasLogoutSuccessHandlerTest {
 
     private MockHttpServletResponse response;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();

@@ -21,7 +21,9 @@ security:
 ---
 
 spring:
-  profiles: docker
+  config:
+    activate:
+      on-profile: docker
 
 security:
   cas:
@@ -38,5 +40,3 @@ security:
 logging:
   level:
     org.jasig.cas.client.validation: debug
-
-

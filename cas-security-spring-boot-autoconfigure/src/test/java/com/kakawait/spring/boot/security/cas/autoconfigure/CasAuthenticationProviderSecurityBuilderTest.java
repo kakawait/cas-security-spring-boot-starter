@@ -2,8 +2,8 @@ package com.kakawait.spring.boot.security.cas.autoconfigure;
 
 import com.kakawait.spring.security.cas.authentication.DynamicProxyCallbackUrlCasAuthenticationProvider;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.MessageSource;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
@@ -22,7 +22,7 @@ public class CasAuthenticationProviderSecurityBuilderTest {
 
     private CasAuthenticationProviderSecurityBuilder builder;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         builder = new CasAuthenticationProviderSecurityBuilder();
     }

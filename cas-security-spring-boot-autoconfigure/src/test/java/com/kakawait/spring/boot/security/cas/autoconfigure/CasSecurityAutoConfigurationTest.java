@@ -12,8 +12,8 @@ import com.kakawait.spring.security.cas.web.authentication.RequestAwareCasLogout
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
@@ -38,6 +38,7 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Thibaud Leprêtre
@@ -52,28 +53,32 @@ public class CasSecurityAutoConfigurationTest {
 
     private ConfigurableApplicationContext context;
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (context != null) {
             context.close();
         }
     }
 
-    @Test(expected = NoSuchBeanDefinitionException.class)
+    @Test
     public void autoConfiguration_MissingCasServerBaseUrl_SkipAutoConfiguration() {
         load(new Properties(), EmptyConfiguration.class);
 
-        context.getBean(CasSecurityAutoConfiguration.class);
+        assertThrows(NoSuchBeanDefinitionException.class,
+                () -> context.getBean(CasSecurityAutoConfiguration.class)
+        );
     }
 
-    @Test(expected = NoSuchBeanDefinitionException.class)
+    @Test
     public void autoConfiguration_DisableProperty_SkipAutoConfiguration() {
         Properties properties = new Properties();
         properties.put("security.cas.server.base-url", CAS_SERVER_BASE_URL);
         properties.put("security.cas.enabled", "false");
         load(properties, EmptyConfiguration.class);
 
-        context.getBean(CasSecurityAutoConfiguration.class);
+        assertThrows(NoSuchBeanDefinitionException.class,
+                () -> context.getBean(CasSecurityAutoConfiguration.class)
+        );
     }
 
     @Test

@@ -3,10 +3,10 @@ package com.kakawait.spring.security.cas.authentication;
 import com.kakawait.spring.security.cas.web.authentication.ProxyCallbackAndServiceAuthenticationDetails;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;
 import org.springframework.security.core.Authentication;
 
@@ -18,13 +18,13 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Thibaud Leprêtre
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
 
     @Mock
@@ -43,7 +43,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class DynamicProxyCallbackUrlCasAuthenticationProviderTest {
         authenticationProvider.authenticate(authentication);
 
         verify(authentication, times(1)).getDetails();
-        verifyZeroInteractions(ticketValidator);
+        verifyNoInteractions(ticketValidator);
     }
 
     @Test

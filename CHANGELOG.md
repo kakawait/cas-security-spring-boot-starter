@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/22) - 06 jul 2022
+
+- Apply pom code convention (https://maven.apache.org/developers/conventions/code.html#pom-code-convention)
+- Use java 11
+- Use spring-boot 2.6.9
+
 ## [1.0.6](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/28) - 26 nov 2020
 
 - Add support for CAS client >= 3.6 ([#147](https://github.com/kakawait/cas-security-spring-boot-starter/issues/147))

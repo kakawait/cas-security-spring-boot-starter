@@ -72,7 +72,7 @@ public class CasSecurityAutoConfiguration {
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "static",
             matchIfMissing = true)
-    ServiceProperties serviceProperties(CasSecurityProperties casSecurityProperties) throws Exception {
+    ServiceProperties serviceProperties(CasSecurityProperties casSecurityProperties) {
         ServiceProperties serviceProperties = new ServiceProperties();
 
         URI baseUrl = casSecurityProperties.getService().getBaseUrl();
@@ -87,7 +87,7 @@ public class CasSecurityAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(ServiceProperties.class)
     @ConditionalOnProperty(value = "security.cas.service.resolution-mode", havingValue = "dynamic")
-    ServiceProperties laxServiceProperties() throws Exception {
+    ServiceProperties laxServiceProperties() {
         LaxServiceProperties serviceProperties = new LaxServiceProperties();
         serviceProperties.setAuthenticateAllArtifacts(true);
         serviceProperties.afterPropertiesSet();
@@ -323,7 +323,7 @@ public class CasSecurityAutoConfiguration {
                     paths.add(path);
                 }
             }
-            // Add login, logout and proxy-callback paths in order to be handle by CasAuthenticationFilter.
+            // Add login, logout and proxy-callback paths in order to be handled by CasAuthenticationFilter.
             // Without authentication will be broken.
             paths.add(casSecurityProperties.getService().getPaths().getLogin());
             paths.add(casSecurityProperties.getService().getPaths().getLogout());

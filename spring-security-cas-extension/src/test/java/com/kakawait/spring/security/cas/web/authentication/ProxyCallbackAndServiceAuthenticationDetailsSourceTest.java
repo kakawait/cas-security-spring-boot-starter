@@ -1,7 +1,7 @@
 package com.kakawait.spring.security.cas.web.authentication;
 
 import com.kakawait.spring.security.cas.LaxServiceProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetails;

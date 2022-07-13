@@ -4,14 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spring-security-cas-extension</artifactId>
-    <packaging>jar</packaging>
-
+    <!-- Do NOT change the order of tags or plugins as this might affect the results of the build. -->
+    <!-- See https://maven.apache.org/developers/conventions/code.html#pom-code-convention -->
     <parent>
         <groupId>com.kakawait</groupId>
         <artifactId>cas-security-spring-boot-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.1.0</version>
     </parent>
+
+    <artifactId>spring-security-cas-extension</artifactId>
+    <packaging>jar</packaging>
 
     <name>Spring security cas extension</name>
     <description>Spring security cas extension and additional implementation used by the starter</description>
@@ -21,6 +23,20 @@
         <jsr305.version>3.0.2</jsr305.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -37,12 +53,10 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>${javax.servlet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
-            <version>${jsr305.version}</version>
         </dependency>
 
         <dependency>
@@ -76,5 +90,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

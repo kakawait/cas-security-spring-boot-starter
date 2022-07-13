@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                         http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
-    <packaging>jar</packaging>
-
+    <!-- Do NOT change the order of tags or plugins as this might affect the results of the build. -->
+    <!-- See https://maven.apache.org/developers/conventions/code.html#pom-code-convention -->
     <parent>
         <groupId>com.kakawait</groupId>
         <artifactId>cas-security-spring-boot-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.1.0</version>
     </parent>
+
+    <artifactId>cas-security-spring-boot-autoconfigure</artifactId>
+    <packaging>jar</packaging>
 
     <name>Cas security spring boot autoconfigure</name>
     <description>Spring boot autoconfigure for Apereo CAS client fully integrated with Spring security</description>
@@ -21,10 +23,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.kakawait</groupId>
             <artifactId>spring-security-cas-extension</artifactId>
-            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -72,5 +74,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
