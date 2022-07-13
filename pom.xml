@@ -67,7 +67,7 @@
         <spring-boot-dependencies.version>2.6.9</spring-boot-dependencies.version>
 
         <!-- provided dependencies -->
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
 
         <!-- test dependencies -->
         <assertj-core.version>3.15.0</assertj-core.version>
@@ -102,7 +102,7 @@
                 <artifactId>spring-security-cas-extension</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
