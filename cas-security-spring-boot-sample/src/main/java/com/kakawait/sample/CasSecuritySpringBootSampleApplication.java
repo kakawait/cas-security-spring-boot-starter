@@ -62,8 +62,8 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Bean
-    FilterRegistrationBean forwardedHeaderFilter() {
-        FilterRegistrationBean filterRegBean = new FilterRegistrationBean();
+    FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+        FilterRegistrationBean<ForwardedHeaderFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new ForwardedHeaderFilter());
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return filterRegBean;
@@ -307,7 +307,7 @@ public class CasSecuritySpringBootSampleApplication {
          */
         private Optional<String> getProxyGrantingTicket(Authentication authentication) {
             Optional<AttributePrincipal> attributePrincipal = getAttributePrincipal(authentication);
-            if (!attributePrincipal.isPresent() || !(attributePrincipal.get() instanceof AttributePrincipalImpl)) {
+            if (attributePrincipal.isEmpty() || !(attributePrincipal.get() instanceof AttributePrincipalImpl)) {
                 return Optional.empty();
             }
             Field field = ReflectionUtils.findField(AttributePrincipalImpl.class, "proxyGrantingTicket");

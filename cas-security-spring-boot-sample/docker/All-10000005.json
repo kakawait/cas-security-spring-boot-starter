@@ -1,5 +1,5 @@
 {
-  "@class" : "org.apereo.cas.services.RegexRegisteredService",
+  "@class" : "org.apereo.cas.services.CasRegisteredService",
   "serviceId" : "^(https?|imaps?)://.*",
   "name" : "All",
   "id" : 10000005,
