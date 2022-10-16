@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class RequestAwareCasLogoutSuccessHandlerTest {
 
@@ -40,7 +40,7 @@ public class RequestAwareCasLogoutSuccessHandlerTest {
                 serviceProperties);
         logoutSuccessHandler.onLogoutSuccess(request, response, null);
 
-        String service = encode(request.getRequestURL().toString(), UTF_8.toString());
+        String service = encode(request.getRequestURL().toString(), UTF_8);
         assertThat(response.getRedirectedUrl())
                 .isEqualTo(casLogout.toASCIIString() + "?service=" + service);
     }

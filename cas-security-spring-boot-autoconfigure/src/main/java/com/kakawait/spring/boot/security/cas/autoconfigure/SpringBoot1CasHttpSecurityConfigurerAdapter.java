@@ -15,7 +15,7 @@ import java.util.List;
 import static com.kakawait.spring.boot.security.cas.autoconfigure.SpringBoot1CasHttpSecurityConfigurerAdapter.SpringBoot1SecurityProperties.SECURITY_PROPERTIES_HEADERS_CLASS;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Order(CasSecurityProperties.CAS_AUTH_ORDER - 10)
 class SpringBoot1CasHttpSecurityConfigurerAdapter extends CasSecurityConfigurerAdapter {

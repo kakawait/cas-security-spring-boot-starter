@@ -18,7 +18,7 @@ import java.net.URI;
  *
  * @see ProxyTicketProvider
  * @author Jonathan Coueraud
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  * @since 0.7.0
  */
 public class CasAuthorizationInterceptor implements ClientHttpRequestInterceptor {

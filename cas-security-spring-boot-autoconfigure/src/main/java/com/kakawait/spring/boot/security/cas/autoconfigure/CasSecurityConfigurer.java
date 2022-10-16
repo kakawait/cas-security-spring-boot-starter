@@ -4,7 +4,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public interface CasSecurityConfigurer {
 

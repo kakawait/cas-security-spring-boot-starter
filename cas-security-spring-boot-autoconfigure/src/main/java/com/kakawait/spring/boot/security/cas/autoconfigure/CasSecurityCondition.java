@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @SuppressWarnings("unused")
 public class CasSecurityCondition extends AllNestedConditions {

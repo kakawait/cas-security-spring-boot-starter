@@ -11,6 +11,6 @@ docker-compose up -d
 
 ## Usage
 
-Go to http://localhost:8081 and you should be redirected to http://localhost:8082 (CAS Server).
+Go to http://localhost:8081, and you should be redirected to http://localhost:8082 (CAS Server).
 
 Use casuser/Mellon as login/password.

@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @ExtendWith(MockitoExtension.class)
 public class AttributePrincipalProxyTicketProviderTest {

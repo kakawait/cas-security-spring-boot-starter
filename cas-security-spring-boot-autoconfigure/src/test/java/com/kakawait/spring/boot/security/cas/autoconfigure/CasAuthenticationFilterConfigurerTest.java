@@ -13,7 +13,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class CasAuthenticationFilterConfigurerTest {
 

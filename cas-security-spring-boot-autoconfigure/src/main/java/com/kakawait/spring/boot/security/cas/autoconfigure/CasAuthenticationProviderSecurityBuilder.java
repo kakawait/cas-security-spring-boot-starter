@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Accessors(fluent = true)
 @Setter

@@ -8,7 +8,7 @@ import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.springframework.util.StringUtils;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Setter
 @Accessors(fluent = true)

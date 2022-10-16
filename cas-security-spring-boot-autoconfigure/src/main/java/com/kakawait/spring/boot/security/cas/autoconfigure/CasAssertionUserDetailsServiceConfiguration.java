@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @ConditionalOnMissingBean(AbstractCasAssertionUserDetailsService.class)
 class CasAssertionUserDetailsServiceConfiguration {

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromContextPath;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class RequestAwareCasAuthenticationEntryPoint extends CasAuthenticationEntryPoint {
 

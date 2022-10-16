@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Accessors(fluent = true)
 @Setter

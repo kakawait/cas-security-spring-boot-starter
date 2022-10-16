@@ -7,7 +7,7 @@ import org.springframework.security.cas.authentication.CasAuthenticationProvider
 import org.springframework.security.core.Authentication;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class DynamicProxyCallbackUrlCasAuthenticationProvider extends CasAuthenticationProvider {
     @Override

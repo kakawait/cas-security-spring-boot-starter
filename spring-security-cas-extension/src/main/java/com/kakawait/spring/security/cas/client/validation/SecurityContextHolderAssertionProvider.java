@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
  * {@link CasAuthenticationToken} that contains {@link Assertion} through {@link CasAuthenticationToken#getAssertion()}.
  *
  * @author Jonathan Coueraud
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  * @see SecurityContextHolder
  * @see CasAuthenticationToken
  * @since 0.7.0

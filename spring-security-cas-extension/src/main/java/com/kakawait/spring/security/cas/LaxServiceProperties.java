@@ -4,7 +4,7 @@ import org.springframework.security.cas.ServiceProperties;
 import org.springframework.util.Assert;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class LaxServiceProperties extends ServiceProperties {
 

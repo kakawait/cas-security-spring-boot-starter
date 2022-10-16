@@ -21,7 +21,7 @@ import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class CasLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
         implements LogoutSuccessHandler {
@@ -53,11 +53,7 @@ public class CasLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequ
 
     protected void addLogoutServiceParameter(UriComponentsBuilder builder, String service) {
         if (service != null) {
-            try {
-                builder.replaceQueryParam(serviceProperties.getServiceParameter(), encode(service, UTF_8.toString()));
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Unable to encode service url {}", service, e);
-            }
+            builder.replaceQueryParam(serviceProperties.getServiceParameter(), encode(service, UTF_8));
         }
     }
 }

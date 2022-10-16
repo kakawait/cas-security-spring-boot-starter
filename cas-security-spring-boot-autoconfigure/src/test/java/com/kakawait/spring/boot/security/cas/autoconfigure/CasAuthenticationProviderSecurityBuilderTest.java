@@ -16,7 +16,7 @@ import java.util.Comparator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class CasAuthenticationProviderSecurityBuilderTest {
 
@@ -42,12 +42,14 @@ public class CasAuthenticationProviderSecurityBuilderTest {
     @Test
     public void build_AnyParameters_InjectInsideCasAuthenticationProvider() {
         String key = "key";
+        //noinspection rawtypes
         AuthenticationUserDetailsService userDetailsService = Mockito.mock(AuthenticationUserDetailsService.class);
         GrantedAuthoritiesMapper grantedAuthoritiesMapper = Mockito.mock(GrantedAuthoritiesMapper.class);
         MessageSource messageSource = Mockito.mock(MessageSource.class);
         StatelessTicketCache statelessTicketCache = Mockito.mock(StatelessTicketCache.class);
         TicketValidator ticketValidator = Mockito.mock(TicketValidator.class);
 
+        //noinspection unchecked
         builder.key(key)
                .authenticationUserDetailsService(userDetailsService)
                .grantedAuthoritiesMapper(grantedAuthoritiesMapper)

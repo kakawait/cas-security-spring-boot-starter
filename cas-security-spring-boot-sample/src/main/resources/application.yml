@@ -31,9 +31,9 @@ security:
       # Browser/client base url, that uses external exposed port that why is 8082
       base-url: http://localhost:8082/cas/
       # Server-to-server base url, that uses internal docker network so with port mapping that why is 8080
-      validation-base-url: http://cas:8080/cas/
+      #validation-base-url: http://cas:8080/cas/
     service:
-      callback-base-url: http://app:8081/cas/
+      callback-base-url: http://host.docker.internal:8081/cas/
       paths:
         proxy-callback: /cas/proxy-callback
 

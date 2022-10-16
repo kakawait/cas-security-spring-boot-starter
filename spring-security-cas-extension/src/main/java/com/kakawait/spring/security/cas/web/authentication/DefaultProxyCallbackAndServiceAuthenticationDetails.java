@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromContextPath;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class DefaultProxyCallbackAndServiceAuthenticationDetails
         implements ProxyCallbackAndServiceAuthenticationDetails {

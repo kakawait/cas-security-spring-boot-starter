@@ -9,7 +9,7 @@ import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class ProxyCallbackAndServiceAuthenticationDetailsSource extends ServiceAuthenticationDetailsSource {
 

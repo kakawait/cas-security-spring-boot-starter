@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
  * Assertion provider is simple interface that provides a way to get the current (user bounded) {@link Assertion}.
  *
  * @author Jonathan Coueraud
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  * @since 0.7.0
  */
 public interface AssertionProvider {

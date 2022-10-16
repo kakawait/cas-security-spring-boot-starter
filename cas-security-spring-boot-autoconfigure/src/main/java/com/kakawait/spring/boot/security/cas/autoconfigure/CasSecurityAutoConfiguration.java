@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +34,7 @@ import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
 import org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -52,7 +53,7 @@ import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityAut
 import static com.kakawait.spring.boot.security.cas.autoconfigure.CasSecurityProperties.CAS_AUTH_ORDER;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Configuration
 @ConditionalOnWebApplication
@@ -284,8 +285,8 @@ public class CasSecurityAutoConfiguration {
 
     }
 
-    @Order(CAS_AUTH_ORDER)
-    static class CasLoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
+    @ConditionalOnDefaultWebSecurity
+    static class CasLoginSecurityConfiguration {
 
         private final CasSecurityProperties casSecurityProperties;
 
@@ -293,8 +294,9 @@ public class CasSecurityAutoConfiguration {
             this.casSecurityProperties = casSecurityProperties;
         }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(CAS_AUTH_ORDER)
+        SecurityFilterChain casLoginSecurityFilterChain(HttpSecurity http) throws Exception {
             String[] paths = getSecurePaths();
             if (paths.length > 0) {
                 http.requestMatchers().antMatchers(paths);
@@ -310,6 +312,7 @@ public class CasSecurityAutoConfiguration {
                     http.authorizeRequests().anyRequest().permitAll();
                 }
             }
+            return http.build();
         }
 
         private String[] getSecurePaths() {

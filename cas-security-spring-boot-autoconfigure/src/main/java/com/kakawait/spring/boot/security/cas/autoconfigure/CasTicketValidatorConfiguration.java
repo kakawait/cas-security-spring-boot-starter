@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @ConditionalOnMissingBean(TicketValidator.class)
 public class CasTicketValidatorConfiguration {

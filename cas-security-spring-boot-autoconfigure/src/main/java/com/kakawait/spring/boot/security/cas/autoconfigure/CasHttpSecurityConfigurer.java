@@ -31,7 +31,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Slf4j
 public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSecurityConfigurer, HttpSecurity> {
@@ -62,20 +62,20 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
     /**
      * {@inheritDoc}
      *
-     * @deprecated use {@link #configure(HttpSecurity)} instead.
-     * Will not be removed but until this issue was not treat
-     * https://github.com/spring-projects/spring-security/issues/4422 I still prefer using this
-     * {@link SecurityConfigurerAdapter} directly like following
+     * @deprecated use {@link #configure(HttpSecurity)} instead. Will not be removed but until this issue was not treat
+     *         <a href="https://github.com/spring-projects/spring-security/issues/4422">spring-security issue #4422</a>
+     *         I still prefer using this
+     *         {@link SecurityConfigurerAdapter} directly like following
      *
-     * <pre>{@code
-     * CasHttpSecurityConfigurer.cas().configure(http);
-     * }</pre>
-     * <p>
-     * instead of
+     *         <pre>{@code
+     *         CasHttpSecurityConfigurer.cas().configure(http);
+     *         }</pre>
+     *         <p>
+     *         instead of
      *
-     * <pre>{@code
-     * http.apply(CasHttpSecurityConfigurera.cas());
-     * }</pre>
+     *         <pre>{@code
+     *         http.apply(CasHttpSecurityConfigurera.cas());
+     *         }</pre>
      */
     @Override
     @Deprecated
@@ -88,10 +88,9 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
     }
 
     /**
-     * {@inheritDoc}
-     * In addition {@link #configure(HttpSecurity)} will call {@link #init(HttpSecurity)} in order to be used without
-     * {@link HttpSecurity#apply(SecurityConfigurerAdapter)} usage, related to
-     * https://github.com/spring-projects/spring-security/issues/4422 issue.
+     * {@inheritDoc} In addition {@link #configure(HttpSecurity)} will call {@link #init(HttpSecurity)} in order to be
+     * used without {@link HttpSecurity#apply(SecurityConfigurerAdapter)} usage, related to
+     * <a href="https://github.com/spring-projects/spring-security/issues/4422">spring-security issue #4422</a> issue.
      * <p>
      * Thus when using
      *
@@ -99,8 +98,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
      * CasHttpSecurityConfigurer.cas().configure(http);
      * }</pre>
      * <p>
-     * {@code configure(http)} will also call {@link CasHttpSecurityConfigurerAdapter#init(HttpSecurity)} and no need
-     * to write following duplicates
+     * {@code configure(http)} will also call {@link CasHttpSecurityConfigurerAdapter#init(HttpSecurity)} and no need to
+     * write following duplicates
      *
      * <pre>{@code
      * CasHttpSecurityConfigurer.cas().init(http);
@@ -116,9 +115,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
 
     private CasHttpSecurityConfigurerAdapter getCasHttpSecurityConfigurerAdapter(ApplicationContext context) {
         if (securityConfigurerAdapter == null) {
-            securityConfigurerAdapter = context
-                    .getAutowireCapableBeanFactory()
-                    .createBean(CasHttpSecurityConfigurerAdapter.class);
+            securityConfigurerAdapter =
+                    context.getAutowireCapableBeanFactory().createBean(CasHttpSecurityConfigurerAdapter.class);
         }
         if (authenticationManager != null) {
             securityConfigurerAdapter.setAuthenticationManager(authenticationManager);
@@ -166,7 +164,7 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
         }
 
         @Override
-        public void afterPropertiesSet() throws Exception {
+        public void afterPropertiesSet() {
             configurers.forEach(c -> {
                 c.configure(filterConfigurer);
                 c.configure(singleSignOutFilterConfigurer);
@@ -185,8 +183,8 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
             try {
                 ConfigurationKey<String> key = ConfigurationKeys.CAS_SERVER_URL_PREFIX;
-                Method setter = singleSignOutFilter.getClass()
-                        .getDeclaredMethod("set" + StringUtils.capitalize(key.getName()));
+                Method setter =
+                        singleSignOutFilter.getClass().getDeclaredMethod("set" + StringUtils.capitalize(key.getName()));
                 setter.invoke(singleSignOutFilter, casSecurityProperties.getServer().getBaseUrl().toASCIIString());
             } catch (NoSuchMethodException | SecurityException e) {
                 // since commit :
@@ -197,10 +195,12 @@ public class CasHttpSecurityConfigurer extends AbstractHttpConfigurer<CasHttpSec
             }
             singleSignOutFilterConfigurer.configure(singleSignOutFilter);
 
-            http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
-                .addFilter(filter);
+            http
+                    .exceptionHandling()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .and()
+                    .addFilterBefore(singleSignOutFilter, CsrfFilter.class)
+                    .addFilter(filter);
         }
 
         @Override

@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.springframework.boot.autoconfigure.security.SecurityProperties.BASIC_AUTH_ORDER;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @Data
 @ConfigurationProperties(prefix = "security.cas")
@@ -69,7 +69,7 @@ public class CasSecurityProperties {
         AUTHENTICATED,
 
         /**
-         * No security authorization is setup.
+         * No security authorization is set up.
          */
         NONE
     }
@@ -91,7 +91,7 @@ public class CasSecurityProperties {
          * and {@code security.cas.user.defaultRoles = MEMBER}. At the end the user will have both {@code USER} and
          * {@code MEMBER} role.
          * <p>
-         * Same thing if you're using {@link #rolesAttributes}, {@code defaultRoles} will be append to the list of
+         * Same thing if you're using {@link #rolesAttributes}, {@code defaultRoles} will be appended to the list of
          * roles retrieve from {@code CAS Attributes}.
          */
         private String[] defaultRoles = new String[0];
@@ -103,7 +103,7 @@ public class CasSecurityProperties {
         /**
          * CAS Server protocol version used to define which {@link org.jasig.cas.client.validation.TicketValidator} to
          * use.
-         *
+         * <p>
          * By default {@code ProxyTicketValidator} is selected rather than {@code ServiceTicketValidator}.
          *
          * @see org.jasig.cas.client.validation.Cas30ProxyTicketValidator
@@ -119,14 +119,14 @@ public class CasSecurityProperties {
 
         /**
          * CAS Server validation base url, example https://my-cas.server.internal/
-         *
+         * <p>
          * If defined it will be used to compute complete <i>validation base url</i> (for ticket validation)
          * instead of using {@link Server#baseUrl}.
-         *
+         * <p>
          * <i>Validation url</i> request is executed by the <i>java CAS client</i> when intercepting a
-         * <i>service ticket</i> or <i>proxy ticket</i>. Thus it can be useful to be different than
+         * <i>service ticket</i> or <i>proxy ticket</i>. Thus, it can be useful to be different from
          * {@link Server#baseUrl} when CAS server can't share the same network as your browser (for example).
-         *
+         * <p>
          * For example when using containers (<i>Docker</i> or others) or VM, you can't use {@code localhost} hostname
          * in your <i>validation url</i> since your CAS service inside a container or VM doesn't have the same
          * {@code localhost} as you host machine.
@@ -142,14 +142,14 @@ public class CasSecurityProperties {
         @Data
         public static class Paths {
             /**
-             * CAS Server login path that will be append to {@link Server#baseUrl}
+             * CAS Server login path that will be appended to {@link Server#baseUrl}
              *
              * @see org.springframework.security.cas.web.CasAuthenticationEntryPoint
              */
             private String login = "/login";
 
             /**
-             * CAS Server logout path that will be append to {@link Server#baseUrl}
+             * CAS Server logout path that will be appended to {@link Server#baseUrl}
              */
             private String logout = "/logout";
         }
@@ -167,16 +167,16 @@ public class CasSecurityProperties {
 
         /**
          * CAS Service callback base url, example https://my.service.com/
-         *
+         * <p>
          * If defined it will be used to compute complete <i>proxy callback url</i> instead of using
          * {@link Service#baseUrl}.
-         * It will also be use even if {@link #baseUrl} is not defined and you're using {@link Service#resolutionMode}
+         * It will also be use even if {@link #baseUrl} is not defined, and you're using {@link Service#resolutionMode}
          * is equals to {@link ServiceResolutionMode#DYNAMIC}.
-         *
+         * <p>
          * <i>Proxy callback</i> request is a fully new request executed from CAS server (using its own http client)
-         * to your service. Thus it can be useful to be different than {@link Service#baseUrl} when CAS server
+         * to your service. Thus, it can be useful to be different from {@link Service#baseUrl} when CAS server
          * can't share the same network as your browser (for example).
-         *
+         * <p>
          * For example when using containers (<i>Docker</i> or others) or VM, you can't use {@code localhost} hostname
          * in your <i>proxy callback url</i> since CAS server inside a container or VM doesn't have the same
          * {@code localhost} as your host machine.
@@ -193,19 +193,19 @@ public class CasSecurityProperties {
         public static class Paths {
 
             /**
-             * CAS Service login path that will be append to {@link Service#baseUrl}
+             * CAS Service login path that will be appended to {@link Service#baseUrl}
              */
             private String login = "/login";
 
             /**
-             * CAS Service logout path that will be append to {@link Service#baseUrl}
+             * CAS Service logout path that will be appended to {@link Service#baseUrl}
              *
              * @see org.springframework.security.web.authentication.logout.LogoutFilter
              */
             private String logout = "/logout";
 
             /**
-             * CAS Service proxy callback path that will be append to {@link Service#callbackBaseUrl} if defined else
+             * CAS Service proxy callback path that will be appended to {@link Service#callbackBaseUrl} if defined else
              * fallback to {@link Service#baseUrl}
              *
              * @see Service#callbackBaseUrl

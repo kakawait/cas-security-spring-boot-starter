@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](#) - TBD
+
 ## [1.1.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/22) - 06 jul 2022
 
 - Apply pom code convention (https://maven.apache.org/developers/conventions/code.html#pom-code-convention)
@@ -33,7 +35,7 @@ to extends...
 ## [1.0.1](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/24) - 31 jan 2020
 
 - Happy new year :tada:
-- Move some method to become `public` in order to facilate customization (https://github.com/kakawait/cas-security-spring-boot-starter/pull/135/commits/02e1e805998f92216753cc87c6f3e99d6f6ff17e)
+- Move some method to become `public` in order to facilitate customization (https://github.com/kakawait/cas-security-spring-boot-starter/pull/135/commits/02e1e805998f92216753cc87c6f3e99d6f6ff17e)
 
 ## [1.0.0](https://github.com/kakawait/cas-security-spring-boot-starter/milestone/9) - 5 sept 2019
 
@@ -64,7 +66,7 @@ In addition, no more default role `ROLE_USER` will be added to any authenticated
 
 Thus default `security.cas.authorization.mode` (formerly `security.cas.authorization.mode`) value is now `authenticated` instead of `role`.
 
-However if you want to re-add default `ROLE_` on every authenticated user you could use:
+However, if you want to re-add default `ROLE_` on every authenticated user you could use:
 
 ```yml
 security:
@@ -75,7 +77,7 @@ security:
 
 Where `security.cas.user.default-roles` accepts _list_ of roles.
 
-And if you comes back to `ROLE` based authentication instead of _just authenticated_, you should:
+And if you come back to `ROLE` based authentication instead of _just authenticated_, you should:
 
 ```yml
 security:

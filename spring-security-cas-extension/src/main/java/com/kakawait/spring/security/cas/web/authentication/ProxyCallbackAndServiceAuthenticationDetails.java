@@ -5,7 +5,7 @@ import org.springframework.security.cas.web.authentication.ServiceAuthentication
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public interface ProxyCallbackAndServiceAuthenticationDetails extends ServiceAuthenticationDetails {
     String getProxyCallbackUrl();

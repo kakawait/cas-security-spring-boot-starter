@@ -19,7 +19,7 @@ import static java.nio.charset.StandardCharsets.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class CasLogoutSuccessHandlerTest {
 
@@ -43,7 +43,7 @@ public class CasLogoutSuccessHandlerTest {
         CasLogoutSuccessHandler logoutSuccessHandler = new CasLogoutSuccessHandler(casLogout, serviceProperties);
         logoutSuccessHandler.onLogoutSuccess(request, response, null);
 
-        String service = encode(serviceProperties.getService(), UTF_8.toString());
+        String service = encode(serviceProperties.getService(), UTF_8);
         assertThat(response.getRedirectedUrl())
                 .isEqualTo(casLogout.toASCIIString() + "?service=" + service);
     }

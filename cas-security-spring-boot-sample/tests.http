@@ -1,0 +1,96 @@
+### Testing ignored should be accessible for all :)
+# @no-redirect
+GET http://localhost:8081/ignored
+
+> {%
+ client.test("Request executed successfully", function() {
+   client.assert(response.status === 200, "Response status is not 200");
+ });
+%}
+
+### Testing permit-all should be accessible for all :)
+# @no-redirect
+GET http://localhost:8081/permit-all
+
+> {%
+ client.test("Request executed successfully", function() {
+   client.assert(response.status === 200, "Response status is not 200");
+ });
+%}
+
+### Get execution param
+GET http://localhost:8082/cas/login
+
+> {%
+ client.global.set("execution", response.body.match(/"execution" value="([^"]+)"/).pop())
+ %}
+
+### Login
+POST http://localhost:8082/cas/login?service=http%3A%2F%2Flocalhost%3A8081%2Flogin
+Content-Type: application/x-www-form-urlencoded
+
+username=casuser&password=Mellon&execution={{execution}}&_eventId=submit
+
+### Test /
+GET http://localhost:8081/
+
+> {%
+ client.test("Request executed successfully", function() {
+   client.assert(response.status === 200, "Response status is not 200");
+ });
+ client.test("Response contains username", function() {
+   client.assert(response.body.match(/Username=casuser/) !== null);
+ });
+ client.test("Response contains role", function() {
+   client.assert(response.body.match(/Granted Authorities=\[ROLE_USER\]/) !== null);
+ });
+ client.test("Response contains PGT", function() {
+   client.assert(response.body.match(/PGT-[a-zA-Z0-9-]+/) !== null);
+ });
+ %}
+
+### Test /httpbin
+GET http://localhost:8081/httpbin
+Accept: application/json
+
+> {%
+ client.test("Request executed successfully", function() {
+   client.assert(response.status === 200, "Response status is not 200");
+ });
+ client.test("Response contains ticket", function() {
+   client.assert(response.body.args.ticket.match(/[SP]T-[a-zA-Z0-9-]+/) !== null);
+ });
+ %}
+
+### Test /admin
+GET http://localhost:8081/admin
+
+> {%
+ client.test("Request executed forbidden", function() {
+   client.assert(response.status === 403, "Response status is not 403");
+ });
+ %}
+
+### Test /api without auth
+// @no-cookie-jar
+GET http://localhost:8081/api
+
+> {%
+ client.test("Request executed unauthorized", function() {
+   client.assert(response.status === 401, "Response status is not 403");
+ });
+ %}
+
+### test /api with auth
+GET http://localhost:8081/api
+
+> {%
+ client.test("Request executed successfully", function() {
+   client.assert(response.status === 200, "Response status is not 200");
+ });
+ client.test("Response contains principal name", function() {
+   client.assert(response.body.match(/^Hello casuser$/) !== null);
+ });
+%}
+
+

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService
         extends AbstractCasAssertionUserDetailsService {
@@ -30,7 +30,7 @@ public class GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetail
 
     private final Collection<? extends GrantedAuthority> defaultGrantedAuthorities;
 
-    private boolean toUppercase = true;
+    private final boolean toUppercase = true;
 
     public GrantedAuthoritiesFromAssertionAttributesWithDefaultRolesUserDetailsService(String[] attributes,
             Collection<? extends GrantedAuthority> defaultGrantedAuthorities) {

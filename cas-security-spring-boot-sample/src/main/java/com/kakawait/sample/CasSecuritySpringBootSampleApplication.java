@@ -26,7 +26,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -51,7 +53,7 @@ import java.security.Principal;
 import java.util.Optional;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 @SpringBootApplication
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -78,40 +80,41 @@ public class CasSecuritySpringBootSampleApplication {
     }
 
     @Configuration
-    @Order(CasSecurityProperties.CAS_AUTH_ORDER + 1)
-    static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    static class SecurityConfiguration {
 
         /**
-         * Ignoring path by completely removing security filter on /ignored endpoint.
-         * That method should be used when you really need security/authentication.
-         * For example for resources/static endpoints.
+         * Ignoring path by completely removing security filter on /ignored endpoint. That method should be used when
+         * you really need security/authentication. For example for resources/static endpoints.
          * <p>
          * If you would just like to {@code permitAll()} an endpoint you should instead check
          * {@see OverrideDefaultCasSecurity#configure} method.
          */
-        @Override
-        public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/ignored");
+        @Bean
+        @Order(CasSecurityProperties.CAS_AUTH_ORDER + 1)
+        public WebSecurityCustomizer webSecurityCustomizer() {
+            return (web) -> web.ignoring().antMatchers("/ignored");
         }
-    }
 
-    @Configuration
-    @Conditional(CasSecurityCondition.class)
-    static class OverrideDefaultCasSecurity extends CasSecurityConfigurerAdapter {
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http.authorizeRequests().antMatchers("/permit-all").permitAll().anyRequest().authenticated();
 
-        private boolean configured = false;
+            CasHttpSecurityConfigurer.cas().configure(http);
 
-        /**
-         * Permit all on specific endpoint.
-         */
-        @Override
-        public void configure(HttpSecurity http) throws Exception {
-            // We make sure the antMatchers method in configure is called only once.
-            // This prevents an error if we use antMatchers after the .anyRequest().authenticated() in ApiSecurityConfiguration.
-            if (!configured) {
-                http.authorizeRequests().antMatchers("/permit-all").permitAll();
-                configured = true;
-            }
+            return http.build();
+        }
+
+        @Bean
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+            HttpSecurity apiSecurity = http.antMatcher("/api/**");
+
+            apiSecurity.authorizeRequests().anyRequest().authenticated();
+
+            CasHttpSecurityConfigurer.cas().configure(apiSecurity);
+
+            http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+            return http.build();
         }
     }
 
@@ -129,27 +132,10 @@ public class CasSecuritySpringBootSampleApplication {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             // Allow GET method to /logout even if CSRF is enabled
-            http.logout()
+            http
+                    .logout()
                     .logoutSuccessHandler(casLogoutSuccessHandler)
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-        }
-    }
-
-    @Configuration
-    @Conditional(CasSecurityCondition.class)
-    // The configure method contains .anyRequest().authenticated() after which no antMatchers can used ever again.
-    // So we use the @Order(CasSecurityProperties.CAS_AUTH_ORDER + 2) to make this configure excute after all the other configure methods.
-    @Order(CasSecurityProperties.CAS_AUTH_ORDER + 2)
-    static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/api/**").authorizeRequests().anyRequest().authenticated();
-            // Applying CAS security on current HttpSecurity (FilterChain)
-            // I'm not using .apply() from HttpSecurity due to following issue
-            // https://github.com/spring-projects/spring-security/issues/4422
-            CasHttpSecurityConfigurer.cas().configure(http);
-            http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         }
     }
 
@@ -166,7 +152,8 @@ public class CasSecuritySpringBootSampleApplication {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout()
+            http
+                    .logout()
                     .permitAll()
                     // Add null logoutSuccessHandler to disable CasLogoutSuccessHandler
                     .logoutSuccessHandler(null)
@@ -191,10 +178,11 @@ public class CasSecuritySpringBootSampleApplication {
 
     /**
      * Security has changed from Spring Boot 1 and Spring Boot 2, see
-     * https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#security
+     * <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#security">Spring
+     * boot 2.0 migration guide</a>
      * <p>
-     * That configuration try to expose you how could you <i>simulate</i> some Spring Boot 1 behavior with
-     * Spring Boot 2 application
+     * That configuration try to expose you how could you <i>simulate</i> some Spring Boot 1 behavior with Spring Boot 2
+     * application
      */
     @Configuration
     static class BackwardSpringBoot1CasSecurityConfiguration extends CasSecurityConfigurerAdapter {
@@ -212,9 +200,9 @@ public class CasSecuritySpringBootSampleApplication {
         }
 
         /**
-         * To be able to use basic auth that could by-pass cas auth (could be useful for debug or admin).
-         * You need to re-inject {@link BasicAuthenticationFilter} just before {@link CasAuthenticationFilter} after
-         * building or getting the default Spring boot {@link AuthenticationManager}.
+         * To be able to use basic auth that could by-pass cas auth (could be useful for debug or admin). You need to
+         * re-inject {@link BasicAuthenticationFilter} just before {@link CasAuthenticationFilter} after building or
+         * getting the default Spring boot {@link AuthenticationManager}.
          *
          * @param http the {@link HttpSecurity} to modify
          */
@@ -237,7 +225,7 @@ public class CasSecuritySpringBootSampleApplication {
         private final AssertionProvider assertionProvider;
 
         public IndexController(RestTemplate casRestTemplate, ProxyTicketProvider proxyTicketProvider,
-                               AssertionProvider assertionProvider) {
+                AssertionProvider assertionProvider) {
             this.casRestTemplate = casRestTemplate;
             this.proxyTicketProvider = proxyTicketProvider;
             this.assertionProvider = assertionProvider;
@@ -254,9 +242,8 @@ public class CasSecuritySpringBootSampleApplication {
         }
 
         @RequestMapping("/proxy-ticket")
-        public @ResponseBody
-        String ticket(@RequestParam(value = "service") String service,
-                      Authentication authentication, Principal principal) {
+        public @ResponseBody String ticket(@RequestParam(value = "service") String service,
+                Authentication authentication, Principal principal) {
             String template = "Get proxy ticket using %s for service %s = %s";
             // Simplest (except directly using RestTemplate see method just below)
             String s1 = String.format(template, "ProxyTicketProvider", service,
@@ -273,8 +260,7 @@ public class CasSecuritySpringBootSampleApplication {
         }
 
         @RequestMapping({"/httpbin", "/rest-template"})
-        public @ResponseBody
-        String httpbin() {
+        public @ResponseBody String httpbin() {
             return casRestTemplate.getForEntity("http://httpbin.org/get", String.class).getBody();
         }
 
@@ -290,8 +276,7 @@ public class CasSecuritySpringBootSampleApplication {
 
         @Secured("ROLE_ADMIN")
         @RequestMapping(path = "/admin")
-        public @ResponseBody
-        String roleUsingAnnotation() {
+        public @ResponseBody String roleUsingAnnotation() {
             return "You're admin";
         }
 
@@ -321,8 +306,7 @@ public class CasSecuritySpringBootSampleApplication {
     static class HelloWorldController {
 
         @RequestMapping
-        public @ResponseBody
-        String hello(Principal principal) {
+        public @ResponseBody String hello(Principal principal) {
             return principal == null ? "Hello anonymous" : "Hello " + principal.getName();
         }
     }

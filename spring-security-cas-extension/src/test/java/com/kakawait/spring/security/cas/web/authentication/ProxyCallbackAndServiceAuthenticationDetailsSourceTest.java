@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class ProxyCallbackAndServiceAuthenticationDetailsSourceTest {
 

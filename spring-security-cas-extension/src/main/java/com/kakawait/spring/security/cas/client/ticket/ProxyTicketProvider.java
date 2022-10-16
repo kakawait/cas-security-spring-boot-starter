@@ -5,7 +5,7 @@ package com.kakawait.spring.security.cas.client.ticket;
  * and current bounded user.
  *
  * @author Jonathan Coueraud
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  * @since 0.7.0
  */
 public interface ProxyTicketProvider {

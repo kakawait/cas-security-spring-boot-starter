@@ -11,7 +11,7 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thibaud Leprêtre
+ * @author Thibaud Lepretre
  */
 public class DefaultProxyCallbackAndServiceAuthenticationDetailsTest {
 
