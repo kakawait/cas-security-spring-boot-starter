@@ -1,15 +1,12 @@
 version: '2.1'
 services:
   cas:
-    # Tag version does not really represent CAS server version. Please check pom.xml to get real version.
-    image: apereo/cas:v5.1.3
+    image: apereo/cas:6.6.1
     ports:
       - "8082:8080"
     volumes:
-      - ./docker/tmp:/root/.m2/repository/
-      - ./docker/cas.properties:/cas-overlay/etc/cas/config/cas.properties:ro
-      - ./docker/All-10000005.json:/cas-overlay/etc/cas/services/All-10000005.json:ro
-      - ./docker/pom.xml:/cas-overlay/pom.xml
+      - ./docker/cas.properties:/etc/cas/config/cas.properties:ro
+      - ./docker/All-10000005.json:/etc/cas/services/All-10000005.json:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/cas"]
       interval: 1m30s
